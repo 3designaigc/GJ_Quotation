@@ -1,6 +1,7 @@
 const DB_NAME = "gjt-product-database";
 const DB_VERSION = 1;
-const LOCAL_EXCEL_URL = "./%E6%88%90%E6%9C%AC%E8%A8%88%E7%AE%97%EF%BC%BF%E5%85%A7%E9%83%A8%E6%AA%94%E6%A1%88%20202604.xlsx";
+const DATA_MANIFEST_URL = "./Data/manifest.json";
+const LOCAL_EXCEL_URL = "./Data/%E6%88%90%E6%9C%AC%E8%A8%88%E7%AE%97%EF%BC%BF%E5%85%A7%E9%83%A8%E6%AA%94%E6%A1%88%20202604A.xlsx";
 
 const costKeys = ["exw", "fob", "freight40", "cifFactory", "cifTwd"];
 
@@ -34,7 +35,6 @@ const quoteDefaultKeys = ["code", "nameZh", "nameEn", "spec", "ean", "origin", "
 const state = {
   db: null,
   datasets: [],
-  pdfPages: [],
   activeDatasetId: null,
   activeRows: [],
   filteredRows: [],
@@ -58,7 +58,6 @@ const els = {
   totalRows: document.querySelector("#totalRows"),
   supplierCount: document.querySelector("#supplierCount"),
   originCount: document.querySelector("#originCount"),
-  pdfPageCount: document.querySelector("#pdfPageCount"),
   datasetSelect: document.querySelector("#datasetSelect"),
   search: document.querySelector("#search"),
   filters: {
@@ -90,13 +89,7 @@ const els = {
   clearSelection: document.querySelector("#clearSelection"),
   exportSelectedPdf: document.querySelector("#exportSelectedPdf"),
   selectedCount: document.querySelector("#selectedCount"),
-  pdfSearch: document.querySelector("#pdfSearch"),
-  pdfResults: document.querySelector("#pdfResults"),
 };
-
-if (window.pdfjsLib?.GlobalWorkerOptions) {
-  window.pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js";
-}
 
 boot();
 
@@ -106,11 +99,13 @@ async function boot() {
   renderDataHeader();
   renderQuoteFieldPicker();
   await refreshFromDb();
+  await loadDataManifest({ includeDatasets: !state.datasets.length });
+  await refreshFromDb();
   if (!state.datasets.length) {
     if (window.GJT_EMBEDDED_DATA) await loadEmbeddedData();
     else await loadLocalExcel(true);
   }
-  writeLog("資料庫已啟動。預設資料來源為成本計算＿內部檔案 202604.xlsx。");
+  writeLog("資料庫已啟動。正式資料目錄為 Data/。");
 }
 
 function bindEvents() {
@@ -151,8 +146,6 @@ function bindEvents() {
     renderQuoteTable();
   });
   els.fieldPicker.addEventListener("change", renderQuoteTable);
-  els.pdfSearch.addEventListener("input", renderPdfResults);
-
   els.tableBody.addEventListener("change", handleSelectionChange);
   els.tableBody.addEventListener("input", handleCellEdit);
   els.quoteTableBody.addEventListener("change", handleSelectionChange);
@@ -281,10 +274,50 @@ async function loadLocalExcel(silent) {
     const response = await fetch(LOCAL_EXCEL_URL);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const blob = await response.blob();
-    const file = new File([blob], "成本計算＿內部檔案 202604.xlsx", { type: blob.type });
+    const file = new File([blob], "成本計算＿內部檔案 202604A.xlsx", { type: blob.type });
     await importFiles([file]);
   } catch (error) {
     if (!silent) writeLog(`無法自動載入成本 Excel：${error.message}。請使用 http://localhost 或直接上傳檔案。`);
+  }
+}
+
+async function loadDataManifest({ includeDatasets = true } = {}) {
+  let response;
+  try {
+    response = await fetch(DATA_MANIFEST_URL, { cache: "no-store" });
+    if (!response.ok) return;
+  } catch {
+    return;
+  }
+
+  try {
+    const manifest = await response.json();
+    const files = Array.isArray(manifest.files) ? manifest.files : [];
+    let loaded = 0;
+
+    for (const item of files) {
+      const name = item.name || item.url?.split("/").pop();
+      const ext = name?.split(".").pop()?.toLowerCase();
+      const type = item.type || (["xlsx", "xls", "csv"].includes(ext) ? "excel" : "");
+      if (!item.url || !name) continue;
+      if (type === "excel" && !includeDatasets) continue;
+      if (type !== "excel") continue;
+
+      const fileResponse = await fetch(item.url);
+      if (!fileResponse.ok) {
+        writeLog(`Data 檔案載入失敗：${name}（HTTP ${fileResponse.status}）`);
+        continue;
+      }
+
+      const blob = await fileResponse.blob();
+      const file = new File([blob], name, { type: blob.type });
+      await importWorkbook(file);
+      loaded += 1;
+    }
+
+    if (loaded) writeLog(`已從 Data/ 載入 ${loaded} 個檔案。`);
+  } catch (error) {
+    writeLog(`Data manifest 讀取失敗：${error.message}`);
   }
 }
 
@@ -292,7 +325,7 @@ async function loadEmbeddedData() {
   const data = window.GJT_EMBEDDED_DATA;
   if (!data?.rows?.length) return;
   await put("datasets", {
-    fileName: data.fileName || "成本計算＿內部檔案 202604.xlsx",
+    fileName: data.fileName || "成本計算＿內部檔案 202604A.xlsx",
     importedAt: data.importedAt || new Date().toISOString(),
     sheetNames: data.sheetNames || [],
     rowCount: data.rows.length,
@@ -306,7 +339,6 @@ async function loadEmbeddedData() {
 async function clearDb() {
   if (!confirm("確定清空本機瀏覽器資料庫？原始 Excel 檔案不會被刪除。")) return;
   await clearStore("datasets");
-  await clearStore("pdfPages");
   state.selectedIds.clear();
   await refreshFromDb();
   writeLog("已清空本機資料庫。");
@@ -316,7 +348,6 @@ async function importFiles(files) {
   for (const file of files) {
     const ext = file.name.split(".").pop().toLowerCase();
     if (["xlsx", "xls", "csv"].includes(ext)) await importWorkbook(file);
-    else if (ext === "pdf") await importPdf(file);
     else writeLog(`略過不支援格式：${file.name}`);
   }
   await refreshFromDb();
@@ -390,22 +421,6 @@ function isHeaderRecord(record) {
   return headerHits >= 4;
 }
 
-async function importPdf(file) {
-  if (!window.pdfjsLib) {
-    alert("PDF 解析套件尚未載入。若要上傳 PDF，請確認網路可載入 PDF.js。");
-    return;
-  }
-  writeLog(`解析 PDF：${file.name}`);
-  const pdf = await window.pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
-  for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
-    const page = await pdf.getPage(pageNumber);
-    const textContent = await page.getTextContent();
-    const text = textContent.items.map((item) => item.str).join(" ").replace(/\s+/g, " ").trim();
-    await put("pdfPages", { fileName: file.name, pageNumber, text, importedAt: new Date().toISOString() });
-  }
-  writeLog(`已建立 PDF 索引：${file.name}，${pdf.numPages} 頁。`);
-}
-
 function normalizeRow(raw, sheetName) {
   const row = {};
   dataColumns.forEach((col) => {
@@ -440,7 +455,6 @@ function hasMeaningfulData(row) {
 
 async function refreshFromDb() {
   state.datasets = await getAll("datasets");
-  state.pdfPages = await getAll("pdfPages");
   state.activeDatasetId = state.activeDatasetId || state.datasets.at(-1)?.id || null;
   selectActiveRows();
   renderAll();
@@ -461,7 +475,6 @@ function renderAll() {
   renderFilters();
   renderSummary();
   renderTables();
-  renderPdfResults();
   updateEditStatus();
 }
 
@@ -469,7 +482,7 @@ function renderDatasetSelect() {
   els.datasetSelect.innerHTML = "";
   if (!state.datasets.length) {
     els.datasetSelect.append(new Option("尚無資料集", ""));
-    els.sourceLine.textContent = "資料來源：成本計算＿內部檔案 202604.xlsx";
+    els.sourceLine.textContent = "資料來源：Data/ 成本計算＿內部檔案 202604A.xlsx";
     return;
   }
   state.datasets.forEach((dataset) => {
@@ -507,7 +520,6 @@ function renderSummary() {
   els.totalRows.textContent = state.activeRows.length.toLocaleString();
   els.supplierCount.textContent = unique("supplier").length.toLocaleString();
   els.originCount.textContent = unique("origin").length.toLocaleString();
-  els.pdfPageCount.textContent = state.pdfPages.length.toLocaleString();
   els.datasetRows.textContent = state.activeRows.length.toLocaleString();
 }
 
@@ -614,19 +626,6 @@ function exportSelectedPdf() {
   window.print();
 }
 
-function renderPdfResults() {
-  const query = clean(els.pdfSearch.value);
-  const pages = query ? state.pdfPages.filter((page) => clean(page.text).includes(query)) : state.pdfPages.slice(-20);
-  if (!pages.length) {
-    els.pdfResults.innerHTML = '<div class="empty">尚無 PDF 索引，或沒有符合搜尋條件。</div>';
-    return;
-  }
-  els.pdfResults.innerHTML = pages.slice(0, 80).map((page) => {
-    const text = page.text.length > 320 ? `${page.text.slice(0, 320)}...` : page.text;
-    return `<article class="pdf-hit"><strong>${escapeHtml(page.fileName)}｜第 ${page.pageNumber} 頁</strong><br>${escapeHtml(text)}</article>`;
-  }).join("");
-}
-
 function filterMatch(value, filter) {
   return !filter || String(value || "") === filter;
 }
@@ -662,7 +661,6 @@ function openDb() {
     request.onupgradeneeded = () => {
       const db = request.result;
       if (!db.objectStoreNames.contains("datasets")) db.createObjectStore("datasets", { keyPath: "id", autoIncrement: true });
-      if (!db.objectStoreNames.contains("pdfPages")) db.createObjectStore("pdfPages", { keyPath: "id", autoIncrement: true });
     };
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);

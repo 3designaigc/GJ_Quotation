@@ -11,7 +11,7 @@
     <header class="header">
       <div>
         <h1>Golden Jade Terre 高玉 — 成本與報價資料庫</h1>
-        <p id="sourceLine">資料來源：成本計算＿內部檔案 202604.xlsx</p>
+        <p id="sourceLine">資料來源：Data/ 成本計算＿內部檔案 202604A.xlsx</p>
       </div>
       <div class="header-actions">
         <button id="loadLocalExcel" type="button">載入成本 Excel</button>
@@ -24,19 +24,19 @@
       <div class="importer-head">
         <div>
           <h2>資料更新</h2>
-          <p>可上傳新的 Excel 或 PDF。Excel 會新增資料集版本；PDF 會建立文字索引。</p>
+          <p>可上傳新的 Excel。Excel 會新增資料集版本；正式部署檔案請放在 Data/ 並更新 manifest。</p>
         </div>
         <div class="importer-actions">
           <label class="file-btn">
-            <input id="fileInput" type="file" multiple accept=".xlsx,.xls,.csv,.pdf,application/pdf">
-            上傳 Excel / PDF
+            <input id="fileInput" type="file" multiple accept=".xlsx,.xls,.csv">
+            上傳 Excel
           </label>
           <button id="clearDb" type="button" class="danger">清空本機資料庫</button>
         </div>
       </div>
       <div class="drop-zone" id="dropZone">
         <strong>拖曳檔案到此處</strong>
-        <span>支援 .xlsx .xls .csv .pdf。資料會存入本機瀏覽器 IndexedDB。</span>
+        <span>支援 .xlsx .xls .csv。上傳資料會存入本機瀏覽器 IndexedDB；Data/ 清單會在首次開啟時自動載入。</span>
       </div>
       <pre id="log" class="log">等待載入資料...</pre>
     </section>
@@ -45,7 +45,6 @@
       <article><span>產品筆數</span><strong id="totalRows">0</strong></article>
       <article><span>供應商</span><strong id="supplierCount">0</strong></article>
       <article><span>產地</span><strong id="originCount">0</strong></article>
-      <article><span>PDF 頁面索引</span><strong id="pdfPageCount">0</strong></article>
     </section>
 
     <section class="controls">
@@ -130,20 +129,9 @@
       </main>
     </section>
 
-    <section class="pdf-panel">
-      <div class="pdf-head">
-        <div>
-          <h2>PDF 文件索引</h2>
-          <p>上傳 PDF 後可搜尋文字內容，用於型錄、合約或規格書查找。</p>
-        </div>
-        <input id="pdfSearch" type="search" placeholder="搜尋 PDF 文字">
-      </div>
-      <div id="pdfResults" class="pdf-results"></div>
-    </section>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
   <script src="./embedded-data.js"></script>
   <script src="./app.js"></script>
 </body>

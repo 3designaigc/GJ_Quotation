@@ -123,8 +123,7 @@ button.danger {
 }
 
 .importer-head,
-.quote-head,
-.pdf-head {
+.quote-head {
   display: flex;
   justify-content: space-between;
   gap: 16px;
@@ -132,16 +131,14 @@ button.danger {
 }
 
 .importer h2,
-.quote-panel h2,
-.pdf-panel h2 {
+.quote-panel h2 {
   margin-bottom: 4px;
   color: var(--blue-dark);
   font-size: 15px;
 }
 
 .importer p,
-.quote-panel p,
-.pdf-panel p {
+.quote-panel p {
   color: var(--gray);
   font-size: 11px;
 }
@@ -421,8 +418,7 @@ button.danger {
 }
 
 .controls input,
-.controls select,
-.pdf-head input {
+.controls select {
   border: 1px solid #ccc;
   border-radius: 4px;
   padding: 6px 10px;
@@ -650,32 +646,6 @@ tfoot td {
   font-weight: 700;
 }
 
-.pdf-panel {
-  margin-top: 18px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 14px 16px;
-  background: #fff;
-}
-
-.pdf-results {
-  max-height: 260px;
-  margin-top: 10px;
-  overflow: auto;
-  border: 1px solid #e0e5eb;
-  border-radius: 4px;
-}
-
-.pdf-hit {
-  padding: 10px 12px;
-  border-bottom: 1px solid #e8ecf0;
-  line-height: 1.55;
-}
-
-.pdf-hit strong {
-  color: var(--blue-dark);
-}
-
 .empty {
   padding: 18px;
   color: var(--gray);
@@ -696,7 +666,6 @@ tfoot td {
   .quote-panel,
   .controls,
   .legend,
-  .pdf-panel,
   .summary-grid,
   .view-tabs,
   .header-actions {
