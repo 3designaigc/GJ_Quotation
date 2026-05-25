@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>高玉企業 — 現金付款收款預估表</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"PingFang TC","Microsoft JhengHei",sans-serif;background:#f5f2eb;color:#333;font-size:13px}
+.hdr{background:linear-gradient(135deg,#013121,#2A5240);color:#fff;padding:12px 22px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.hdr-inner{display:flex;align-items:center}
+.hdr-logo{font-size:17px;font-weight:700;letter-spacing:.5px}
+.hdr-sub{font-size:11px;opacity:.7;margin-top:3px}
+.hdr-badge{margin-left:auto;background:rgba(255,255,255,.13);border-radius:8px;padding:5px 16px;text-align:center;font-size:11px;white-space:nowrap}
+.hdr-badge strong{display:block;font-size:15px;font-weight:700;color:#C9A84C}
+
+/* ── KPI grid ── */
+.kpi-section{padding:14px 24px 8px;display:flex;flex-direction:column;gap:8px}
+.kpi-row{display:flex;gap:8px;flex-wrap:wrap}
+.kpi-row-label{font-size:10px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:.5px;padding:0 4px}
+.kpi{background:#fff;border-radius:8px;padding:10px 16px;flex:1;min-width:150px;
+      border-left:4px solid #c8a951;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.kpi.recv{border-color:#2a8a4a}.kpi.pay{border-color:#c0392b}.kpi.net{border-color:#2471a3}
+.kpi-label{font-size:10px;color:#888;margin-bottom:2px}
+.kpi-val{font-size:16px;font-weight:700;color:#222;white-space:nowrap}
+.kpi.recv .kpi-val{color:#2a8a4a}.kpi.pay .kpi-val{color:#c0392b}.kpi.net .kpi-val{color:#2471a3}
+.kpi-sub{font-size:10px;color:#bbb;margin-top:1px}
+
+/* ── Currency tabs ── */
+.cur-tabs{display:flex;gap:4px;padding:4px 24px 0;background:#fff;border-bottom:2px solid #e5dcc8}
+.cur-tab{padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;border-radius:6px 6px 0 0;
+          border:1px solid #ddd;border-bottom:none;background:#f5f2eb;color:#888;transition:all .15s}
+.cur-tab.active{background:#3a2e1e;color:#c8a951;border-color:#3a2e1e}
+.cur-tab:hover:not(.active){background:#ede8de}
+
+/* ── Toolbar ── */
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;padding:8px 24px;background:#fff;
+          border-bottom:1px solid #e5dcc8;align-items:center}
+.toolbar label{font-size:11px;color:#888}
+.toolbar select,.toolbar input{border:1px solid #ddd;border-radius:4px;padding:4px 8px;font-size:12px;background:#faf8f3}
+.toolbar button{background:#c8a951;color:#fff;border:none;border-radius:4px;padding:5px 12px;font-size:12px;cursor:pointer}
+.toolbar button:hover{background:#a8893a}
+
+/* ── Bar chart ── */
+.monthly-section{padding:10px 24px 8px;background:#fff;border-bottom:1px solid #e5dcc8}
+.monthly-section h3{font-size:11px;color:#888;margin-bottom:6px;font-weight:600}
+.bar-chart{display:flex;align-items:flex-end;gap:3px;height:80px;overflow-x:auto}
+.bar-group{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:46px}
+.bar-wrap{display:flex;gap:2px;align-items:flex-end;height:66px}
+.bar{width:18px;border-radius:2px 2px 0 0;cursor:default}
+.bar.recv-bar{background:#2a8a4a}.bar.pay-bar{background:#c0392b}
+.bar:hover{opacity:.75}
+.bar-lbl{font-size:9px;color:#888;text-align:center;white-space:nowrap}
+
+/* ── Table ── */
+.table-wrap{padding:10px 24px 48px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;background:#fff;border-radius:8px;
+       overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07);min-width:900px}
+thead tr{background:#3a2e1e;color:#c8a951}
+th{padding:8px 9px;font-size:11px;font-weight:600;text-align:left;white-space:nowrap}
+td{padding:6px 9px;font-size:12px;border-bottom:1px solid #f0ead8;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr.recv-row td:first-child{border-left:3px solid #2a8a4a}
+tr.pay-row td:first-child{border-left:3px solid #c0392b}
+tr:hover td{background:#fdf8ee}
+
+.badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:600;white-space:nowrap}
+.badge.recv{background:#d5f0df;color:#1a7a3a}
+.badge.pay{background:#fddede;color:#a02020}
+.badge.deposit{background:#fef0d0;color:#a06020}
+.badge.balance{background:#dde8fa;color:#204080}
+.badge.full,.badge.佣金,.badge.月結全額{background:#ebebeb;color:#555}
+.badge.確認{background:#d5f0df;color:#1a7a3a}
+.badge.估計{background:#fff3cd;color:#856404}
+
+.eur-val{color:#7040a0;font-weight:600;text-align:right;white-space:nowrap}
+.usd-val{color:#1a5f8a;font-weight:600;text-align:right;white-space:nowrap}
+.rmb-val{color:#8a3a1a;font-weight:600;text-align:right;white-space:nowrap}
+.twd-val{color:#2a8a4a;font-weight:600;text-align:right;white-space:nowrap}
+.twd-pay{color:#c0392b;font-weight:600;text-align:right;white-space:nowrap}
+.dim{color:#bbb;text-align:right;white-space:nowrap}
+.mode-tag{font-size:10px;background:#f0ead8;color:#7a5a20;padding:1px 5px;border-radius:3px;white-space:nowrap}
+.month-hdr td{background:#3a2e1e!important;color:#c8a951;font-size:11px;font-weight:700;padding:4px 9px}
+.sum-row td{background:#fdf5e0!important;font-weight:700;border-top:2px solid #c8a951;font-size:11px}
+.po-cell{font-weight:600;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.no-data{text-align:center;padding:32px;color:#aaa;font-size:13px}
+.date-mono{font-family:monospace;font-size:11px;white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="hdr-inner"><img src="data:image/png;base64,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" style="height:48px;width:48px;border-radius:8px;margin-right:14px;flex-shrink:0" alt="GoldenJade"><div>
+    <div class="hdr-logo">Golden Jade Terre 高玉企業</div>
+    <div class="hdr-sub">現金付款收款預估表 &nbsp;｜&nbsp; 以訂單逐筆列出應收應付時程，依幣別分開顯示</div>
+  </div></div>
+  <div class="hdr-badge"><strong>💰 現金流</strong>2026-05-25 07:28</div>
+</div>
+
+<!-- KPI by currency -->
+<div class="kpi-section">
+  <div class="kpi-row-label">▸ 歐元 EUR</div>
+  <div class="kpi-row" id="kpi-eur">
+    <div class="kpi recv"><div class="kpi-label">EUR 應收</div><div class="kpi-val" id="kp-eur-r">—</div><div class="kpi-sub" id="kp-eur-r-twd"></div></div>
+    <div class="kpi pay"><div class="kpi-label">EUR 應付</div><div class="kpi-val" id="kp-eur-p">—</div><div class="kpi-sub" id="kp-eur-p-twd"></div></div>
+    <div class="kpi net"><div class="kpi-label">EUR 淨</div><div class="kpi-val" id="kp-eur-n">—</div></div>
+  </div>
+  <div class="kpi-row-label">▸ 美元 USD</div>
+  <div class="kpi-row" id="kpi-usd">
+    <div class="kpi recv"><div class="kpi-label">USD 應收</div><div class="kpi-val" id="kp-usd-r">—</div><div class="kpi-sub" id="kp-usd-r-twd"></div></div>
+    <div class="kpi pay"><div class="kpi-label">USD 應付</div><div class="kpi-val" id="kp-usd-p">—</div><div class="kpi-sub" id="kp-usd-p-twd"></div></div>
+    <div class="kpi net"><div class="kpi-label">USD 淨</div><div class="kpi-val" id="kp-usd-n">—</div></div>
+  </div>
+  <div class="kpi-row-label">▸ 台幣 TWD（純台幣交易，不含外幣換算）</div>
+  <div class="kpi-row">
+    <div class="kpi recv"><div class="kpi-label">TWD 純台幣 應收</div><div class="kpi-val" id="kp-twd-r">—</div></div>
+    <div class="kpi pay"><div class="kpi-label">TWD 純台幣 應付</div><div class="kpi-val" id="kp-twd-p">—</div></div>
+    <div class="kpi net"><div class="kpi-label">TWD 純台幣 淨</div><div class="kpi-val" id="kp-twd-n">—</div></div>
+  </div>
+</div>
+
+<!-- Currency filter tabs -->
+<div class="cur-tabs">
+  <div class="cur-tab active" onclick="setCurTab('all',this)">全部幣別</div>
+  <div class="cur-tab" onclick="setCurTab('EUR',this)">€ 歐元</div>
+  <div class="cur-tab" onclick="setCurTab('USD',this)">$ 美元</div>
+  <div class="cur-tab" onclick="setCurTab('TWD',this)">NT$ 台幣</div>
+</div>
+
+<div class="toolbar">
+  <label>月份</label>
+  <select id="f-month" onchange="applyFilters()"><option value="">全部月份</option></select>
+  <label>類型</label>
+  <select id="f-type" onchange="applyFilters()">
+    <option value="">全部</option><option value="應收">應收</option><option value="應付">應付</option>
+  </select>
+  <label>往來方</label>
+  <select id="f-party" onchange="applyFilters()"><option value="">全部</option></select>
+  <label>交易模式</label>
+  <select id="f-mode" onchange="applyFilters()"><option value="">全部</option></select>
+  <label>關鍵字</label>
+  <input type="text" id="f-kw" placeholder="訂單號/產品/往來方…" oninput="applyFilters()" style="width:145px">
+  <button onclick="resetFilters()">清除篩選</button>
+</div>
+
+<div class="monthly-section">
+  <h3>月度現金流概覽（以台幣換算，綠=應收 紅=應付）</h3>
+  <div class="bar-chart" id="bar-chart"></div>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>類型</th>
+        <th>預計日期</th>
+        <th>訂單號</th>
+        <th>往來方</th>
+        <th>模式</th>
+        <th>性質</th>
+        <th style="text-align:right;color:#7040a0">€ EUR</th>
+        <th style="text-align:right;color:#1a5f8a">$ USD</th>
+        <th style="text-align:right;color:#555">NT$ 台幣</th>
+        <th style="text-align:right;color:#888">TWD換算</th>
+        <th>條件</th>
+        <th>確認</th>
+      </tr>
+    </thead>
+    <tbody id="cf-body"></tbody>
+  </table>
+</div>
+
+<script>
+const EVENTS = [{"idx": 10, "po": "25BK0003", "order_date": "2025-11-20", "type": "應付", "counterpart": "Europastry", "mode": "買進", "customer": "高玉", "supplier": "Europastry", "product": "冷凍麵包", "pay_nature": "全額", "twd_amt": 910262, "foreign_amt": 26772.4, "currency": "EUR", "date_est": "2025-01-20", "condition": "BL 60天", "confirmed": true, "ym": "2025-01"}, {"idx": 50, "po": "PC紙箱印刷", "order_date": "2025-12-01", "type": "應收", "counterpart": "Pietro Coricelli(代墊還款)", "mode": "收佣金(PC)", "customer": "高玉", "supplier": "Pietro Coricelli", "product": "代印東森紙箱", "pay_nature": "代墊還款", "twd_amt": 12780, "foreign_amt": 0, "currency": "TWD", "date_est": "2025-01-20", "condition": "TDS清帳", "confirmed": true, "ym": "2025-01"}, {"idx": 51, "po": "紅酒推廣費用", "order_date": "2025-12-01", "type": "應收", "counterpart": "TDS(代墊還款)", "mode": "收佣金(TDS)", "customer": "高玉", "supplier": "TDS", "product": "25/10大全聯紅酒節", "pay_nature": "代墊還款", "twd_amt": 8114, "foreign_amt": 0, "currency": "TWD", "date_est": "2025-01-20", "condition": "TDS清帳", "confirmed": true, "ym": "2025-01"}, {"idx": 52, "po": "美廉Kozakli檢驗費", "order_date": "2025-12-01", "type": "應收", "counterpart": "TDS(代墊還款)", "mode": "收佣金(TDS)", "customer": "高玉", "supplier": "TDS", "product": "美廉PURE檢驗費用", "pay_nature": "代墊還款", "twd_amt": 11885, "foreign_amt": 0, "currency": "TWD", "date_est": "2025-01-20", "condition": "TDS清帳", "confirmed": true, "ym": "2025-01"}, {"idx": 48, "po": "美廉白酒", "order_date": "2025-01-18", "type": "應收", "counterpart": "美廉社", "mode": "收佣金(TDS)", "customer": "美廉社", "supplier": "Verga", "product": "美廉白酒", "pay_nature": "佣金", "twd_amt": 53419, "foreign_amt": 1443.75, "currency": "EUR", "date_est": "2025-03-19", "condition": "TDS清帳", "confirmed": true, "ym": "2025-03"}, {"idx": 11, "po": "25OL0001", "order_date": "2025-07-10", "type": "應付", "counterpart": "Agro", "mode": "買進轉手", "customer": "東森", "supplier": "Agro", "product": "玄米油", "pay_nature": "訂金", "twd_amt": 515040, "foreign_amt": 17760.0, "currency": "USD", "date_est": "2025-07-10", "condition": "訂金50%, BL 14天50%", "confirmed": true, "ym": "2025-07"}, {"idx": 7, "po": "25FA0002", "order_date": "2025-08-03", "type": "應付", "counterpart": "順發", "mode": "買進轉手", "customer": "生活良好", "supplier": "順發", "product": "餅乾", "pay_nature": "訂金", "twd_amt": 45414, "foreign_amt": 1566.0, "currency": "USD", "date_est": "2025-08-03", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2025-08"}, {"idx": 8, "po": "25FA0001", "order_date": "2025-08-03", "type": "應付", "counterpart": "順發", "mode": "買進轉手", "customer": "美廉社", "supplier": "順發", "product": "餅乾", "pay_nature": "訂金", "twd_amt": 37236, "foreign_amt": 1284.0, "currency": "USD", "date_est": "2025-08-03", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2025-08"}, {"idx": 0, "po": "06122024_2", "order_date": "2025-04-20", "type": "應收", "counterpart": "東森", "mode": "收佣金(PC)", "customer": "東森", "supplier": "Pietro Coricelli", "product": "PC酪梨油", "pay_nature": "佣金", "twd_amt": 174755, "foreign_amt": 0, "currency": "TWD", "date_est": "2025-08-05", "condition": "TDS清帳", "confirmed": true, "ym": "2025-08"}, {"idx": 7, "po": "25FA0002", "order_date": "2025-08-03", "type": "應付", "counterpart": "順發", "mode": "買進轉手", "customer": "生活良好", "supplier": "順發", "product": "餅乾", "pay_nature": "BL尾款", "twd_amt": 105966, "foreign_amt": 3654.0, "currency": "USD", "date_est": "2025-08-05", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2025-08"}, {"idx": 8, "po": "25FA0001", "order_date": "2025-08-03", "type": "應付", "counterpart": "順發", "mode": "買進轉手", "customer": "美廉社", "supplier": "順發", "product": "餅乾", "pay_nature": "BL尾款", "twd_amt": 86884, "foreign_amt": 2996.0, "currency": "USD", "date_est": "2025-08-05", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2025-08"}, {"idx": 11, "po": "25OL0001", "order_date": "2025-07-10", "type": "應付", "counterpart": "Agro", "mode": "買進轉手", "customer": "東森", "supplier": "Agro", "product": "玄米油", "pay_nature": "BL尾款", "twd_amt": 515040, "foreign_amt": 17760.0, "currency": "USD", "date_est": "2025-08-05", "condition": "訂金50%, BL 14天50%", "confirmed": true, "ym": "2025-08"}, {"idx": 8, "po": "25FA0001", "order_date": "2025-08-03", "type": "應收", "counterpart": "美廉社", "mode": "買進轉手", "customer": "美廉社", "supplier": "順發", "product": "餅乾", "pay_nature": "全額", "twd_amt": 167040, "foreign_amt": 5568.0, "currency": "USD", "date_est": "2025-08-10", "condition": "BL 45天", "confirmed": true, "ym": "2025-08"}, {"idx": 17, "po": "25FA0004", "order_date": "2025-09-10", "type": "應付", "counterpart": "GoMuc", "mode": "買進轉手", "customer": "美廉社", "supplier": "GoMuc", "product": "小魚乾點心", "pay_nature": "BL尾款", "twd_amt": 194251, "foreign_amt": 6698.3, "currency": "USD", "date_est": "2025-08-12", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2025-08"}, {"idx": 19, "po": "25FA0005", "order_date": "2025-09-10", "type": "應付", "counterpart": "Koriko", "mode": "買進轉手", "customer": "美廉社", "supplier": "Koriko", "product": "海苔捲點心", "pay_nature": "BL尾款", "twd_amt": 143724, "foreign_amt": 4956.0, "currency": "USD", "date_est": "2025-08-21", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2025-08"}, {"idx": 18, "po": "25FA0003", "order_date": "2025-09-18", "type": "應付", "counterpart": "GURIMI/ABC", "mode": "買進轉手", "customer": "美廉社", "supplier": "GURIMI/ABC", "product": "泡麵", "pay_nature": "BL尾款", "twd_amt": 67802, "foreign_amt": 2338.0, "currency": "USD", "date_est": "2025-08-22", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2025-08"}, {"idx": 1, "po": "25001.0", "order_date": "2025-08-30", "type": "應收", "counterpart": "東森", "mode": "收佣金(根因)", "customer": "東森", "supplier": "天津工廠", "product": "抹布", "pay_nature": "佣金", "twd_amt": 46051, "foreign_amt": 11232.0, "currency": "RMB", "date_est": "2025-08-26", "condition": "TDS清帳", "confirmed": true, "ym": "2025-08"}, {"idx": 12, "po": "25OL0002", "order_date": "2025-08-30", "type": "應付", "counterpart": "Agro", "mode": "買進轉手", "customer": "東森", "supplier": "Agro", "product": "玄米油", "pay_nature": "訂金", "twd_amt": 521443, "foreign_amt": 17980.8, "currency": "USD", "date_est": "2025-08-30", "condition": "訂金50%, BL 14天50%", "confirmed": true, "ym": "2025-08"}, {"idx": 12, "po": "25OL0002", "order_date": "2025-08-30", "type": "應付", "counterpart": "Agro", "mode": "買進轉手", "customer": "東森", "supplier": "Agro", "product": "玄米油", "pay_nature": "BL尾款", "twd_amt": 521443, "foreign_amt": 17980.8, "currency": "USD", "date_est": "2025-09-03", "condition": "訂金50%, BL 14天50%", "confirmed": true, "ym": "2025-09"}, {"idx": 17, "po": "25FA0004", "order_date": "2025-09-10", "type": "應付", "counterpart": "GoMuc", "mode": "買進轉手", "customer": "美廉社", "supplier": "GoMuc", "product": "小魚乾點心", "pay_nature": "訂金", "twd_amt": 83250, "foreign_amt": 2870.7, "currency": "USD", "date_est": "2025-09-10", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2025-09"}, {"idx": 19, "po": "25FA0005", "order_date": "2025-09-10", "type": "應付", "counterpart": "Koriko", "mode": "買進轉手", "customer": "美廉社", "supplier": "Koriko", "product": "海苔捲點心", "pay_nature": "訂金", "twd_amt": 61596, "foreign_amt": 2124.0, "currency": "USD", "date_est": "2025-09-10", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2025-09"}, {"idx": 18, "po": "25FA0003", "order_date": "2025-09-18", "type": "應付", "counterpart": "GURIMI/ABC", "mode": "買進轉手", "customer": "美廉社", "supplier": "GURIMI/ABC", "product": "泡麵", "pay_nature": "訂金", "twd_amt": 29058, "foreign_amt": 1002.0, "currency": "USD", "date_est": "2025-09-18", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2025-09"}, {"idx": 14, "po": "橄欖油", "order_date": "2025-07-30", "type": "應收", "counterpart": "美廉社", "mode": "收佣金(TDS)", "customer": "美廉社", "supplier": "Kozakli", "product": "橄欖油", "pay_nature": "佣金", "twd_amt": 170383, "foreign_amt": 4604.95, "currency": "EUR", "date_est": "2025-09-28", "condition": "TDS清帳", "confirmed": true, "ym": "2025-09"}, {"idx": 16, "po": "葵花油", "order_date": "2025-07-30", "type": "應收", "counterpart": "美廉社", "mode": "收佣金(PC)", "customer": "美廉社", "supplier": "Yonca", "product": "葵花油", "pay_nature": "佣金", "twd_amt": 27814, "foreign_amt": 1145.24, "currency": "USD", "date_est": "2025-09-28", "condition": "TDS清帳", "confirmed": true, "ym": "2025-09"}, {"idx": 30, "po": "25FA0006", "order_date": "2025-11-06", "type": "應付", "counterpart": "Chizzpa", "mode": "買進轉手", "customer": "美廉社", "supplier": "Chizzpa", "product": "洋芋片", "pay_nature": "BL尾款", "twd_amt": 303106, "foreign_amt": 9777.6, "currency": "USD", "date_est": "2025-10-01", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2025-10"}, {"idx": 31, "po": "25FA0007", "order_date": "2025-11-06", "type": "應付", "counterpart": "Chizzpa", "mode": "買進轉手", "customer": "美廉社", "supplier": "Chizzpa", "product": "洋芋片", "pay_nature": "BL尾款", "twd_amt": 303106, "foreign_amt": 9777.6, "currency": "USD", "date_est": "2025-10-01", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2025-10"}, {"idx": 11, "po": "25OL0001", "order_date": "2025-07-10", "type": "應收", "counterpart": "東森", "mode": "買進轉手", "customer": "東森", "supplier": "Agro", "product": "玄米油", "pay_nature": "全額", "twd_amt": 1220436, "foreign_amt": 40681.2, "currency": "USD", "date_est": "2025-10-08", "condition": "BL 90天", "confirmed": true, "ym": "2025-10"}, {"idx": 7, "po": "25FA0002", "order_date": "2025-08-03", "type": "應收", "counterpart": "生活良好", "mode": "買進轉手", "customer": "生活良好", "supplier": "順發", "product": "餅乾", "pay_nature": "全額", "twd_amt": 176436, "foreign_amt": 5881.2, "currency": "USD", "date_est": "2025-10-20", "condition": "ETA 60天", "confirmed": true, "ym": "2025-10"}, {"idx": 17, "po": "25FA0004", "order_date": "2025-09-10", "type": "應收", "counterpart": "美廉社", "mode": "買進轉手", "customer": "美廉社", "supplier": "GoMuc", "product": "小魚乾點心", "pay_nature": "全額", "twd_amt": 363291, "foreign_amt": 12109.7, "currency": "USD", "date_est": "2025-10-25", "condition": "BL 45天", "confirmed": true, "ym": "2025-10"}, {"idx": 19, "po": "25FA0005", "order_date": "2025-09-10", "type": "應收", "counterpart": "美廉社", "mode": "買進轉手", "customer": "美廉社", "supplier": "Koriko", "product": "海苔捲點心", "pay_nature": "全額", "twd_amt": 245400, "foreign_amt": 8180.0, "currency": "USD", "date_est": "2025-10-25", "condition": "BL 45天", "confirmed": true, "ym": "2025-10"}, {"idx": 18, "po": "25FA0003", "order_date": "2025-09-18", "type": "應收", "counterpart": "美廉社", "mode": "買進轉手", "customer": "美廉社", "supplier": "GURIMI/ABC", "product": "泡麵", "pay_nature": "全額", "twd_amt": 111540, "foreign_amt": 3718.0, "currency": "USD", "date_est": "2025-11-02", "condition": "BL 45天", "confirmed": true, "ym": "2025-11"}, {"idx": 30, "po": "25FA0006", "order_date": "2025-11-06", "type": "應付", "counterpart": "Chizzpa", "mode": "買進轉手", "customer": "美廉社", "supplier": "Chizzpa", "product": "洋芋片", "pay_nature": "訂金", "twd_amt": 129902, "foreign_amt": 4190.4, "currency": "USD", "date_est": "2025-11-06", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2025-11"}, {"idx": 31, "po": "25FA0007", "order_date": "2025-11-06", "type": "應付", "counterpart": "Chizzpa", "mode": "買進轉手", "customer": "美廉社", "supplier": "Chizzpa", "product": "洋芋片", "pay_nature": "訂金", "twd_amt": 129902, "foreign_amt": 4190.4, "currency": "USD", "date_est": "2025-11-06", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2025-11"}, {"idx": 3, "po": "06122024_3", "order_date": "2025-07-20", "type": "應收", "counterpart": "東森", "mode": "收佣金(PC)", "customer": "東森", "supplier": "Pietro Coricelli", "product": "PC酪梨油", "pay_nature": "佣金", "twd_amt": 174755, "foreign_amt": 0, "currency": "TWD", "date_est": "2025-11-10", "condition": "TDS清帳", "confirmed": true, "ym": "2025-11"}, {"idx": 9, "po": "25BK0002", "order_date": "2025-09-07", "type": "應付", "counterpart": "Europastry", "mode": "買進", "customer": "高玉", "supplier": "Europastry", "product": "冷凍麵包", "pay_nature": "全額", "twd_amt": 884082, "foreign_amt": 26002.42, "currency": "EUR", "date_est": "2025-11-10", "condition": "BL 60天", "confirmed": true, "ym": "2025-11"}, {"idx": 12, "po": "25OL0002", "order_date": "2025-08-30", "type": "應收", "counterpart": "東森", "mode": "買進轉手", "customer": "東森", "supplier": "Agro", "product": "玄米油", "pay_nature": "全額", "twd_amt": 1220436, "foreign_amt": 40681.2, "currency": "USD", "date_est": "2025-11-28", "condition": "BL 90天", "confirmed": true, "ym": "2025-11"}, {"idx": 2, "po": "美廉紅白平替", "order_date": "2025-09-30", "type": "應收", "counterpart": "美廉社", "mode": "收佣金(TDS)", "customer": "美廉社", "supplier": "Verga", "product": "美廉紅白平替", "pay_nature": "佣金", "twd_amt": 104157, "foreign_amt": 3063.45, "currency": "EUR", "date_est": "2025-11-30", "condition": "TDS清帳", "confirmed": true, "ym": "2025-11"}, {"idx": 39, "po": "25FA0008", "order_date": "2025-12-30", "type": "應付", "counterpart": "HariHari", "mode": "買進轉手", "customer": "美廉社", "supplier": "HariHari", "product": "洋芋片", "pay_nature": "BL尾款", "twd_amt": 103236, "foreign_amt": 3330.18, "currency": "USD", "date_est": "2025-12-01", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2025-12"}, {"idx": 45, "po": "25FA0010", "order_date": "2025-12-20", "type": "應付", "counterpart": "GURIMI/ABC", "mode": "買進轉手", "customer": "美廉社", "supplier": "GURIMI/ABC", "product": "泡麵", "pay_nature": "BL尾款", "twd_amt": 333576, "foreign_amt": 11502.61, "currency": "USD", "date_est": "2025-12-01", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2025-12"}, {"idx": 46, "po": "25FA0011", "order_date": "2026-01-13", "type": "應付", "counterpart": "順發", "mode": "買進轉手", "customer": "美廉社", "supplier": "順發", "product": "餅乾", "pay_nature": "BL尾款", "twd_amt": 169520, "foreign_amt": 5845.51, "currency": "USD", "date_est": "2025-12-01", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2025-12"}, {"idx": 6, "po": "25002.0", "order_date": "2025-09-08", "type": "應收", "counterpart": "東森", "mode": "收佣金(根因)", "customer": "東森", "supplier": "天津工廠", "product": "抹布", "pay_nature": "佣金", "twd_amt": 181991, "foreign_amt": 44388.0, "currency": "RMB", "date_est": "2025-12-08", "condition": "TDS清帳", "confirmed": true, "ym": "2025-12"}, {"idx": 4, "po": "16052025_2", "order_date": "2025-08-06", "type": "應收", "counterpart": "東森", "mode": "收佣金(PC)", "customer": "東森", "supplier": "Pietro Coricelli", "product": "PC橄欖油", "pay_nature": "佣金", "twd_amt": 142312, "foreign_amt": 0, "currency": "TWD", "date_est": "2025-12-12", "condition": "TDS清帳", "confirmed": true, "ym": "2025-12"}, {"idx": 5, "po": "16052025_3", "order_date": "2025-08-06", "type": "應收", "counterpart": "東森", "mode": "收佣金(PC)", "customer": "東森", "supplier": "Pietro Coricelli", "product": "PC橄欖油", "pay_nature": "佣金", "twd_amt": 142312, "foreign_amt": 0, "currency": "TWD", "date_est": "2025-12-12", "condition": "TDS清帳", "confirmed": true, "ym": "2025-12"}, {"idx": 15, "po": "橄欖油", "order_date": "2025-10-15", "type": "應收", "counterpart": "美廉社", "mode": "收佣金(TDS)", "customer": "美廉社", "supplier": "Kozakli", "product": "橄欖油", "pay_nature": "佣金", "twd_amt": 170383, "foreign_amt": 4604.95, "currency": "EUR", "date_est": "2025-12-14", "condition": "TDS清帳", "confirmed": true, "ym": "2025-12"}, {"idx": 45, "po": "25FA0010", "order_date": "2025-12-20", "type": "應付", "counterpart": "GURIMI/ABC", "mode": "買進轉手", "customer": "美廉社", "supplier": "GURIMI/ABC", "product": "泡麵", "pay_nature": "訂金", "twd_amt": 142961, "foreign_amt": 4929.69, "currency": "USD", "date_est": "2025-12-20", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2025-12"}, {"idx": 30, "po": "25FA0006", "order_date": "2025-11-06", "type": "應收", "counterpart": "美廉社", "mode": "買進轉手", "customer": "美廉社", "supplier": "Chizzpa", "product": "洋芋片", "pay_nature": "全額", "twd_amt": 480144, "foreign_amt": 16004.8, "currency": "USD", "date_est": "2025-12-21", "condition": "BL 45天", "confirmed": true, "ym": "2025-12"}, {"idx": 31, "po": "25FA0007", "order_date": "2025-11-06", "type": "應收", "counterpart": "美廉社", "mode": "買進轉手", "customer": "美廉社", "supplier": "Chizzpa", "product": "洋芋片", "pay_nature": "全額", "twd_amt": 451044, "foreign_amt": 15034.8, "currency": "USD", "date_est": "2025-12-21", "condition": "BL 45天", "confirmed": true, "ym": "2025-12"}, {"idx": 13, "po": "1895紅酒", "order_date": "2025-10-10", "type": "應收", "counterpart": "生活良好", "mode": "收佣金(TDS)", "customer": "生活良好", "supplier": "Verga", "product": "1895紅酒", "pay_nature": "佣金", "twd_amt": 73435, "foreign_amt": 1984.72, "currency": "EUR", "date_est": "2025-12-24", "condition": "TDS清帳", "confirmed": true, "ym": "2025-12"}, {"idx": 36, "po": "25OL0003", "order_date": "2025-12-29", "type": "應付", "counterpart": "Agro", "mode": "買進轉手", "customer": "東森", "supplier": "Agro", "product": "玄米油", "pay_nature": "BL尾款", "twd_amt": 516810, "foreign_amt": 16671.3, "currency": "USD", "date_est": "2025-12-24", "condition": "訂金50%, BL 14天50%", "confirmed": true, "ym": "2025-12"}, {"idx": 49, "po": "25FA0012", "order_date": "2026-01-13", "type": "應付", "counterpart": "順發", "mode": "買進轉手", "customer": "美廉社", "supplier": "順發", "product": "餅乾", "pay_nature": "BL尾款", "twd_amt": 239699, "foreign_amt": 8265.47, "currency": "USD", "date_est": "2025-12-24", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2025-12"}, {"idx": 36, "po": "25OL0003", "order_date": "2025-12-29", "type": "應付", "counterpart": "Agro", "mode": "買進轉手", "customer": "東森", "supplier": "Agro", "product": "玄米油", "pay_nature": "訂金", "twd_amt": 516810, "foreign_amt": 16671.3, "currency": "USD", "date_est": "2025-12-29", "condition": "訂金50%, BL 14天50%", "confirmed": true, "ym": "2025-12"}, {"idx": 39, "po": "25FA0008", "order_date": "2025-12-30", "type": "應付", "counterpart": "HariHari", "mode": "買進轉手", "customer": "美廉社", "supplier": "HariHari", "product": "洋芋片", "pay_nature": "訂金", "twd_amt": 44244, "foreign_amt": 1427.22, "currency": "USD", "date_est": "2025-12-30", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2025-12"}, {"idx": 40, "po": "25FA0009", "order_date": "2025-12-30", "type": "應付", "counterpart": "HariHari", "mode": "買進轉手", "customer": "美廉社", "supplier": "HariHari", "product": "洋芋片", "pay_nature": "訂金", "twd_amt": 44244, "foreign_amt": 1427.22, "currency": "USD", "date_est": "2025-12-30", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2025-12"}, {"idx": 28, "po": "COOP", "order_date": "2025-10-22", "type": "應收", "counterpart": "生活良好", "mode": "收佣金(TDS)", "customer": "生活良好", "supplier": "COOP", "product": "COOP", "pay_nature": "佣金", "twd_amt": 75023, "foreign_amt": 2027.65, "currency": "EUR", "date_est": "2026-01-05", "condition": "TDS清帳", "confirmed": true, "ym": "2026-01"}, {"idx": 40, "po": "25FA0009", "order_date": "2025-12-30", "type": "應付", "counterpart": "HariHari", "mode": "買進轉手", "customer": "美廉社", "supplier": "HariHari", "product": "洋芋片", "pay_nature": "BL尾款", "twd_amt": 103236, "foreign_amt": 3330.18, "currency": "USD", "date_est": "2026-01-06", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2026-01"}, {"idx": 20, "po": "040720251", "order_date": "2025-10-09", "type": "應收", "counterpart": "東森", "mode": "收佣金(PC)", "customer": "東森", "supplier": "Pietro Coricelli", "product": "PC橄欖油", "pay_nature": "佣金", "twd_amt": 145431, "foreign_amt": 0, "currency": "TWD", "date_est": "2026-01-07", "condition": "TDS清帳", "confirmed": true, "ym": "2026-01"}, {"idx": 24, "po": "16052025_1", "order_date": "2025-10-10", "type": "應收", "counterpart": "東森", "mode": "收佣金(PC)", "customer": "東森", "supplier": "Pietro Coricelli", "product": "PC酪梨油", "pay_nature": "佣金", "twd_amt": 193776, "foreign_amt": 0, "currency": "TWD", "date_est": "2026-01-08", "condition": "TDS清帳", "confirmed": true, "ym": "2026-01"}, {"idx": 46, "po": "25FA0011", "order_date": "2026-01-13", "type": "應付", "counterpart": "順發", "mode": "買進轉手", "customer": "美廉社", "supplier": "順發", "product": "餅乾", "pay_nature": "訂金", "twd_amt": 72651, "foreign_amt": 2505.22, "currency": "USD", "date_est": "2026-01-13", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2026-01"}, {"idx": 49, "po": "25FA0012", "order_date": "2026-01-13", "type": "應付", "counterpart": "順發", "mode": "買進轉手", "customer": "美廉社", "supplier": "順發", "product": "餅乾", "pay_nature": "訂金", "twd_amt": 102728, "foreign_amt": 3542.34, "currency": "USD", "date_est": "2026-01-13", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2026-01"}, {"idx": 57, "po": "26FA0001", "order_date": "2026-03-01", "type": "應付", "counterpart": "Koriko", "mode": "買進轉手", "customer": "美廉社", "supplier": "Koriko", "product": "海苔捲點心", "pay_nature": "BL尾款", "twd_amt": 139339, "foreign_amt": 4804.8, "currency": "USD", "date_est": "2026-01-16", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2026-01"}, {"idx": 21, "po": "040720252", "order_date": "2025-10-20", "type": "應收", "counterpart": "東森", "mode": "收佣金(PC)", "customer": "東森", "supplier": "Pietro Coricelli", "product": "PC橄欖油", "pay_nature": "佣金", "twd_amt": 145394, "foreign_amt": 0, "currency": "TWD", "date_est": "2026-01-18", "condition": "TDS清帳", "confirmed": true, "ym": "2026-01"}, {"idx": 58, "po": "26FA0002", "order_date": "2026-03-01", "type": "應付", "counterpart": "GoMuc", "mode": "買進轉手", "customer": "美廉社", "supplier": "GoMuc", "product": "小魚乾點心", "pay_nature": "BL尾款", "twd_amt": 189856, "foreign_amt": 6546.75, "currency": "USD", "date_est": "2026-01-21", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2026-01"}, {"idx": 59, "po": "26FA0003", "order_date": "2026-02-21", "type": "應付", "counterpart": "順發", "mode": "買進轉手", "customer": "生活良好", "supplier": "順發", "product": "餅乾", "pay_nature": "BL尾款", "twd_amt": 99328, "foreign_amt": 3425.1, "currency": "USD", "date_est": "2026-01-21", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2026-01"}, {"idx": 25, "po": "250703.0", "order_date": "2025-10-27", "type": "應收", "counterpart": "東森", "mode": "收佣金(PC)", "customer": "東森", "supplier": "Pietro Coricelli", "product": "PC酪梨油", "pay_nature": "佣金", "twd_amt": 193776, "foreign_amt": 0, "currency": "TWD", "date_est": "2026-01-25", "condition": "TDS清帳", "confirmed": true, "ym": "2026-01"}, {"idx": 45, "po": "25FA0010", "order_date": "2025-12-20", "type": "應收", "counterpart": "美廉社", "mode": "買進轉手", "customer": "美廉社", "supplier": "GURIMI/ABC", "product": "泡麵", "pay_nature": "全額", "twd_amt": 610740, "foreign_amt": 20358.0, "currency": "USD", "date_est": "2026-02-03", "condition": "BL 45天", "confirmed": true, "ym": "2026-02"}, {"idx": 22, "po": "040720253", "order_date": "2025-11-06", "type": "應收", "counterpart": "東森", "mode": "收佣金(PC)", "customer": "東森", "supplier": "Pietro Coricelli", "product": "PC橄欖油", "pay_nature": "佣金", "twd_amt": 145431, "foreign_amt": 0, "currency": "TWD", "date_est": "2026-02-04", "condition": "TDS清帳", "confirmed": true, "ym": "2026-02"}, {"idx": 60, "po": "26IC0001", "order_date": "2026-02-22", "type": "應收", "counterpart": "高玉", "mode": "買進", "customer": "高玉", "supplier": "G7", "product": "冰淇淋", "pay_nature": "BL尾款", "twd_amt": 1266665, "foreign_amt": 34234.2, "currency": "EUR", "date_est": "2026-02-04", "condition": "order 50%, BL 30days 50%", "confirmed": true, "ym": "2026-02"}, {"idx": 29, "po": "PURE橄欖油", "order_date": "2025-12-09", "type": "應收", "counterpart": "美廉自有品牌", "mode": "收佣金(TDS)", "customer": "美廉自有品牌", "supplier": "Kozakli", "product": "PURE橄欖油", "pay_nature": "佣金", "twd_amt": 118306, "foreign_amt": 3197.46, "currency": "EUR", "date_est": "2026-02-07", "condition": "TDS清帳", "confirmed": true, "ym": "2026-02"}, {"idx": 60, "po": "26IC0001", "order_date": "2026-02-22", "type": "應付", "counterpart": "G7", "mode": "買進", "customer": "高玉", "supplier": "G7", "product": "冰淇淋", "pay_nature": "BL尾款", "twd_amt": 1677157, "foreign_amt": 45328.56, "currency": "EUR", "date_est": "2026-02-11", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2026-02"}, {"idx": 39, "po": "25FA0008", "order_date": "2025-12-30", "type": "應收", "counterpart": "美廉社", "mode": "買進轉手", "customer": "美廉社", "supplier": "HariHari", "product": "洋芋片", "pay_nature": "全額", "twd_amt": 168477, "foreign_amt": 5615.9, "currency": "USD", "date_est": "2026-02-13", "condition": "BL 45天", "confirmed": true, "ym": "2026-02"}, {"idx": 40, "po": "25FA0009", "order_date": "2025-12-30", "type": "應收", "counterpart": "美廉社", "mode": "買進轉手", "customer": "美廉社", "supplier": "HariHari", "product": "洋芋片", "pay_nature": "全額", "twd_amt": 168477, "foreign_amt": 5615.9, "currency": "USD", "date_est": "2026-02-13", "condition": "BL 45天", "confirmed": true, "ym": "2026-02"}, {"idx": 41, "po": "開心果餅乾短效", "order_date": "2025-12-05", "type": "應收", "counterpart": "生活良好", "mode": "收佣金(TDS)", "customer": "生活良好", "supplier": "義大利餅乾", "product": "開心果餅乾短效", "pay_nature": "佣金", "twd_amt": 11416, "foreign_amt": 308.53, "currency": "EUR", "date_est": "2026-02-18", "condition": "TDS清帳", "confirmed": true, "ym": "2026-02"}, {"idx": 59, "po": "26FA0003", "order_date": "2026-02-21", "type": "應付", "counterpart": "順發", "mode": "買進轉手", "customer": "生活良好", "supplier": "順發", "product": "餅乾", "pay_nature": "訂金", "twd_amt": 42569, "foreign_amt": 1467.9, "currency": "USD", "date_est": "2026-02-21", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2026-02"}, {"idx": 60, "po": "26IC0001", "order_date": "2026-02-22", "type": "應付", "counterpart": "G7", "mode": "買進", "customer": "高玉", "supplier": "G7", "product": "冰淇淋", "pay_nature": "訂金", "twd_amt": 718781, "foreign_amt": 19426.53, "currency": "EUR", "date_est": "2026-02-22", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2026-02"}, {"idx": 60, "po": "26IC0001", "order_date": "2026-02-22", "type": "應收", "counterpart": "高玉", "mode": "買進", "customer": "高玉", "supplier": "G7", "product": "冰淇淋", "pay_nature": "訂金", "twd_amt": 1266665, "foreign_amt": 34234.2, "currency": "EUR", "date_est": "2026-02-22", "condition": "order 50%, BL 30days 50%", "confirmed": true, "ym": "2026-02"}, {"idx": 27, "po": "Cirio橄欖油", "order_date": "2025-12-12", "type": "應收", "counterpart": "生活良好", "mode": "收佣金(PC)", "customer": "生活良好", "supplier": "Pietro Coricelli", "product": "Cirio橄欖油", "pay_nature": "佣金", "twd_amt": 79866, "foreign_amt": 0, "currency": "TWD", "date_est": "2026-02-25", "condition": "TDS清帳", "confirmed": true, "ym": "2026-02"}, {"idx": 32, "po": "葵花油1L+芥花油1L", "order_date": "2025-12-12", "type": "應收", "counterpart": "生活良好", "mode": "收佣金(TDS)", "customer": "生活良好", "supplier": "Rio Santo", "product": "葵花油1L+芥花油1L", "pay_nature": "佣金", "twd_amt": 121745, "foreign_amt": 3290.41, "currency": "EUR", "date_est": "2026-02-25", "condition": "TDS清帳", "confirmed": true, "ym": "2026-02"}, {"idx": 47, "po": "美廉白酒", "order_date": "2025-12-28", "type": "應收", "counterpart": "美廉社", "mode": "收佣金(TDS)", "customer": "美廉社", "supplier": "Verga", "product": "美廉白酒", "pay_nature": "佣金", "twd_amt": 53419, "foreign_amt": 1443.75, "currency": "EUR", "date_est": "2026-02-26", "condition": "TDS清帳", "confirmed": true, "ym": "2026-02"}, {"idx": 57, "po": "26FA0001", "order_date": "2026-03-01", "type": "應付", "counterpart": "Koriko", "mode": "買進轉手", "customer": "美廉社", "supplier": "Koriko", "product": "海苔捲點心", "pay_nature": "訂金", "twd_amt": 59717, "foreign_amt": 2059.2, "currency": "USD", "date_est": "2026-03-01", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2026-03"}, {"idx": 58, "po": "26FA0002", "order_date": "2026-03-01", "type": "應付", "counterpart": "GoMuc", "mode": "買進轉手", "customer": "美廉社", "supplier": "GoMuc", "product": "小魚乾點心", "pay_nature": "訂金", "twd_amt": 81367, "foreign_amt": 2805.75, "currency": "USD", "date_est": "2026-03-01", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2026-03"}, {"idx": 23, "po": "040720254", "order_date": "2025-12-02", "type": "應收", "counterpart": "東森", "mode": "收佣金(PC)", "customer": "東森", "supplier": "Pietro Coricelli", "product": "PC橄欖油", "pay_nature": "佣金", "twd_amt": 145431, "foreign_amt": 0, "currency": "TWD", "date_est": "2026-03-02", "condition": "TDS清帳", "confirmed": true, "ym": "2026-03"}, {"idx": 54, "po": "25FA0014", "order_date": "2026-03-11", "type": "應付", "counterpart": "HariHari", "mode": "買進轉手", "customer": "美廉社", "supplier": "HariHari", "product": "洋芋片", "pay_nature": "BL尾款", "twd_amt": 103236, "foreign_amt": 3330.18, "currency": "USD", "date_est": "2026-03-02", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2026-03"}, {"idx": 55, "po": "25FA0015", "order_date": "2026-03-11", "type": "應付", "counterpart": "HariHari", "mode": "買進轉手", "customer": "美廉社", "supplier": "HariHari", "product": "洋芋片", "pay_nature": "BL尾款", "twd_amt": 103236, "foreign_amt": 3330.18, "currency": "USD", "date_est": "2026-03-02", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2026-03"}, {"idx": 46, "po": "25FA0011", "order_date": "2026-01-13", "type": "應收", "counterpart": "美廉社", "mode": "買進轉手", "customer": "美廉社", "supplier": "順發", "product": "餅乾", "pay_nature": "全額", "twd_amt": 326196, "foreign_amt": 10873.2, "currency": "USD", "date_est": "2026-03-04", "condition": "BL 45天", "confirmed": true, "ym": "2026-03"}, {"idx": 49, "po": "25FA0012", "order_date": "2026-01-13", "type": "應收", "counterpart": "美廉社", "mode": "買進轉手", "customer": "美廉社", "supplier": "順發", "product": "餅乾", "pay_nature": "全額", "twd_amt": 470484, "foreign_amt": 15682.8, "currency": "USD", "date_est": "2026-03-04", "condition": "BL 45天", "confirmed": true, "ym": "2026-03"}, {"idx": 54, "po": "25FA0014", "order_date": "2026-03-11", "type": "應付", "counterpart": "HariHari", "mode": "買進轉手", "customer": "美廉社", "supplier": "HariHari", "product": "洋芋片", "pay_nature": "訂金", "twd_amt": 44244, "foreign_amt": 1427.22, "currency": "USD", "date_est": "2026-03-11", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2026-03"}, {"idx": 55, "po": "25FA0015", "order_date": "2026-03-11", "type": "應付", "counterpart": "HariHari", "mode": "買進轉手", "customer": "美廉社", "supplier": "HariHari", "product": "洋芋片", "pay_nature": "訂金", "twd_amt": 44244, "foreign_amt": 1427.22, "currency": "USD", "date_est": "2026-03-11", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2026-03"}, {"idx": 35, "po": "芥花油1L", "order_date": "2026-01-20", "type": "應收", "counterpart": "美廉自有品牌", "mode": "收佣金(PC)", "customer": "美廉自有品牌", "supplier": "Yonca", "product": "芥花油1L", "pay_nature": "佣金", "twd_amt": 65817, "foreign_amt": 0, "currency": "TWD", "date_est": "2026-03-21", "condition": "TDS清帳", "confirmed": true, "ym": "2026-03"}, {"idx": 56, "po": "春季酒PROSECCO", "order_date": "2026-01-09", "type": "應收", "counterpart": "生活良好", "mode": "收佣金(TDS)", "customer": "生活良好", "supplier": "TDS", "product": "春季酒PROSECCO", "pay_nature": "佣金", "twd_amt": 35373, "foreign_amt": 956.02, "currency": "EUR", "date_est": "2026-03-25", "condition": "TDS清帳", "confirmed": true, "ym": "2026-03"}, {"idx": 36, "po": "25OL0003", "order_date": "2025-12-29", "type": "應收", "counterpart": "東森", "mode": "買進轉手", "customer": "東森", "supplier": "Agro", "product": "玄米油", "pay_nature": "全額", "twd_amt": 1157638, "foreign_amt": 38587.92, "currency": "USD", "date_est": "2026-03-29", "condition": "BL 90天", "confirmed": true, "ym": "2026-03"}, {"idx": 26, "po": "25FZ0001", "order_date": "2025-10-05", "type": "應付", "counterpart": "Feast", "mode": "買進", "customer": "高玉", "supplier": "Feast", "product": "冷凍薯條蔬菜", "pay_nature": "預付款", "twd_amt": 518850, "foreign_amt": 17891.37, "currency": "USD", "date_est": "2026-04-14", "condition": "預付款", "confirmed": true, "ym": "2026-04"}, {"idx": 57, "po": "26FA0001", "order_date": "2026-03-01", "type": "應收", "counterpart": "美廉社", "mode": "買進轉手", "customer": "美廉社", "supplier": "Koriko", "product": "海苔捲點心", "pay_nature": "全額", "twd_amt": 238716, "foreign_amt": 7957.2, "currency": "USD", "date_est": "2026-04-15", "condition": "BL 45天", "confirmed": true, "ym": "2026-04"}, {"idx": 58, "po": "26FA0002", "order_date": "2026-03-01", "type": "應收", "counterpart": "美廉社", "mode": "買進轉手", "customer": "美廉社", "supplier": "GoMuc", "product": "小魚乾點心", "pay_nature": "全額", "twd_amt": 364500, "foreign_amt": 12150.0, "currency": "USD", "date_est": "2026-04-15", "condition": "BL 45天", "confirmed": true, "ym": "2026-04"}, {"idx": 42, "po": "131020251.0", "order_date": "2026-01-18", "type": "應收", "counterpart": "東森", "mode": "收佣金(PC)", "customer": "東森", "supplier": "Pietro Coricelli", "product": "PC酪梨油", "pay_nature": "佣金", "twd_amt": 189417, "foreign_amt": 0, "currency": "TWD", "date_est": "2026-04-18", "condition": "TDS清帳", "confirmed": true, "ym": "2026-04"}, {"idx": 44, "po": "131020253.0", "order_date": "2026-01-23", "type": "應收", "counterpart": "東森", "mode": "收佣金(PC)", "customer": "東森", "supplier": "Pietro Coricelli", "product": "PC酪梨油", "pay_nature": "佣金", "twd_amt": 189417, "foreign_amt": 0, "currency": "TWD", "date_est": "2026-04-23", "condition": "TDS清帳", "confirmed": true, "ym": "2026-04"}, {"idx": 43, "po": "131020252.0", "order_date": "2026-01-24", "type": "應收", "counterpart": "東森", "mode": "收佣金(PC)", "customer": "東森", "supplier": "Pietro Coricelli", "product": "PC酪梨油", "pay_nature": "佣金", "twd_amt": 189417, "foreign_amt": 0, "currency": "TWD", "date_est": "2026-04-24", "condition": "TDS清帳", "confirmed": true, "ym": "2026-04"}, {"idx": 54, "po": "25FA0014", "order_date": "2026-03-11", "type": "應收", "counterpart": "美廉社", "mode": "買進轉手", "customer": "美廉社", "supplier": "HariHari", "product": "洋芋片", "pay_nature": "全額", "twd_amt": 174093, "foreign_amt": 5615.9, "currency": "USD", "date_est": "2026-04-25", "condition": "BL 45天", "confirmed": true, "ym": "2026-04"}, {"idx": 55, "po": "25FA0015", "order_date": "2026-03-11", "type": "應收", "counterpart": "美廉社", "mode": "買進轉手", "customer": "美廉社", "supplier": "HariHari", "product": "洋芋片", "pay_nature": "全額", "twd_amt": 174093, "foreign_amt": 5615.9, "currency": "USD", "date_est": "2026-04-25", "condition": "BL 45天", "confirmed": true, "ym": "2026-04"}, {"idx": 74, "po": "26FA0004", "order_date": "2026-05-15", "type": "應付", "counterpart": "HariHari", "mode": "買進轉手", "customer": "美廉社", "supplier": "HariHari", "product": "洋芋片", "pay_nature": "BL尾款", "twd_amt": 107220, "foreign_amt": 3458.7, "currency": "USD", "date_est": "2026-05-01", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2026-05"}, {"idx": 59, "po": "26FA0003", "order_date": "2026-02-21", "type": "應收", "counterpart": "生活良好", "mode": "買進轉手", "customer": "生活良好", "supplier": "順發", "product": "餅乾", "pay_nature": "全額", "twd_amt": 184752, "foreign_amt": 6158.4, "currency": "USD", "date_est": "2026-05-07", "condition": "BL 75天", "confirmed": true, "ym": "2026-05"}, {"idx": 74, "po": "26FA0004", "order_date": "2026-05-15", "type": "應付", "counterpart": "HariHari", "mode": "買進轉手", "customer": "美廉社", "supplier": "HariHari", "product": "洋芋片", "pay_nature": "訂金", "twd_amt": 45951, "foreign_amt": 1482.3, "currency": "USD", "date_est": "2026-05-15", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2026-05"}, {"idx": 91, "po": "pending", "order_date": "2026-03-30", "type": "應收", "counterpart": "生活良好", "mode": "收佣金(TDS)", "customer": "生活良好", "supplier": "Beer", "product": "Van Pur", "pay_nature": "佣金", "twd_amt": 27716, "foreign_amt": 749.08, "currency": "EUR", "date_est": "2026-05-29", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2026-05"}, {"idx": 75, "po": "26FA0005", "order_date": "2026-06-10", "type": "應付", "counterpart": "HariHari", "mode": "買進轉手", "customer": "美廉社", "supplier": "HariHari", "product": "洋芋片", "pay_nature": "BL尾款", "twd_amt": 107220, "foreign_amt": 3458.7, "currency": "USD", "date_est": "2026-06-01", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2026-06"}, {"idx": 53, "po": "大推", "order_date": "2026-03-25", "type": "應收", "counterpart": "生活良好", "mode": "收佣金(PC)", "customer": "生活良好", "supplier": "Pietro Coricelli", "product": "大推", "pay_nature": "佣金", "twd_amt": 148896, "foreign_amt": 0, "currency": "TWD", "date_est": "2026-06-08", "condition": "TDS清帳", "confirmed": true, "ym": "2026-06"}, {"idx": 75, "po": "26FA0005", "order_date": "2026-06-10", "type": "應付", "counterpart": "HariHari", "mode": "買進轉手", "customer": "美廉社", "supplier": "HariHari", "product": "洋芋片", "pay_nature": "訂金", "twd_amt": 45951, "foreign_amt": 1482.3, "currency": "USD", "date_est": "2026-06-10", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2026-06"}, {"idx": 65, "po": "3/5 revised", "order_date": "2026-03-30", "type": "應收", "counterpart": "生活良好", "mode": "收佣金(TDS)", "customer": "生活良好", "supplier": "Beer", "product": "VE啤酒", "pay_nature": "佣金", "twd_amt": 56264, "foreign_amt": 1520.64, "currency": "EUR", "date_est": "2026-06-13", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2026-06"}, {"idx": 76, "po": "26FA0007", "order_date": "2026-07-10", "type": "應付", "counterpart": "HariHari", "mode": "買進轉手", "customer": "美廉社", "supplier": "HariHari", "product": "洋芋片", "pay_nature": "BL尾款", "twd_amt": 103236, "foreign_amt": 3330.18, "currency": "USD", "date_est": "2026-06-15", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2026-06"}, {"idx": 77, "po": "26FA0006", "order_date": "2026-07-20", "type": "應付", "counterpart": "HariHari", "mode": "買進轉手", "customer": "美廉社", "supplier": "HariHari", "product": "洋芋片", "pay_nature": "BL尾款", "twd_amt": 277589, "foreign_amt": 8954.48, "currency": "USD", "date_est": "2026-06-15", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2026-06"}, {"idx": 64, "po": "美廉冰淇淋", "order_date": "2026-04-25", "type": "應收", "counterpart": "美廉社", "mode": "收佣金(TDS)", "customer": "美廉社", "supplier": "Menodiciotto", "product": "美廉冰淇淋", "pay_nature": "佣金", "twd_amt": 98475, "foreign_amt": 2661.49, "currency": "EUR", "date_est": "2026-06-24", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2026-06"}, {"idx": 67, "po": "橄欖油", "order_date": "2026-04-25", "type": "應收", "counterpart": "美廉自有品牌", "mode": "收佣金(TDS)", "customer": "美廉自有品牌", "supplier": "Kozakli", "product": "橄欖油", "pay_nature": "佣金", "twd_amt": 241869, "foreign_amt": 6537.0, "currency": "EUR", "date_est": "2026-06-24", "condition": "TDS清帳", "confirmed": true, "ym": "2026-06"}, {"idx": 71, "po": "Cirio橄欖油", "order_date": "2026-04-15", "type": "應收", "counterpart": "生活良好", "mode": "收佣金(PC)", "customer": "生活良好", "supplier": "Pietro Coricelli", "product": "Cirio橄欖油", "pay_nature": "佣金", "twd_amt": 86913, "foreign_amt": 0, "currency": "TWD", "date_est": "2026-06-29", "condition": "TDS清帳", "confirmed": true, "ym": "2026-06"}, {"idx": 72, "po": "橄欖油", "order_date": "2026-04-30", "type": "應收", "counterpart": "美廉社", "mode": "收佣金(TDS)", "customer": "美廉社", "supplier": "Kozakli", "product": "橄欖油", "pay_nature": "佣金", "twd_amt": 241328, "foreign_amt": 6522.38, "currency": "EUR", "date_est": "2026-06-29", "condition": "TDS清帳", "confirmed": true, "ym": "2026-06"}, {"idx": 74, "po": "26FA0004", "order_date": "2026-05-15", "type": "應收", "counterpart": "美廉社", "mode": "買進轉手", "customer": "美廉社", "supplier": "HariHari", "product": "洋芋片", "pay_nature": "全額", "twd_amt": 177193, "foreign_amt": 5715.9, "currency": "USD", "date_est": "2026-06-29", "condition": "BL 45天", "confirmed": true, "ym": "2026-06"}, {"idx": 66, "po": "26FZ0001", "order_date": "2026-04-25", "type": "應付", "counterpart": "Feast", "mode": "買進", "customer": "高玉", "supplier": "Feast", "product": "冷凍薯條蔬菜", "pay_nature": "預付款", "twd_amt": 408231, "foreign_amt": 11033.28, "currency": "EUR", "date_est": "2026-07-09", "condition": "預付款", "confirmed": true, "ym": "2026-07"}, {"idx": 76, "po": "26FA0007", "order_date": "2026-07-10", "type": "應付", "counterpart": "HariHari", "mode": "買進轉手", "customer": "美廉社", "supplier": "HariHari", "product": "洋芋片", "pay_nature": "訂金", "twd_amt": 44244, "foreign_amt": 1427.22, "currency": "USD", "date_est": "2026-07-10", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2026-07"}, {"idx": 69, "po": "La Mole餅乾", "order_date": "2026-05-01", "type": "應收", "counterpart": "生活良好", "mode": "收佣金(TDS)", "customer": "生活良好", "supplier": "La Mole", "product": "La Mole餅乾", "pay_nature": "佣金", "twd_amt": 43789, "foreign_amt": 1183.49, "currency": "EUR", "date_est": "2026-07-15", "condition": "TDS清帳", "confirmed": true, "ym": "2026-07"}, {"idx": 70, "po": "松露", "order_date": "2026-05-01", "type": "應收", "counterpart": "生活良好", "mode": "收佣金(TDS)", "customer": "生活良好", "supplier": "Valnerina Tartufi", "product": "松露", "pay_nature": "佣金", "twd_amt": 77778, "foreign_amt": 2102.11, "currency": "EUR", "date_est": "2026-07-15", "condition": "TDS清帳", "confirmed": true, "ym": "2026-07"}, {"idx": 77, "po": "26FA0006", "order_date": "2026-07-20", "type": "應付", "counterpart": "HariHari", "mode": "買進轉手", "customer": "美廉社", "supplier": "HariHari", "product": "洋芋片", "pay_nature": "訂金", "twd_amt": 118967, "foreign_amt": 3837.64, "currency": "USD", "date_est": "2026-07-20", "condition": "訂金30%, BL 70%", "confirmed": true, "ym": "2026-07"}, {"idx": 75, "po": "26FA0005", "order_date": "2026-06-10", "type": "應收", "counterpart": "美廉社", "mode": "買進轉手", "customer": "美廉社", "supplier": "HariHari", "product": "洋芋片", "pay_nature": "全額", "twd_amt": 177193, "foreign_amt": 5715.9, "currency": "USD", "date_est": "2026-07-25", "condition": "BL 45天", "confirmed": true, "ym": "2026-07"}, {"idx": 68, "po": "美廉白酒", "order_date": "2026-06-01", "type": "應收", "counterpart": "美廉社", "mode": "收佣金(TDS)", "customer": "美廉社", "supplier": "Verga", "product": "美廉白酒", "pay_nature": "佣金", "twd_amt": 53419, "foreign_amt": 1443.75, "currency": "EUR", "date_est": "2026-07-31", "condition": "TDS清帳", "confirmed": true, "ym": "2026-07"}, {"idx": 76, "po": "26FA0007", "order_date": "2026-07-10", "type": "應收", "counterpart": "美廉社", "mode": "買進轉手", "customer": "美廉社", "supplier": "HariHari", "product": "洋芋片", "pay_nature": "全額", "twd_amt": 177193, "foreign_amt": 5715.9, "currency": "USD", "date_est": "2026-08-24", "condition": "BL 45天", "confirmed": true, "ym": "2026-08"}, {"idx": 77, "po": "26FA0006", "order_date": "2026-07-20", "type": "應收", "counterpart": "美廉社", "mode": "買進轉手", "customer": "美廉社", "supplier": "HariHari", "product": "洋芋片", "pay_nature": "全額", "twd_amt": 476452, "foreign_amt": 15369.42, "currency": "USD", "date_est": "2026-09-03", "condition": "BL 45天", "confirmed": true, "ym": "2026-09"}, {"idx": 37, "po": "25OL0004", "order_date": "2026-10-15", "type": "應付", "counterpart": "Agro", "mode": "買進轉手", "customer": "東森", "supplier": "Agro", "product": "玄米油", "pay_nature": "BL尾款", "twd_amt": 516810, "foreign_amt": 16671.3, "currency": "USD", "date_est": "2026-09-15", "condition": "訂金50%, BL 14天50%", "confirmed": true, "ym": "2026-09"}, {"idx": 37, "po": "25OL0004", "order_date": "2026-10-15", "type": "應付", "counterpart": "Agro", "mode": "買進轉手", "customer": "東森", "supplier": "Agro", "product": "玄米油", "pay_nature": "訂金", "twd_amt": 516810, "foreign_amt": 16671.3, "currency": "USD", "date_est": "2026-10-15", "condition": "訂金50%, BL 14天50%", "confirmed": true, "ym": "2026-10"}, {"idx": 38, "po": "25OL0005", "order_date": "2026-12-15", "type": "應付", "counterpart": "Agro", "mode": "買進轉手", "customer": "東森", "supplier": "Agro", "product": "玄米油", "pay_nature": "BL尾款", "twd_amt": 516810, "foreign_amt": 16671.3, "currency": "USD", "date_est": "2026-11-15", "condition": "訂金50%, BL 14天50%", "confirmed": true, "ym": "2026-11"}, {"idx": 38, "po": "25OL0005", "order_date": "2026-12-15", "type": "應付", "counterpart": "Agro", "mode": "買進轉手", "customer": "東森", "supplier": "Agro", "product": "玄米油", "pay_nature": "訂金", "twd_amt": 516810, "foreign_amt": 16671.3, "currency": "USD", "date_est": "2026-12-15", "condition": "訂金50%, BL 14天50%", "confirmed": true, "ym": "2026-12"}, {"idx": 37, "po": "25OL0004", "order_date": "2026-10-15", "type": "應收", "counterpart": "東森", "mode": "買進轉手", "customer": "東森", "supplier": "Agro", "product": "玄米油", "pay_nature": "全額", "twd_amt": 1157638, "foreign_amt": 38587.92, "currency": "USD", "date_est": "2027-01-13", "condition": "BL 90天", "confirmed": true, "ym": "2027-01"}, {"idx": 38, "po": "25OL0005", "order_date": "2026-12-15", "type": "應收", "counterpart": "東森", "mode": "買進轉手", "customer": "東森", "supplier": "Agro", "product": "玄米油", "pay_nature": "全額", "twd_amt": 1157638, "foreign_amt": 38587.92, "currency": "USD", "date_est": "2027-03-15", "condition": "BL 90天", "confirmed": true, "ym": "2027-03"}, {"idx": 9, "po": "25BK0002", "order_date": "2025-09-07", "type": "應收", "counterpart": "高玉", "mode": "買進", "customer": "高玉", "supplier": "Europastry", "product": "冷凍麵包", "pay_nature": "全額", "twd_amt": 1761360, "foreign_amt": 0, "currency": "TWD", "date_est": "", "condition": "", "confirmed": false, "ym": "未確認"}, {"idx": 10, "po": "25BK0003", "order_date": "2025-11-20", "type": "應收", "counterpart": "高玉", "mode": "買進", "customer": "高玉", "supplier": "Europastry", "product": "冷凍麵包", "pay_nature": "全額", "twd_amt": 1696320, "foreign_amt": 0, "currency": "TWD", "date_est": "", "condition": "", "confirmed": false, "ym": "未確認"}, {"idx": 26, "po": "25FZ0001", "order_date": "2025-10-05", "type": "應收", "counterpart": "高玉", "mode": "買進", "customer": "高玉", "supplier": "Feast", "product": "冷凍薯條蔬菜", "pay_nature": "全額", "twd_amt": 1050000, "foreign_amt": 0, "currency": "TWD", "date_est": "", "condition": "", "confirmed": false, "ym": "未確認"}, {"idx": 66, "po": "26FZ0001", "order_date": "2026-04-25", "type": "應收", "counterpart": "高玉", "mode": "買進", "customer": "高玉", "supplier": "Feast", "product": "冷凍薯條蔬菜", "pay_nature": "月結全額", "twd_amt": 1125496, "foreign_amt": 0, "currency": "TWD", "date_est": "", "condition": "台灣出貨月結65天", "confirmed": false, "ym": "未確認"}, {"idx": 73, "po": "茶包", "order_date": "2026-05-10", "type": "應收", "counterpart": "生活良好", "mode": "收佣金(TDS)", "customer": "生活良好", "supplier": "Dogadan", "product": "茶包", "pay_nature": "佣金", "twd_amt": 18500, "foreign_amt": 500.0, "currency": "EUR", "date_est": "", "condition": "TDS清帳", "confirmed": false, "ym": "未確認"}];
+let curTab = 'all';
+
+const SYM = {EUR:'€',USD:'$',RMB:'¥',TWD:'NT$'};
+
+function fmtForeign(amt, cur) {
+  if(!amt || amt < 0.01) return '';
+  const sym = SYM[cur] || cur;
+  return sym + ' ' + amt.toLocaleString('zh-TW', {minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function fmtTWD(n) {
+  if(!n && n!==0) return '—';
+  return 'NT$ ' + Math.round(n).toLocaleString('zh-TW');
+}
+function natCls(n) {
+  if(!n) return 'full';
+  if(n.includes('訂金')||n.includes('預付')) return 'deposit';
+  if(n.includes('尾款')||n.includes('BL')) return 'balance';
+  return 'full';
+}
+
+function buildChart(data) {
+  const byYm = {};
+  data.forEach(e => {
+    const ym = e.ym || '未確認';
+    if(!byYm[ym]) byYm[ym] = {recv:0,pay:0};
+    if(e.type==='應收') byYm[ym].recv += e.twd_amt;
+    else byYm[ym].pay += e.twd_amt;
+  });
+  const yms = Object.keys(byYm).sort();
+  const maxA = Math.max(...yms.map(ym=>Math.max(byYm[ym].recv,byYm[ym].pay)), 1);
+  const chart = document.getElementById('bar-chart');
+  chart.innerHTML = '';
+  yms.forEach(ym => {
+    const rh = Math.round(byYm[ym].recv/maxA*64);
+    const ph = Math.round(byYm[ym].pay/maxA*64);
+    const g = document.createElement('div'); g.className='bar-group';
+    const lbl = ym==='未確認'?'待確認':ym.slice(5);
+    g.innerHTML = `<div class="bar-wrap">
+      <div class="bar recv-bar" style="height:${rh||2}px" title="${ym} 應收 ${Math.round(byYm[ym].recv).toLocaleString()}"></div>
+      <div class="bar pay-bar" style="height:${ph||2}px" title="${ym} 應付 ${Math.round(byYm[ym].pay).toLocaleString()}"></div>
+    </div><div class="bar-lbl">${lbl}</div>`;
+    chart.appendChild(g);
+  });
+}
+
+function updateKPIs(data) {
+  const agg = {};
+  data.forEach(e => {
+    const c = e.currency;
+    if(!agg[c]) agg[c]={rF:0,pF:0,rTWD:0,pTWD:0};
+    if(e.type==='應收') { agg[c].rF+=e.foreign_amt; agg[c].rTWD+=e.twd_amt; }
+    else { agg[c].pF+=e.foreign_amt; agg[c].pTWD+=e.twd_amt; }
+  });
+  // EUR
+  const eur = agg['EUR']||{rF:0,pF:0,rTWD:0,pTWD:0};
+  document.getElementById('kp-eur-r').textContent = eur.rF ? '€ '+eur.rF.toLocaleString('zh-TW',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—';
+  document.getElementById('kp-eur-r-twd').textContent = eur.rTWD ? '≈ NT$ '+Math.round(eur.rTWD).toLocaleString() : '';
+  document.getElementById('kp-eur-p').textContent = eur.pF ? '€ '+eur.pF.toLocaleString('zh-TW',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—';
+  document.getElementById('kp-eur-p-twd').textContent = eur.pTWD ? '≈ NT$ '+Math.round(eur.pTWD).toLocaleString() : '';
+  const eurNet = eur.rF - eur.pF;
+  const eurEl = document.getElementById('kp-eur-n');
+  eurEl.textContent = (eurNet>=0?'€ +':'€ ')+eurNet.toLocaleString('zh-TW',{minimumFractionDigits:2,maximumFractionDigits:2});
+  eurEl.style.color = eurNet >= 0 ? '#2471a3' : '#c0392b';
+  // USD
+  const usd = agg['USD']||{rF:0,pF:0,rTWD:0,pTWD:0};
+  document.getElementById('kp-usd-r').textContent = usd.rF ? '$ '+usd.rF.toLocaleString('zh-TW',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—';
+  document.getElementById('kp-usd-r-twd').textContent = usd.rTWD ? '≈ NT$ '+Math.round(usd.rTWD).toLocaleString() : '';
+  document.getElementById('kp-usd-p').textContent = usd.pF ? '$ '+usd.pF.toLocaleString('zh-TW',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—';
+  document.getElementById('kp-usd-p-twd').textContent = usd.pTWD ? '≈ NT$ '+Math.round(usd.pTWD).toLocaleString() : '';
+  const usdNet = usd.rF - usd.pF;
+  const usdEl = document.getElementById('kp-usd-n');
+  usdEl.textContent = (usdNet>=0?'$ +':'$ ')+usdNet.toLocaleString('zh-TW',{minimumFractionDigits:2,maximumFractionDigits:2});
+  usdEl.style.color = usdNet >= 0 ? '#2471a3' : '#c0392b';
+  // TWD totals
+  const allRecvTWD = data.filter(e=>e.type==='應收'&&e.currency==='TWD').reduce((a,e)=>a+e.twd_amt,0);
+  const allPayTWD  = data.filter(e=>e.type==='應付'&&e.currency==='TWD').reduce((a,e)=>a+e.twd_amt,0);
+  document.getElementById('kp-twd-r').textContent = 'NT$ '+Math.round(allRecvTWD).toLocaleString();
+  document.getElementById('kp-twd-p').textContent = 'NT$ '+Math.round(allPayTWD).toLocaleString();
+  const twdEl = document.getElementById('kp-twd-n');
+  const net = allRecvTWD - allPayTWD;
+  twdEl.textContent = 'NT$ '+(net>=0?'+':'')+Math.round(net).toLocaleString();
+  twdEl.style.color = net >= 0 ? '#2471a3' : '#c0392b';
+}
+
+function setCurTab(cur, el) {
+  curTab = cur;
+  document.querySelectorAll('.cur-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  applyFilters();
+}
+
+function buildDropdowns() {
+  const months = [...new Set(EVENTS.map(e=>e.ym))].sort();
+  const sel = document.getElementById('f-month');
+  months.forEach(m=>{ const o=document.createElement('option');o.value=m;o.textContent=m;sel.appendChild(o); });
+  const parties = [...new Set(EVENTS.map(e=>e.counterpart))].sort();
+  const psel = document.getElementById('f-party');
+  parties.forEach(p=>{ const o=document.createElement('option');o.value=p;o.textContent=p;psel.appendChild(o); });
+  const modes = [...new Set(EVENTS.map(e=>e.mode))].sort();
+  const msel = document.getElementById('f-mode');
+  modes.forEach(m=>{ const o=document.createElement('option');o.value=m;o.textContent=m;msel.appendChild(o); });
+}
+
+function applyFilters() {
+  const month = document.getElementById('f-month').value;
+  const type  = document.getElementById('f-type').value;
+  const party = document.getElementById('f-party').value;
+  const mode  = document.getElementById('f-mode').value;
+  const kw    = document.getElementById('f-kw').value.toLowerCase();
+  const filtered = EVENTS.filter(e => {
+    if(curTab !== 'all' && e.currency !== curTab) return false;
+    if(month && e.ym !== month) return false;
+    if(type  && e.type !== type) return false;
+    if(party && e.counterpart !== party) return false;
+    if(mode  && e.mode !== mode) return false;
+    if(kw && !(e.po.toLowerCase().includes(kw)||e.product.toLowerCase().includes(kw)||
+               e.counterpart.toLowerCase().includes(kw))) return false;
+    return true;
+  });
+  renderTable(filtered);
+  buildChart(filtered);
+  updateKPIs(filtered);
+}
+
+function renderTable(data) {
+  const tbody = document.getElementById('cf-body');
+  if(!data.length) { tbody.innerHTML='<tr><td colspan="12" class="no-data">無符合條件的資料</td></tr>'; return; }
+
+  let rows='', lastYm='__', subR=0, subP=0;
+  // Track currency sub-totals per month
+  let subCur = {};
+
+  const flush = (ym) => {
+    const net = subR - subP;
+    let curLine = Object.entries(subCur).filter(([c,v])=>v.r||v.p).map(([c,v])=>{
+      const sym = SYM[c]||c;
+      if(c==='TWD') return '';
+      return `${sym} 應收${v.r.toFixed(2)} / 應付${v.p.toFixed(2)}`;
+    }).filter(Boolean).join(' &nbsp;｜&nbsp; ');
+    rows += `<tr class="sum-row">
+      <td colspan="5">小計 — ${ym==='未確認'?'⚠️ 待確認':ym}</td>
+      <td></td>
+      <td colspan="2" style="font-size:10px;color:#888">${curLine}</td>
+      <td class="twd-val">+${Math.round(subR).toLocaleString()}</td>
+      <td class="twd-pay" style="text-align:right">-${Math.round(subP).toLocaleString()}</td>
+      <td style="color:#2471a3;font-weight:700;text-align:right">淨 ${Math.round(net).toLocaleString()}</td>
+      <td></td></tr>`;
+  };
+
+  data.forEach(e => {
+    if(e.ym !== lastYm) {
+      if(lastYm !== '__') flush(lastYm);
+      subR=0; subP=0; subCur={};
+      rows += `<tr class="month-hdr"><td colspan="12">📅 ${e.ym==='未確認'?'⚠️ 日期待確認':e.ym}</td></tr>`;
+      lastYm = e.ym;
+    }
+    const c = e.currency;
+    if(!subCur[c]) subCur[c]={r:0,p:0};
+    if(e.type==='應收') { if(c==='TWD') subR+=e.twd_amt; subCur[c].r+=e.foreign_amt; }
+    else { if(c==='TWD') subP+=e.twd_amt; subCur[c].p+=e.foreign_amt; }
+
+    const rc   = e.type==='應收'?'recv-row':'pay-row';
+    const badge= e.type==='應收'?'<span class="badge recv">應收</span>':'<span class="badge pay">應付</span>';
+    const nc   = natCls(e.pay_nature);
+    const nat  = e.pay_nature ? `<span class="badge ${nc}">${e.pay_nature}</span>` : '';
+    const conf = e.confirmed ? '<span class="badge 確認">✓ 確認</span>' : '<span class="badge 估計">估計</span>';
+    const cur  = e.currency;
+    const fa   = e.foreign_amt;
+
+    const eurCell = cur==='EUR' && fa ? `<td class="eur-val">€ ${fa.toLocaleString('zh-TW',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>` : '<td class="dim">—</td>';
+    const usdCell = cur==='USD' && fa ? `<td class="usd-val">$ ${fa.toLocaleString('zh-TW',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>` : '<td class="dim">—</td>';
+    const rmbCell = ''; // not shown as separate col but included in TWD
+    const twdLabel= (cur==='TWD'||!fa) ? (e.type==='應收'?`<td class="twd-val">NT$ ${Math.round(e.twd_amt).toLocaleString()}</td>`:`<td class="twd-pay">NT$ ${Math.round(e.twd_amt).toLocaleString()}</td>`) : '<td class="dim">—</td>';
+    const twdConv = (cur!=='TWD' && fa) ? `<td class="dim" style="font-size:11px">≈ NT$ ${Math.round(e.twd_amt).toLocaleString()}</td>` : '<td></td>';
+
+    rows += `<tr class="${rc}">
+      <td>${badge}</td>
+      <td class="date-mono">${e.date_est||'—'}</td>
+      <td class="po-cell" title="${e.po}">${e.po}</td>
+      <td><b>${e.counterpart}</b></td>
+      <td><span class="mode-tag">${e.mode}</span></td>
+      <td>${nat}</td>
+      ${eurCell}${usdCell}${twdLabel}${twdConv}
+      <td style="color:#aaa;font-size:10px;white-space:nowrap">${e.condition||''}</td>
+      <td>${conf}</td>
+    </tr>`;
+  });
+  if(lastYm !== '__') flush(lastYm);
+  tbody.innerHTML = rows;
+}
+
+function resetFilters() {
+  ['f-month','f-type','f-party','f-mode'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-kw').value='';
+  curTab='all';
+  document.querySelectorAll('.cur-tab').forEach((t,i)=>t.classList.toggle('active',i===0));
+  applyFilters();
+}
+
+buildDropdowns();
+applyFilters();
+</script>
+</body>
+</html>
