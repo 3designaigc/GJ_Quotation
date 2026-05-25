@@ -20,6 +20,7 @@ input:focus,select:focus{outline:2px solid rgba(1,49,33,.2);border-color:#013121
 .btn:hover{background:#2A5240}
 .err{display:none;margin-top:12px;padding:9px 11px;border-radius:6px;background:#FFF1F1;color:#B42318;font-size:12px}
 .hint{margin-top:14px;font-size:11px;color:#777;line-height:1.7}
+.ver{margin-top:18px;font-size:10px;color:#bbb;text-align:center}
 /* App shell */
 .app{display:none;height:100vh;grid-template-rows:52px 1fr}
 .top{display:flex;align-items:center;gap:10px;padding:0 16px;background:#013121;color:#fff;min-height:52px}
@@ -55,11 +56,7 @@ iframe{width:100%;height:100%;border:0;background:#fff}
     <input id="pin" type="password" inputmode="text" autocomplete="current-password" placeholder="輸入 PIN">
     <button class="btn" onclick="login()">登入</button>
     <div class="err" id="err">使用者或 PIN 不正確。</div>
-    <div class="hint">
-      Tina Huang：全系統（含毛利）<br>
-      Tina Kao：全部報價 + 訂單概況（不含毛利）<br>
-      Noah Tseng：冷凍食品報價 + 訂單概況（不含毛利）
-    </div>
+    <div class="ver">版本日期 2026-05-25</div>
   </section>
 </main>
 
@@ -77,10 +74,11 @@ iframe{width:100%;height:100%;border:0;background:#fff}
 <script>
 const ACCOUNTS = {
   tina_huang: {
-    name: 'Tina Huang', pin: 'tina2026', scope: '管理者',
+    name: 'Tina Huang', pin: 'tina1688', scope: '管理者',
     systems: [
       {label: '📊 業務報價系統', file: '高玉業務報價系統.html'},
-      {label: '📋 訂單分析', file: '訂單分析系統.html'}
+      {label: '📋 訂單分析', file: '訂單分析系統.html'},
+      {label: '💰 成本利潤報表', file: '產品成本利潤報表.html'}
     ]
   },
   tina_kao: {

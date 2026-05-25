@@ -1479,6 +1479,7 @@ function doExportSummary(){
     return {
       name:        r[2],
       englishName: r[3]||'',
+      spec:        r[4]||'',
       ean:         r[5]||'',
       supplier:    r[12]||'',
       supCode:     r[0]||'',
@@ -1488,24 +1489,27 @@ function doExportSummary(){
       supIncoterm: r[11]||'',
       custIncoterm:r[11]||'',
       supPayment:  r[14]||'',
+      cooperMode:  r[13]||'',
       qty:         oc.qty||1,
       agreedPrice: oc.price||0,
       minPrice:    r[15]||0,
       minPriceTWD: r[20]||0,
+      floorForeign:r[21]||0,
+      floorTWD:    r[22]||0,
       unitsPerCarton: r[6]||1,
       totalAgreed: (oc.qty||1)*(oc.price||0),
     };
   });
 
   const payload = {
-    _version:   '1.1',
+    _version:   '2.0',
     _exported:  new Date().toISOString(),
     _workflow: {
       status: 'pending_tina_import',
       visibility: 'tina_only',
       confirmedBy: sales,
       confirmedAt: new Date().toISOString(),
-      importInstruction: 'Only Tina/Codex may import this file into 訂單彙整表2605.xlsx'
+      importInstruction: '請將此檔放入 04_新系統訂單匯入/ 資料夾，執行 import_order.py 匯入 orders.json'
     },
     gjPO,
     custPO,
@@ -1531,7 +1535,7 @@ function doExportSummary(){
   a.click();
 
   // 顯示下一步說明
-  alert('✅ 訂單上傳檔已下載！\n\n請將此 JSON 檔交給 Tina 或上傳到 Tina 指定的位置。\n\n注意：業務端不會、也不能直接寫入或查看訂單彙整表；只有 Tina/Codex 會把此檔匯入私人總表。');
+  alert('✅ 訂單檔已下載！\n\n請將此 JSON 檔傳給 Tina。\n\nTina 審核後執行 import_order.py 即可自動計算毛利並匯入訂單分析系統。');
 }
 
 
