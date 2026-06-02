@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>高玉企業 — 系統入口</title>
+<script src="pending_data.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#F4F6FA;color:#1a1a2e;height:100vh;overflow:hidden}
@@ -30,6 +31,11 @@ input:focus,select:focus{outline:2px solid rgba(1,49,33,.2);border-color:#013121
 .sys-tab{padding:6px 14px;border-radius:6px;border:1px solid rgba(255,255,255,.3);background:transparent;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s}
 .sys-tab:hover{background:rgba(255,255,255,.15)}
 .sys-tab.active{background:#C9A84C;border-color:#C9A84C;color:#013121}
+.tab-wrap{position:relative;display:inline-block}
+.badge{position:absolute;top:-6px;right:-6px;background:#E53E3E;color:#fff;
+  font-size:10px;font-weight:800;min-width:16px;height:16px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;padding:0 4px;
+  line-height:1;pointer-events:none;box-shadow:0 1px 4px rgba(0,0,0,.3)}
 .spacer{flex:1}
 .logout{border:1px solid rgba(255,255,255,.35);background:transparent;color:#fff;border-radius:5px;padding:5px 10px;font-size:12px;cursor:pointer;font-family:inherit}
 iframe{width:100%;height:100%;border:0;background:#fff}
@@ -56,7 +62,7 @@ iframe{width:100%;height:100%;border:0;background:#fff}
     <input id="pin" type="password" inputmode="text" autocomplete="current-password" placeholder="輸入 PIN">
     <button class="btn" onclick="login()">登入</button>
     <div class="err" id="err">使用者或 PIN 不正確。</div>
-    <div class="ver">版本日期 2026-05-25</div>
+    <div class="ver">版本日期 2026-06-02</div>
   </section>
 </main>
 
@@ -78,32 +84,48 @@ const ACCOUNTS = {
     systems: [
       {label: '📊 業務報價系統', file: '高玉業務報價系統.html'},
       {label: '📋 訂單分析', file: '訂單分析系統.html'},
-      {label: '💰 成本利潤報表', file: '產品成本利潤報表.html'}
+      {label: '💰 成本利潤報表', file: '產品成本利潤報表.html'},
+      {label: '💵 現金流預估', file: '現金流預估表.html'},
+      {label: '📥 訂單審核', file: 'order_review.html'}
     ]
   },
   tina_kao: {
-    name: 'Tina Kao', pin: 'kao2026', scope: '業務',
+    name: 'Tina Kao', pin: 'kao2026', scope: '業務主管',
     systems: [
-      {label: '📊 業務報價系統', file: '高玉業務報價系統.html'},
-      {label: '📋 訂單分析', file: '訂單分析系統.html?mode=sales'}
+      {label: '📊 業務報價系統', file: '高玉業務報價系統.html?role=tina'},
+      {label: '📋 訂單分析', file: '訂單分析系統.html'}
     ]
   },
   noah_tseng: {
     name: 'Noah Tseng', pin: 'noah2026', scope: '業務（冷凍食品）',
     systems: [
-      {label: '📊 業務報價系統', file: '高玉業務報價系統_Noah_冷凍食品.html'},
-      {label: '📋 訂單分析', file: '訂單分析系統.html?mode=sales'}
+      {label: '📊 業務報價系統', file: '高玉業務報價系統.html?role=noah'},
+      {label: '📋 訂單分析', file: '訂單分析系統.html'}
     ]
   }
 };
 
 let currentSystems = [];
+let pendingCount = 0;
+let pollTimer = null;
 
 function renderTabs(systems, activeIdx) {
   document.getElementById('sysTabs').innerHTML = systems.map(function(s, i) {
-    return '<button class="sys-tab' + (i === activeIdx ? ' active' : '') +
-           '" onclick="switchSystem(' + i + ')">' + s.label + '</button>';
+    var isReview = s.file === 'order_review.html';
+    var badge = (isReview && pendingCount > 0)
+      ? '<span class="badge">' + pendingCount + '</span>' : '';
+    return '<div class="tab-wrap"><button class="sys-tab' + (i === activeIdx ? ' active' : '') +
+           '" onclick="switchSystem(' + i + ')">' + s.label + '</button>' + badge + '</div>';
   }).join('');
+}
+
+function checkPending() {
+  var n = (window.PENDING_ORDERS && window.PENDING_ORDERS.pending) || 0;
+  if (n !== pendingCount) {
+    pendingCount = n;
+    var saved = sessionStorage.getItem('goldenJadeTab') || '0';
+    renderTabs(currentSystems, parseInt(saved));
+  }
 }
 
 function switchSystem(idx) {
@@ -121,6 +143,7 @@ function openApp(accountKey) {
   document.getElementById('roleText').textContent = account.name + ' ｜ ' + account.scope;
   var savedTab = parseInt(sessionStorage.getItem('goldenJadeTab') || '0');
   var startIdx = savedTab < currentSystems.length ? savedTab : 0;
+  checkPending();
   renderTabs(currentSystems, startIdx);
   document.getElementById('systemFrame').src = currentSystems[startIdx].file;
   sessionStorage.setItem('goldenJadeUser', accountKey);
@@ -139,6 +162,8 @@ function login() {
 }
 
 function logout() {
+  if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+  pendingCount = 0;
   sessionStorage.removeItem('goldenJadeUser');
   sessionStorage.removeItem('goldenJadeTab');
   document.getElementById('systemFrame').src = 'about:blank';
