@@ -112,6 +112,37 @@ tr.selected:hover td{background:#dbeafe}
 .saved-toast.show{opacity:1}
 /* Responsive */
 @media(max-width:900px){.split,.sup-layout{flex-direction:column}.list-panel{width:100%;max-height:40vh}.sup-list{width:100%;max-height:220px}}
+
+/* ===== PDF Export Modal ===== */
+.pdf-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2000;align-items:center;justify-content:center}
+.pdf-modal-overlay.open{display:flex}
+.pdf-modal{background:#fff;border-radius:10px;width:min(760px,96vw);max-height:90vh;display:flex;flex-direction:column;overflow:hidden}
+.pdf-modal-head{background:var(--green);color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.pdf-modal-head h2{font-size:15px;font-weight:700;margin:0}
+.pdf-close{background:none;border:none;color:#fff;font-size:18px;cursor:pointer;padding:0 4px;line-height:1}
+.pdf-modal-body{padding:18px 20px;overflow-y:auto;flex:1}
+.pdf-section{margin-bottom:18px}
+.pdf-section-title{font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border)}
+.pdf-sup-select{width:100%;height:36px;border:1.5px solid var(--border);border-radius:6px;padding:0 10px;font-size:13px}
+.pdf-prod-list{max-height:220px;overflow-y:auto;border:1.5px solid var(--border);border-radius:6px}
+.pdf-prod-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-bottom:1px solid #f1f5f9;font-size:12px;cursor:pointer}
+.pdf-prod-item:last-child{border-bottom:none}
+.pdf-prod-item:hover{background:#f8fafc}
+.pdf-prod-item input[type=checkbox]{accent-color:var(--green);width:14px;height:14px;flex-shrink:0;cursor:pointer}
+.pdf-prod-name{font-weight:600;color:var(--text)}
+.pdf-prod-spec{color:var(--muted);font-size:11px}
+.pdf-prod-ean{color:var(--muted);font-size:10px;font-family:monospace}
+.pdf-sel-all{font-size:11px;color:var(--green);cursor:pointer;text-decoration:underline;margin-bottom:6px;display:inline-block}
+.pdf-fields-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.pdf-field-chk{display:flex;align-items:center;gap:6px;font-size:12px;padding:5px 8px;border-radius:5px;background:#f8fafc;cursor:pointer}
+.pdf-field-chk input[type=checkbox]{accent-color:var(--green);cursor:pointer}
+.pdf-field-chk span{color:var(--muted);font-size:10px}
+.pdf-modal-foot{border-top:1px solid var(--border);padding:12px 20px;display:flex;justify-content:flex-end;gap:10px;flex-shrink:0;background:#fff}
+.pdf-gen-btn{background:var(--green);color:#fff;border:none;padding:8px 22px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer}
+.pdf-gen-btn:hover{background:#2A5240}
+.pdf-gen-btn:disabled{opacity:.45;cursor:not-allowed}
+.pdf-cancel-btn{background:#fff;border:1.5px solid var(--border);padding:8px 16px;border-radius:6px;font-size:13px;cursor:pointer}
+.pdf-no-prod{color:var(--muted);font-size:12px;padding:16px;text-align:center}
 </style>
 </head>
 <body>
@@ -124,7 +155,41 @@ tr.selected:hover td{background:#dbeafe}
   </div>
   <div class="spacer"></div>
   <span id="roleTag" style="font-size:11px;opacity:.7"></span>
+  <button class="export-btn" onclick="openPdfModal()" style="margin-right:4px">📄 匯出技術資料</button>
   <button class="export-btn" onclick="exportJSON()">⬇ 匯出更新 JSON</button>
+</div>
+
+<!-- ===== PDF Export Modal ===== -->
+<div class="pdf-modal-overlay" id="pdf-modal">
+  <div class="pdf-modal">
+    <div class="pdf-modal-head">
+      <h2>📄 匯出產品技術資料 PDF</h2>
+      <button class="pdf-close" onclick="closePdfModal()">✕</button>
+    </div>
+    <div class="pdf-modal-body">
+      <div class="pdf-section">
+        <div class="pdf-section-title">① 選擇供應商</div>
+        <select class="pdf-sup-select" id="pdf-sup-sel" onchange="loadPdfProds()">
+          <option value="">— 請選擇供應商 —</option>
+        </select>
+      </div>
+      <div class="pdf-section">
+        <div class="pdf-section-title">② 勾選產品</div>
+        <span class="pdf-sel-all" onclick="pdfToggleAll()">全選 / 全不選</span>
+        <div class="pdf-prod-list" id="pdf-prod-list">
+          <div class="pdf-no-prod">請先選擇供應商</div>
+        </div>
+      </div>
+      <div class="pdf-section">
+        <div class="pdf-section-title">③ 選擇要匯出的欄位</div>
+        <div class="pdf-fields-grid" id="pdf-fields-grid"></div>
+      </div>
+    </div>
+    <div class="pdf-modal-foot">
+      <button class="pdf-cancel-btn" onclick="closePdfModal()">取消</button>
+      <button class="pdf-gen-btn" id="pdf-gen-btn" onclick="generatePdf()" disabled>產生 PDF</button>
+    </div>
+  </div>
 </div>
 
 <!-- ===== 產品主檔 TAB ===== -->
@@ -720,6 +785,211 @@ document.getElementById('edit-modal').addEventListener('click', function(e) {
 });
 
 init();
+
+// ============================================================
+// PDF EXPORT
+// ============================================================
+const LOGO_B64 = 'data:image/png;base64,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';
+
+const PDF_FIELDS = [
+  {key:'EAN',       label:'EAN / 國際條碼',     en:'EAN / International Barcode',   src:'prod', default:true},
+  {key:'規格',      label:'規格',               en:'Specification',                  src:'prod', default:true},
+  {key:'箱入數',    label:'箱入數',             en:'Units per Carton',               src:'prod', default:true},
+  {key:'生產國',    label:'生產國',             en:'Country of Origin',              src:'prod', default:true},
+  {key:'ingredients',   label:'英文成份',       en:'Ingredients',                    src:'tech', default:true},
+  {key:'ingredients_zh',label:'中文成份',       en:'Ingredients (Chinese)',          src:'tech', default:false},
+  {key:'allergens',     label:'過敏原',         en:'Allergens',                      src:'tech', default:true},
+  {key:'shelf_life_m',  label:'效期（月）',     en:'Shelf Life (months)',            src:'tech', default:true},
+  {key:'bbd_fmt',       label:'效期標示格式',   en:'BBD Format',                     src:'tech', default:false},
+  {key:'carton_dim',    label:'外箱尺寸（cm）', en:'Carton Dimensions (cm)',         src:'tech', default:true},
+  {key:'manufacturer_en',label:'製造商',        en:'Manufacturer',                   src:'tech', default:false},
+  {key:'factory_addr_en',label:'工廠地址',      en:'Factory Address',                src:'tech', default:false},
+  {key:'storage',       label:'儲存方式',       en:'Storage Condition',              src:'tech', default:false},
+  {key:'alcohol_pct',   label:'酒精含量',       en:'Alcohol Content',                src:'tech', default:false},
+  {key:'certs',         label:'認證',           en:'Certifications',                 src:'tech', default:false},
+  {key:'hs_code',       label:'HS Code',        en:'HS Code',                        src:'tech', default:false},
+];
+
+function openPdfModal() {
+  // Populate supplier dropdown
+  const sel = document.getElementById('pdf-sup-sel');
+  const suppliers = [...new Set(PRODS.map(p => p['供應商']).filter(Boolean))].sort();
+  sel.innerHTML = '<option value="">— 請選擇供應商 —</option>' +
+    suppliers.map(s => `<option value="${s}">${s}</option>`).join('');
+
+  // Build field checkboxes
+  const grid = document.getElementById('pdf-fields-grid');
+  grid.innerHTML = PDF_FIELDS.map(f => `
+    <label class="pdf-field-chk">
+      <input type="checkbox" id="pf_${f.key}" ${f.default ? 'checked' : ''}>
+      ${f.label} <span>${f.en}</span>
+    </label>`).join('');
+
+  document.getElementById('pdf-modal').classList.add('open');
+}
+
+function closePdfModal() {
+  document.getElementById('pdf-modal').classList.remove('open');
+}
+
+function loadPdfProds() {
+  const sup = document.getElementById('pdf-sup-sel').value;
+  const listEl = document.getElementById('pdf-prod-list');
+  const genBtn = document.getElementById('pdf-gen-btn');
+  if (!sup) {
+    listEl.innerHTML = '<div class="pdf-no-prod">請先選擇供應商</div>';
+    genBtn.disabled = true;
+    return;
+  }
+  const items = PRODS.filter(p => p['供應商'] === sup);
+  listEl.innerHTML = items.map((p,i) => `
+    <label class="pdf-prod-item">
+      <input type="checkbox" class="pdf-prod-chk" value="${i}" data-ean="${p['EAN']||''}" checked onchange="updatePdfBtn()">
+      <div>
+        <div class="pdf-prod-name">${p['中文品名']||'—'}</div>
+        <div class="pdf-prod-spec">${p['英文品名']||''} ${p['規格']?'· '+p['規格']:''}</div>
+        <div class="pdf-prod-ean">EAN: ${p['EAN']||'—'}</div>
+      </div>
+    </label>`).join('');
+  // Store filtered list for later
+  listEl._prods = items;
+  updatePdfBtn();
+}
+
+function updatePdfBtn() {
+  const checked = document.querySelectorAll('.pdf-prod-chk:checked').length;
+  document.getElementById('pdf-gen-btn').disabled = checked === 0;
+}
+
+function pdfToggleAll() {
+  const boxes = document.querySelectorAll('.pdf-prod-chk');
+  if (!boxes.length) return;
+  const allChecked = [...boxes].every(b => b.checked);
+  boxes.forEach(b => { b.checked = !allChecked; });
+  updatePdfBtn();
+}
+
+function getFieldVal(prod, techRec, fieldKey) {
+  if (!techRec && ['ingredients','ingredients_zh','allergens','shelf_life_m','bbd_fmt',
+    'carton_dim','manufacturer_en','factory_addr_en','storage','alcohol_pct','certs','hs_code'].includes(fieldKey)) {
+    return null;
+  }
+  if (fieldKey === 'EAN') return prod['EAN'] || null;
+  if (fieldKey === '規格') return prod['規格'] || null;
+  if (fieldKey === '箱入數') return prod['箱入數'] ? prod['箱入數'] + ' 個/箱' : null;
+  if (fieldKey === '生產國') return prod['生產國'] || null;
+  if (fieldKey === 'shelf_life_m') return techRec && techRec.shelf_life_m ? techRec.shelf_life_m + ' 個月' : null;
+  if (fieldKey === 'alcohol_pct') {
+    if (!techRec) return null;
+    const v = techRec.alcohol_pct;
+    return (v !== null && v !== undefined && v !== '') ? v + '%' : null;
+  }
+  if (fieldKey === 'certs') {
+    if (!techRec || !techRec.certs || !techRec.certs.length) return null;
+    return Array.isArray(techRec.certs) ? techRec.certs.join(', ') : techRec.certs;
+  }
+  return techRec ? (techRec[fieldKey] || null) : null;
+}
+
+function generatePdf() {
+  const listEl = document.getElementById('pdf-prod-list');
+  const prods = listEl._prods || [];
+  const checked = [...document.querySelectorAll('.pdf-prod-chk:checked')].map(b => parseInt(b.value));
+  const selectedProds = checked.map(i => prods[i]);
+
+  const selFields = PDF_FIELDS.filter(f => {
+    const el = document.getElementById('pf_' + f.key);
+    return el && el.checked;
+  });
+
+  const sup = document.getElementById('pdf-sup-sel').value;
+  const today = new Date().toLocaleDateString('zh-TW', {year:'numeric',month:'2-digit',day:'2-digit'});
+
+  // Build product cards HTML
+  const cards = selectedProds.map(prod => {
+    const ean = (prod['EAN'] || '').replace(/\s/g,'');
+    const techRec = TECH_RAW[ean] || TECH_RAW[prod['EAN']] || null;
+
+    const rows = selFields.map(f => {
+      const val = getFieldVal(prod, techRec, f.key);
+      if (!val && val !== 0) return '';
+      return `<tr>
+        <td class="fl-cell">${f.label}<br><span class="fl-en">${f.en}</span></td>
+        <td class="fv-cell">${String(val).replace(/\n/g,'<br>')}</td>
+      </tr>`;
+    }).filter(Boolean).join('');
+
+    return `<div class="prod-card">
+      <div class="prod-card-head">
+        <div class="prod-cn">${prod['中文品名']||'—'}</div>
+        <div class="prod-en">${prod['英文品名']||''}</div>
+      </div>
+      <table class="data-tbl">
+        <tbody>${rows || '<tr><td colspan="2" style="color:#9ca3af;font-size:11px;padding:8px">（無選取資料）</td></tr>'}</tbody>
+      </table>
+    </div>`;
+  }).join('');
+
+  const printHTML = `<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>產品技術資料 — 高玉企業</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:#111;background:#fff;font-size:12px}
+.page-header{display:flex;align-items:center;padding:16px 24px 12px;border-bottom:2.5px solid #013121;margin-bottom:20px}
+.logo{width:44px;height:44px;border-radius:7px;margin-right:14px;flex-shrink:0}
+.co-name{font-size:16px;font-weight:800;color:#013121;line-height:1.2}
+.co-sub{font-size:10px;color:#6b7280;margin-top:1px}
+.doc-title{margin-left:auto;text-align:right}
+.doc-title h1{font-size:13px;font-weight:700;color:#013121}
+.doc-title .doc-meta{font-size:10px;color:#6b7280;margin-top:3px}
+.section-sup{font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;padding:0 24px 8px;margin-bottom:12px}
+.prod-card{margin:0 24px 20px;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;page-break-inside:avoid}
+.prod-card-head{background:#013121;color:#fff;padding:9px 14px}
+.prod-cn{font-size:13px;font-weight:700;line-height:1.3}
+.prod-en{font-size:10px;opacity:.8;margin-top:2px}
+.data-tbl{width:100%;border-collapse:collapse}
+.fl-cell{width:35%;padding:7px 14px;font-size:10px;font-weight:700;color:#374151;background:#f8fafc;border-bottom:1px solid #e2e8f0;vertical-align:top;line-height:1.4}
+.fl-en{font-weight:400;color:#9ca3af}
+.fv-cell{padding:7px 14px;font-size:11px;color:#111;border-bottom:1px solid #e2e8f0;vertical-align:top;line-height:1.5}
+.data-tbl tr:last-child .fl-cell,.data-tbl tr:last-child .fv-cell{border-bottom:none}
+.page-footer{text-align:center;font-size:9px;color:#9ca3af;padding:12px 24px;border-top:1px solid #e2e8f0;margin-top:24px}
+@media print{
+  body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  @page{margin:10mm 12mm}
+  .prod-card{page-break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="page-header">
+  <img class="logo" src="${LOGO_B64}">
+  <div>
+    <div class="co-name">高玉企業 Golden Jade Terre</div>
+    <div class="co-sub">Product Technical Specification</div>
+  </div>
+  <div class="doc-title">
+    <h1>產品技術資料</h1>
+    <div class="doc-meta">供應商：${sup} ｜ 日期：${today} ｜ 共 ${selectedProds.length} 筆</div>
+  </div>
+</div>
+${cards}
+<div class="page-footer">本文件由高玉企業 Golden Jade Terre 產品技術主檔系統產製 · 僅供內部及客戶提報使用</div>
+<script>window.onload = function(){ window.print(); }</script>
+</body>
+</html>`;
+
+  const win = window.open('', '_blank');
+  win.document.write(printHTML);
+  win.document.close();
+}
+
+document.getElementById('pdf-modal').addEventListener('click', function(e) {
+  if (e.target === this) closePdfModal();
+});
+
 </script>
 </body>
 </html>
