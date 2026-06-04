@@ -153,6 +153,37 @@ tfoot td.r{text-align:right;font-variant-numeric:tabular-nums}
 .flag-row-reason{color:#555;margin-top:2px}
 .flag-row-prices{font-size:12px;color:#777;margin-top:3px}
 
+/* ── Auto-approved panel ── */
+.auto-panel{background:#E8F5E9;border:2px solid #4CAF50;border-radius:var(--radius);
+  padding:20px 24px;margin-bottom:20px}
+.auto-panel-title{font-size:16px;font-weight:700;color:#1B5E20;margin-bottom:12px;
+  display:flex;align-items:center;gap:8px}
+.auto-item{display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;background:#fff;border-radius:8px;margin-bottom:8px;
+  border:1px solid #C8E6C9}
+.auto-item-name{font-weight:600;font-size:13px}
+.auto-item-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.auto-tag{font-size:11px;background:#4CAF50;color:#fff;padding:2px 8px;border-radius:10px;
+  font-weight:700}
+.auto-note{font-size:12px;color:#388E3C;margin-top:12px;padding:8px 12px;
+  background:#F1F8E9;border-radius:6px;border-left:3px solid #4CAF50}
+
+/* ── Flagged queue panel ── */
+.queue-panel{background:#FFF3CD;border:2px solid #FFC107;border-radius:var(--radius);
+  padding:16px 20px;margin-bottom:16px}
+.queue-panel-title{font-size:13px;font-weight:700;color:#856404;margin-bottom:10px;
+  display:flex;align-items:center;gap:8px}
+.queue-items{display:flex;flex-direction:column;gap:6px}
+.queue-item{display:flex;align-items:center;justify-content:space-between;
+  padding:8px 12px;background:#fff;border-radius:6px;border:1px solid #FFD54F;cursor:pointer}
+.queue-item:hover{background:#FFFBF0}
+.queue-item.active{background:#FFF8E1;border-color:#FFA000;border-width:2px}
+.queue-item-name{font-size:12px;font-weight:700}
+.queue-item-flags{font-size:11px;color:#E65100}
+.btn-queue{background:#FFC107;color:#212121;border:none;padding:5px 14px;
+  border-radius:6px;font-size:12px;font-weight:700;cursor:pointer}
+.btn-queue:hover{background:#FFB300}
+
 /* ── Actions ── */
 .actions{display:flex;gap:12px;justify-content:flex-end;padding-top:4px;flex-wrap:wrap}
 .btn-main{background:linear-gradient(135deg,#C8A84B,#A07832);color:#fff;border:none;
@@ -182,11 +213,27 @@ tfoot td.r{text-align:right;font-variant-numeric:tabular-nums}
 </div>
 
 <div id="pending-bar" class="pending-bar hidden">
-  <span class="pb-label">📥 待審核訂單：</span>
+  <span class="pb-label">📥 待人工審核（來自 04_訂單匯入/待審核/）：</span>
   <div class="pb-files" id="pb-files"></div>
 </div>
 
 <div class="main">
+
+  <!-- AUTO-APPROVED PANEL (hidden until auto-processed clean orders) -->
+  <div id="auto-panel" class="auto-panel hidden">
+    <div class="auto-panel-title">✅ 以下訂單已通過價格審核，已自動下載核准檔</div>
+    <div id="auto-items"></div>
+    <div class="auto-note">
+      📂 請將下載的 <strong>訂單_已核准_*.json</strong> 放入 <code>04_訂單匯入/</code> 資料夾。<br>
+      每日 08:00 自動排程（或手動執行 <code>import_order.py --auto</code>）會計算毛利並匯入訂單分析系統。
+    </div>
+  </div>
+
+  <!-- FLAGGED QUEUE PANEL (hidden until multiple flagged orders) -->
+  <div id="queue-panel" class="queue-panel hidden">
+    <div class="queue-panel-title">⚠️ 以下訂單有價格異常，請逐筆審核</div>
+    <div class="queue-items" id="queue-items"></div>
+  </div>
 
   <!-- DROP ZONE -->
   <div id="drop-zone">
@@ -300,32 +347,210 @@ tfoot td.r{text-align:right;font-variant-numeric:tabular-nums}
 <script>
 'use strict';
 
-// ── 待審核清單 ────────────────────────────────────────────────────────────────
-(function(){
-  const p = window.PENDING_ORDERS;
-  if (!p || !p.pending) return;
-  const bar = document.getElementById('pending-bar');
-  const list = document.getElementById('pb-files');
-  (p.files || []).forEach(function(f){
-    const span = document.createElement('span');
-    span.className = 'pb-file';
-    span.title = '請從 04_訂單匯入/待審核/ 資料夾拖入此檔案';
-    span.textContent = f;
-    list.appendChild(span);
-  });
-  bar.classList.remove('hidden');
-})();
-
 // ── Constants ────────────────────────────────────────────────────────────────
+const IMPORT_QUEUE_KEY = 'gj_order_import_queue';
 const DEFAULT_RATES = { EUR: 37.0, Euro: 37.0, EURO: 37.0, USD: 32.0, RMB: 4.4, CNY: 4.4, HKD: 4.1, TWD: 1.0 };
 let ORDER    = null;
-let FLAG_MAP = {};   // { productName → flagObject }
+let FLAG_MAP = {};
+let FLAGGED_QUEUE = [];   // [{order, priceFlags}, ...]
+let FLAGGED_INDEX = 0;
 
 function normCur(cur) {
   const c = (cur || 'TWD').trim();
   if (/^Euro$/i.test(c)) return 'EUR';
   if (/^(TWD|NT\$|台幣)$/i.test(c)) return 'TWD';
   return c.toUpperCase();
+}
+
+// ── 待審核清單（來自 pending_data.js — 已被 import_order.py 移至待審核/的檔案） ───
+(function(){
+  const p = window.PENDING_ORDERS;
+  // Show files in 待審核/ (review) — these already have _priceFlags
+  const reviewFiles = (p && p.reviewFiles) ? p.reviewFiles : ((p && p.files) ? p.files : []);
+  if (!reviewFiles.length) return;
+  const bar = document.getElementById('pending-bar');
+  const list = document.getElementById('pb-files');
+  reviewFiles.forEach(function(f){
+    const span = document.createElement('span');
+    span.className = 'pb-file';
+    span.title = '請從 04_訂單匯入/待審核/ 資料夾拖入此檔案（已含價格旗標）';
+    span.textContent = f;
+    list.appendChild(span);
+  });
+  bar.classList.remove('hidden');
+})();
+
+// ── Auto-process from localStorage queue ─────────────────────────────────────
+
+/** Mirror of import_order.py check_prices() — uses price limits already embedded in each item */
+function checkItemPrice(it, isTWD) {
+  const cur    = normCur(it.currency || '');
+  const agreed = parseFloat(it.agreedPrice) || 0;
+  if (!agreed) return null;
+
+  let minP, floorP;
+  if (cur === 'TWD' || isTWD) {
+    minP   = parseFloat(it.minPriceTWD)  || 0;
+    floorP = parseFloat(it.floorTWD)     || 0;
+  } else {
+    minP   = parseFloat(it.minPrice)     || 0;
+    floorP = parseFloat(it.floorForeign) || 0;
+  }
+
+  if (!minP && !floorP) return null;   // no price data —佣金產品等，略過
+
+  if (floorP > 0 && agreed < floorP) {
+    return {
+      severity: 'critical',
+      reason:   `成交價 ${agreed} ${cur} 低於成本底線 ${floorP} ${cur}（有虧損風險）`,
+      min: minP, floor: floorP, currency: cur,
+    };
+  }
+  if (minP > 0 && agreed < minP) {
+    return {
+      severity: 'warning',
+      reason:   `成交價 ${agreed} ${cur} 低於系統最低報價 ${minP} ${cur}`,
+      min: minP, floor: floorP, currency: cur,
+    };
+  }
+  return null;
+}
+
+function runQueueAutoProcess() {
+  let queue;
+  try { queue = JSON.parse(localStorage.getItem(IMPORT_QUEUE_KEY) || '[]'); }
+  catch(e) { return; }
+  if (!Array.isArray(queue) || queue.length === 0) return;
+
+  const clean = [], flaggedList = [], processedIds = [];
+
+  queue.forEach(entry => {
+    const order  = entry.order || entry;
+    const isTWD  = !!order.isTWD;
+    const items  = order.items || [];
+    const flags  = [];
+
+    items.forEach(it => {
+      const f = checkItemPrice(it, isTWD);
+      if (f) flags.push({ item: it.name, agreed: parseFloat(it.agreedPrice)||0, ...f });
+    });
+
+    if (flags.length === 0) {
+      clean.push(order);
+    } else {
+      const o2 = Object.assign({}, order, { _priceFlags: flags });
+      flaggedList.push({ order: o2, priceFlags: flags });
+    }
+    processedIds.push(entry.id || entry.queuedAt || JSON.stringify(entry).slice(0,40));
+  });
+
+  // Remove processed entries from queue
+  const remaining = queue.filter(e => {
+    const key = e.id || e.queuedAt || JSON.stringify(e).slice(0,40);
+    return !processedIds.includes(key);
+  });
+  try { localStorage.setItem(IMPORT_QUEUE_KEY, JSON.stringify(remaining)); } catch(e) {}
+
+  // Handle clean orders — auto-download with _approved:true
+  if (clean.length > 0) {
+    showAutoApproved(clean);
+  }
+
+  // Handle flagged orders — store in global queue for navigation
+  if (flaggedList.length > 0) {
+    FLAGGED_QUEUE = flaggedList;
+    FLAGGED_INDEX = 0;
+    if (flaggedList.length > 1) {
+      renderFlaggedQueuePanel(flaggedList);
+    }
+    loadFlaggedOrder(0);
+  }
+}
+
+function showAutoApproved(cleanOrders) {
+  const panel = document.getElementById('auto-panel');
+  const items = document.getElementById('auto-items');
+  items.innerHTML = '';
+
+  cleanOrders.forEach(order => {
+    const approved = Object.assign({}, order, {
+      _reviewed:   true,
+      _approved:   true,
+      _reviewedAt: new Date().toISOString(),
+    });
+    const cust = order.customer || 'unknown';
+    const date = (order.orderDate || '').slice(0, 10);
+    const outName = `訂單_已核准_${cust}_${date}.json`;
+
+    // Auto-download
+    downloadJSON(approved, outName);
+
+    // Add row to panel
+    const div = document.createElement('div');
+    div.className = 'auto-item';
+    const nItems = (order.items || []).length;
+    const totStr = (() => {
+      const tots = {};
+      (order.items || []).forEach(it => {
+        const c = normCur(it.currency);
+        tots[c] = (tots[c] || 0) + (parseFloat(it.agreedPrice)||0) * (parseFloat(it.qty)||0);
+      });
+      return Object.entries(tots).map(([c,v]) => `${c} ${v.toFixed(2)}`).join('、') || '—';
+    })();
+    div.innerHTML =
+      `<div>
+        <div class="auto-item-name">${escHtml(cust)} — ${escHtml(order.gjPO || order.custPO || '')} &nbsp;&nbsp;
+          <span class="auto-tag">✅ 通過</span>
+        </div>
+        <div class="auto-item-sub">${nItems} 項　${totStr}　已下載：${outName}</div>
+       </div>`;
+    items.appendChild(div);
+  });
+
+  panel.classList.remove('hidden');
+}
+
+function renderFlaggedQueuePanel(flaggedList) {
+  const qp    = document.getElementById('queue-panel');
+  const qi    = document.getElementById('queue-items');
+  qi.innerHTML = '';
+
+  flaggedList.forEach((entry, idx) => {
+    const order = entry.order;
+    const nCrit = entry.priceFlags.filter(f => f.severity === 'critical').length;
+    const nWarn = entry.priceFlags.filter(f => f.severity === 'warning').length;
+    const flagStr = [nCrit && `🔴 ${nCrit} 項底線`, nWarn && `🟡 ${nWarn} 項低於最低`]
+                    .filter(Boolean).join('　');
+
+    const div = document.createElement('div');
+    div.className = 'queue-item' + (idx === 0 ? ' active' : '');
+    div.id = `qi-${idx}`;
+    div.innerHTML =
+      `<div>
+        <div class="queue-item-name">${escHtml(order.customer)} — ${escHtml(order.gjPO||order.custPO||'')}</div>
+        <div class="queue-item-flags">${flagStr}</div>
+       </div>
+       <button class="btn-queue" onclick="loadFlaggedOrder(${idx})">審核</button>`;
+    qi.appendChild(div);
+  });
+
+  qp.classList.remove('hidden');
+}
+
+function loadFlaggedOrder(idx) {
+  if (idx < 0 || idx >= FLAGGED_QUEUE.length) return;
+  FLAGGED_INDEX = idx;
+
+  // Update active state in queue panel
+  document.querySelectorAll('.queue-item').forEach((el, i) => {
+    el.classList.toggle('active', i === idx);
+  });
+
+  const { order } = FLAGGED_QUEUE[idx];
+  const cust = order.customer || 'unknown';
+  const date = (order.orderDate || '').slice(0, 10);
+  order._srcFilename = `訂單_${cust}_${date}.json`;
+  renderOrder(order);
 }
 
 // ── File loading ─────────────────────────────────────────────────────────────
@@ -361,6 +586,7 @@ function resetTool() {
   document.getElementById('price-flags-section').classList.add('hidden');
   document.getElementById('price-flags-section').innerHTML = '';
   document.getElementById('btn-reject').classList.add('hidden');
+  // Don't hide auto-panel or queue-panel — they show persistent results
   dropZone.classList.remove('hidden');
   fileInput.value = '';
 }
@@ -663,13 +889,27 @@ function exportApproved() {
 
   downloadJSON(approved, outName);
 
-  alert(
-    `✅ 已核准，檔案已下載：${outName}\n\n` +
-    `請將此 JSON 放入：\n` +
-    `  04_訂單匯入/\n\n` +
-    `下次自動排程（每日 08:00）執行時，\n` +
-    `系統將直接匯入，不再進行價格檢查。`
-  );
+  // If reviewing from flagged queue — advance to next order
+  const nextIdx = FLAGGED_INDEX + 1;
+  if (FLAGGED_QUEUE.length > 0 && nextIdx < FLAGGED_QUEUE.length) {
+    const msg = `✅ 已核准並下載：${outName}\n\n請將此檔放入 04_訂單匯入/\n\n→ 還有 ${FLAGGED_QUEUE.length - nextIdx} 張待審核，即將跳至下一張。`;
+    alert(msg);
+    loadFlaggedOrder(nextIdx);
+  } else {
+    alert(
+      `✅ 已核准，檔案已下載：${outName}\n\n` +
+      `請將此 JSON 放入：\n` +
+      `  04_訂單匯入/\n\n` +
+      `下次自動排程（每日 08:00）執行時，\n` +
+      `系統將直接匯入，不再進行價格檢查。`
+    );
+    // Done reviewing — if came from queue, reset to drop zone
+    if (FLAGGED_QUEUE.length > 0) {
+      FLAGGED_QUEUE = [];
+      FLAGGED_INDEX = 0;
+      resetTool();
+    }
+  }
 }
 
 // ── Export: Rejected ─────────────────────────────────────────────────────────
@@ -689,11 +929,23 @@ function exportRejected() {
 
   downloadJSON(rejected, outName);
 
-  alert(
-    `❌ 已退件：${outName}\n\n` +
-    `此訂單不會被匯入系統。\n` +
-    `如需修改後重新送審，請由業務系統重新匯出後放入匯入資料夾。`
-  );
+  // Advance to next flagged order if any
+  const nextIdx = FLAGGED_INDEX + 1;
+  if (FLAGGED_QUEUE.length > 0 && nextIdx < FLAGGED_QUEUE.length) {
+    alert(`❌ 已退件：${outName}\n\n→ 還有 ${FLAGGED_QUEUE.length - nextIdx} 張待審核，即將跳至下一張。`);
+    loadFlaggedOrder(nextIdx);
+  } else {
+    alert(
+      `❌ 已退件：${outName}\n\n` +
+      `此訂單不會被匯入系統。\n` +
+      `如需修改後重新送審，請由業務系統重新匯出後放入匯入資料夾。`
+    );
+    if (FLAGGED_QUEUE.length > 0) {
+      FLAGGED_QUEUE = [];
+      FLAGGED_INDEX = 0;
+      resetTool();
+    }
+  }
 }
 
 function downloadJSON(data, filename) {
@@ -705,6 +957,11 @@ function downloadJSON(data, filename) {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
+
+// ── Init on page load ─────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  runQueueAutoProcess();
+});
 </script>
 </body>
 </html>

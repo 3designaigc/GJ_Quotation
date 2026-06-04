@@ -123,7 +123,14 @@ function renderTabs(systems, activeIdx) {
 }
 
 function checkPending() {
-  var n = (window.PENDING_ORDERS && window.PENDING_ORDERS.pending) || 0;
+  // badge = 待審核（有旗標）+ 本機 localStorage 中未處理的訂單
+  var reviewN  = (window.PENDING_ORDERS && window.PENDING_ORDERS.review)  || 0;
+  var queueN   = 0;
+  try {
+    var q = JSON.parse(localStorage.getItem('gj_order_import_queue') || '[]');
+    queueN = Array.isArray(q) ? q.length : 0;
+  } catch(e) {}
+  var n = reviewN + queueN;
   if (n !== pendingCount) {
     pendingCount = n;
     var saved = sessionStorage.getItem('goldenJadeTab') || '0';
