@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>國際採購下單系統 — Golden Jade Terre</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#f0f2f5;color:#222;font-size:13px}
+#app{max-width:1100px;margin:0 auto;padding:16px}
+h1{font-size:18px;color:#1a3a5c;margin-bottom:14px}
+#drop-zone{border:2px dashed #4a90d9;border-radius:8px;padding:24px;text-align:center;
+  background:#EBF5FB;cursor:pointer;color:#2980b9;margin-bottom:12px;transition:.2s}
+#drop-zone.over{background:#D4E8F7}
+#drop-zone.loaded{background:#E8F6E8;border-color:#27ae60;color:#1e8449}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+label{font-weight:600;color:#555;font-size:12px}
+input[type=date],input[type=text]{border:1px solid #ccc;border-radius:4px;padding:5px 7px;font-size:12px;margin-left:3px}
+.btn{padding:7px 14px;border:none;border-radius:5px;font-size:12px;font-weight:700;cursor:pointer}
+.btn-go{background:#1a3a5c;color:#fff}.btn-go:hover{background:#0f2540}
+.btn-print{background:#27ae60;color:#fff}.btn-print:hover{background:#1e8449}
+#order-info{background:#fff;border-left:4px solid #1a3a5c;padding:10px 14px;border-radius:6px;
+  margin-bottom:10px;font-size:12px;display:none}
+#config-row{display:none}
+#po-wrapper{display:none;margin-top:16px}
+
+/* ── PO Document ── */
+.po-doc{font-family:Arial,sans-serif;font-size:8.5pt;background:#fff;padding:14px 18px;
+  box-shadow:0 2px 10px rgba(0,0,0,.1);max-width:1060px;margin-bottom:20px}
+.date-top{text-align:right;font-weight:700;margin-bottom:8px}
+.po-grid2{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px}
+.po-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:6px}
+.po-grid12{display:grid;grid-template-columns:1fr 2fr;gap:6px;margin-bottom:6px}
+.cell{border:1px solid #bbb;padding:5px 7px;font-size:8pt}
+.cell-label{font-size:7pt;font-weight:700;color:#777;text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px}
+.cell-title{font-weight:700;font-size:9.5pt;margin-bottom:2px}
+.order-num{text-align:center;font-weight:700;padding:5px;background:#f5f7fa;border:1px solid #999;font-size:9pt}
+
+table.pot{width:100%;border-collapse:collapse;font-size:7.5pt;margin-bottom:6px}
+table.pot th{background:#1a3a5c;color:#fff;padding:4px 3px;text-align:center;
+  border:1px solid #0f2540;font-size:7pt;line-height:1.3}
+table.pot td{padding:3px 4px;border:1px solid #ccc;vertical-align:middle;text-align:center}
+table.pot td.tl{text-align:left}
+table.pot td.tr{text-align:right;font-family:'Courier New',monospace}
+table.pot tr.tot-row{background:#EEF2F8;font-weight:700}
+table.pot tr.tot-row td{border:1px solid #99a}
+
+.tag-new{background:#E8F5E9;color:#2E7D32;border:1px solid #81C784;
+  border-radius:3px;padding:0 3px;font-size:6.5pt;font-weight:700;margin-right:2px}
+.remarks{font-size:7.5pt;margin-top:6px;line-height:1.5}
+.remarks p{margin:1px 0}
+.sig-grid{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:12px;
+  border-top:1px solid #555;padding-top:8px}
+.sig-block{font-size:8pt}
+.sig-line{margin-top:22px;border-top:1px solid #888;padding-top:3px}
+[contenteditable]{background:#FFFDE7}
+[contenteditable]:focus{outline:2px solid #4a90d9;background:#FFF9C4}
+.etd-line{margin-top:5px;font-weight:700}
+
+@media print{
+  body{background:#fff}
+  #ctrl-panel{display:none!important}
+  #po-wrapper{display:block!important}
+  .po-doc{box-shadow:none;page-break-after:always}
+  .po-doc:last-child{page-break-after:auto}
+  [contenteditable]{background:transparent!important}
+  @page{size:A4 landscape;margin:8mm 10mm}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ── Control Panel ── -->
+<div id="ctrl-panel">
+  <h1>🌐 國際採購下單系統 — Golden Jade Terre</h1>
+
+  <!-- ── 待辦訂單 Queue Panel ── -->
+  <div id="gj-queue-panel" style="display:none;background:#fffbe6;border:2px solid #f39c12;border-radius:10px;padding:14px 18px;margin-bottom:16px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <span style="font-weight:700;font-size:15px;color:#7d5a00">📋 待處理採購訂單</span>
+      <span id="gj-queue-badge" style="background:#e67e22;color:#fff;border-radius:12px;padding:2px 9px;font-size:13px;font-weight:700">0</span>
+      <span style="font-size:12px;color:#888;margin-left:4px">（保留 72 小時）</span>
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:13px">
+      <thead>
+        <tr style="background:#fef3cd;color:#555">
+          <th style="padding:5px 10px;text-align:left">客戶</th>
+          <th style="padding:5px 10px;text-align:left">GJ PO / 客戶PO</th>
+          <th style="padding:5px 10px;text-align:left">訂單日期</th>
+          <th style="padding:5px 10px;text-align:left">匯出時間</th>
+          <th style="padding:5px 10px;text-align:left">操作</th>
+        </tr>
+      </thead>
+      <tbody id="gj-queue-tbody"></tbody>
+    </table>
+  </div>
+
+  <div id="drop-zone"
+       onclick="document.getElementById('fin').click()"
+       ondragover="event.preventDefault();this.classList.add('over')"
+       ondragleave="this.classList.remove('over')"
+       ondrop="doDrop(event)">
+    📂 點擊或拖放訂單 JSON 至此處（業務報價系統匯出的訂單）
+    <input type="file" id="fin" accept=".json" style="display:none" onchange="loadFile(this)">
+  </div>
+
+  <div id="order-info"></div>
+
+  <div class="row" id="config-row">
+    <label>ETD: <input type="date" id="inp-etd"></label>
+    <label>ETA: <input type="date" id="inp-eta"></label>
+    <label style="flex:1">折扣/特別備注:
+      <input type="text" id="inp-note" style="width:280px" placeholder="e.g. 3% discount is applied as agreed">
+    </label>
+    <button class="btn btn-go" onclick="buildAllPO()">⚡ 生成 PO 草稿</button>
+    <button class="btn btn-print" onclick="window.print()">🖨 列印 / 存 PDF</button>
+  </div>
+</div>
+
+<!-- ── PO Output ── -->
+<div id="po-wrapper"></div>
+
+</div><!-- #app -->
+<script>
+// ── Embedded product data ───────────────────
+const PRODS = [{"ean":"","zh":"美味森市玄米油","en":"Rice Bran Oil","spec":"1L","pcs":6,"plt":0,"cost":18.5,"cur":"USD","inc":"FOB","sup":"Agro Wellness","code":"SP100003"},{"ean":"9555540038286","zh":"Checkers 迷你碎粒杏仁可可製品","en":"Checkers Stand Pouch Mini Chunky Almond 60g (compound)","spec":"60g","pcs":48,"plt":0,"cost":0.48,"cur":"USD","inc":"CIF","sup":"Francestle","code":"SP100006"},{"ean":"9555540038279","zh":"Checkers迷你碎粒綜合可可製品","en":"Checkers Stand Pouch Mini Chunky Assorment 60g (compound)","spec":"60g","pcs":48,"plt":0,"cost":0.48,"cur":"USD","inc":"CIF","sup":"Francestle","code":"SP100006"},{"ean":"9551021090712","zh":"Auston海鹽可可製品","en":"Auston Slim Seasalt Dark 60g","spec":"60g","pcs":36,"plt":0,"cost":1.25,"cur":"USD","inc":"CIF","sup":"Francestle","code":"SP100006"},{"ean":"9551021090682","zh":"Auston 75%黑巧克力","en":"Auston Slim 75% Dark 60g","spec":"60g","pcs":36,"plt":0,"cost":1.35,"cur":"USD","inc":"CIF","sup":"Francestle","code":"SP100006"},{"ean":"9551021090699","zh":"Auston 85%黑巧克力","en":"Auston Slim 85% Dark 60g","spec":"60g","pcs":36,"plt":0,"cost":1.45,"cur":"USD","inc":"CIF","sup":"Francestle","code":"SP100006"},{"ean":"9551021090705","zh":"Auston 99%黑巧克力","en":"Auston Slim 99% Dark 60g","spec":"60g","pcs":36,"plt":0,"cost":1.55,"cur":"USD","inc":"CIF","sup":"Francestle","code":"SP100006"},{"ean":"9551021090736","zh":"Auston 提拉米蘇牛奶可可製品","en":"Auston Cube Tiramisu Milk 65g","spec":"65g","pcs":30,"plt":0,"cost":1.2,"cur":"USD","inc":"CIF","sup":"Francestle","code":"SP100006"},{"ean":"9551021090620","zh":"Auston 提拉米蘇黑可可製品","en":"Auston Cube Tiramisu Dark 65g","spec":"65g","pcs":30,"plt":0,"cost":1.2,"cur":"USD","inc":"CIF","sup":"Francestle","code":"SP100006"},{"ean":"8990019000141","zh":"Mayasi 調味腰果-鹹焦糖風味","en":"Mayasi Cashew- Salted Caramel","spec":"100g","pcs":30,"plt":56,"cost":1.2841,"cur":"USD","inc":"CIF","sup":"PT Managhora","code":"SP100034"},{"ean":"8990019000134","zh":"Mayasi 調味腰果-玉米風味","en":"Mayasi Cashew- Corn","spec":"100g","pcs":30,"plt":56,"cost":1.2841,"cur":"USD","inc":"CIF","sup":"PT Managhora","code":"SP100034"},{"ean":"8990019000158","zh":"Mayasi 調味腰果-蜂蜜奶油風味","en":"Mayasi Cashew- Honey Butter","spec":"100g","pcs":30,"plt":56,"cost":1.2841,"cur":"USD","inc":"CIF","sup":"PT Managhora","code":"SP100034"},{"ean":"4710970827403","zh":"捲心薄餅-巧克力風味 85g","en":"Chocolate Crispy Crepes","spec":"85g","pcs":24,"plt":119,"cost":0.4518,"cur":"USD","inc":"CIF","sup":"PT Managhora","code":"SP100034"},{"ean":"4710970827410","zh":"捲心薄餅-草莓風味 85g","en":"Strawberry Crispy Crepes","spec":"85g","pcs":24,"plt":119,"cost":0.4518,"cur":"USD","inc":"CIF","sup":"PT Managhora","code":"SP100034"},{"ean":"8992388134120","zh":"雞汁風味泡麵","en":"Instant Noodle Chicken Flavor 60g*5pcs","spec":"60g*5pcs","pcs":8,"plt":0,"cost":4.0,"cur":"USD","inc":"FOB","sup":"Abc","code":"SP100012"},{"ean":"8992388134267","zh":"牛肉風味泡麵","en":"Instant Noodle Beef Flavor 60g*5pcs","spec":"60g*5pcs","pcs":8,"plt":0,"cost":4.0,"cur":"USD","inc":"FOB","sup":"Abc","code":"SP100012"},{"ean":"8992388134243","zh":"蔬菜風味泡麵","en":"Instant Noodle Vegetable Flavor 60g*5pcs","spec":"60g*5pcs","pcs":8,"plt":0,"cost":4.0,"cur":"USD","inc":"FOB","sup":"Abc","code":"SP100012"},{"ean":"8992388134144","zh":"炒泡麵","en":"Instant Fried Noodle 60g*5pcs","spec":"60g*5pcs","pcs":8,"plt":0,"cost":4.7,"cur":"USD","inc":"FOB","sup":"Abc","code":"SP100012"},{"ean":"955 6184 175 023","zh":"順發花生夾心餅乾","en":"Biscuit Peanut Butter sandwich","spec":"175g","pcs":12,"plt":0,"cost":0.9,"cur":"USD","inc":"CIF","sup":"順發","code":"SP100005"},{"ean":"955 6184 220 075","zh":"順發MEFAR玉米風味夾心餅乾","en":"Corn Flavoured Sandwich (Individual\nPack)","spec":"120g","pcs":12,"plt":0,"cost":0.52,"cur":"USD","inc":"CIF","sup":"順發","code":"SP100005"},{"ean":"955 6184 220 099","zh":"順發MEFAR巧克力風味夾心餅乾","en":"Chocolate Flavoured Sandwich\n(Individual Pack)","spec":"114g","pcs":12,"plt":0,"cost":0.52,"cur":"USD","inc":"CIF","sup":"順發","code":"SP100005"},{"ean":"955 6184 220 044","zh":"順發MEFAR咖啡風味夾心餅乾","en":"Coffee Flavoured Sandwich\n(Individual Pack)","spec":"114g","pcs":12,"plt":0,"cost":0.52,"cur":"USD","inc":"CIF","sup":"順發","code":"SP100005"},{"ean":"955 6184 018 009","zh":"濃郁芝士風味夾心餅乾","en":"Cheese Sandwich (Individual Pack)","spec":"190g","pcs":12,"plt":0,"cost":0.94,"cur":"USD","inc":"CIF","sup":"順發","code":"SP100005"},{"ean":"955 6184 150 051","zh":"蘇打餅乾","en":"Cream Crackers Special","spec":"88g","pcs":24,"plt":0,"cost":0.26,"cur":"USD","inc":"CIF","sup":"順發","code":"SP100005"},{"ean":"955 6184 000 400","zh":"消化餅乾","en":"Digestive Biscuit","spec":"45g","pcs":0,"plt":0,"cost":0.14,"cur":"USD","inc":"CIF","sup":"順發","code":"SP100005"},{"ean":"955 6184 000 417","zh":"燕麥餅乾","en":"Oaties Biscuit","spec":"45g","pcs":0,"plt":0,"cost":0.14,"cur":"USD","inc":"CIF","sup":"順發","code":"SP100005"},{"ean":"9556184500023","zh":"Shoon Fatt經典糖霜蘇打餅乾","en":"400g*12pcks Biscuit Sugar Cranker","spec":"400g","pcs":12,"plt":0,"cost":0.85,"cur":"USD","inc":"CIF","sup":"順發","code":"SP100005"},{"ean":"9556184200114","zh":"Shoon Fatt奶油玉米風味蘇打餅乾","en":"350g*12pcks Biscuit Gold Crackers","spec":"350g","pcs":12,"plt":0,"cost":0.95,"cur":"USD","inc":"CIF","sup":"順發","code":"SP100005"},{"ean":"9556184300029","zh":"Shoon Fatt圓形瑪莉餅乾","en":"265g*12packs Biscuit Big Marie","spec":"265g","pcs":12,"plt":0,"cost":0.85,"cur":"USD","inc":"CIF","sup":"順發","code":"SP100005"},{"ean":"9556184220068","zh":"MEFAR檸檬風味夾心餅乾","en":"114g*12packs Biscuit Mefar Lemon Flavoured Sandwich","spec":"114g","pcs":12,"plt":0,"cost":0.5,"cur":"USD","inc":"CIF","sup":"順發","code":"SP100005"},{"ean":"9556184220112","zh":"MEFAR可可風味夾心餅乾","en":"111g*12packs Biscuit Mefar Cocoa Flavoured Sandwich","spec":"111g","pcs":12,"plt":0,"cost":0.5,"cur":"USD","inc":"CIF","sup":"順發","code":"SP100005"},{"ean":"9556184250096","zh":"Shoon Fatt消化餅","en":"250g*12packs Biscuit Digestives","spec":"250g","pcs":12,"plt":0,"cost":0.75,"cur":"USD","inc":"CIF","sup":"順發","code":"SP100005"},{"ean":"9556184250102","zh":"Shoon Fatt燕麥餅","en":"248g*12pcs Biscuit Oaties","spec":"248g","pcs":12,"plt":0,"cost":0.75,"cur":"USD","inc":"CIF","sup":"順發","code":"SP100005"},{"ean":"9556184100162","zh":"Shoon Fatt奶油蘇打餅乾","en":"730g*6pcks Biscuit Cream Cracker Special (111)","spec":"730g","pcs":6,"plt":0,"cost":2.0,"cur":"USD","inc":"CIF","sup":"順發","code":"SP100005"},{"ean":"9556184100179","zh":"Shoon Fatt瑪莉圓餅","en":"730g*6pcks Biscuit Big Marie (111)","spec":"730g","pcs":6,"plt":0,"cost":2.0,"cur":"USD","inc":"CIF","sup":"順發","code":"SP100005"},{"ean":"9556184700065","zh":"Shoon Fatt桶裝奶油餅","en":"700g*6tins Biscuit Cheese Cracker","spec":"700g","pcs":6,"plt":0,"cost":2.85,"cur":"USD","inc":"CIF","sup":"順發","code":"SP100005"},{"ean":"8858768843276","zh":"香脆魷魚鬚","en":"Crispy Squid Tentacles (Original Flavor)","spec":"20g","pcs":24,"plt":0,"cost":0.7375,"cur":"USD","inc":"FOB","sup":"GoMuc","code":"SP100013"},{"ean":"8858768842323","zh":"烤魷魚","en":"Grilled Squid","spec":"10g","pcs":48,"plt":0,"cost":0.6167,"cur":"USD","inc":"FOB","sup":"GoMuc","code":"SP100013"},{"ean":"8858768842460","zh":"烤魷魚捲","en":"Grilled-Rolled Squid","spec":"13g","pcs":48,"plt":0,"cost":0.9021,"cur":"USD","inc":"FOB","sup":"GoMuc","code":"SP100013"},{"ean":"8858768841432","zh":"香脆鯷魚(原味)","en":"Crispy Fish Original","spec":"65g","pcs":24,"plt":0,"cost":0.6667,"cur":"USD","inc":"FOB","sup":"GoMuc","code":"SP100013"},{"ean":"8858768841418","zh":"香脆鯷魚(芝麻)","en":"Crispy Fish Sesame","spec":"65g","pcs":24,"plt":0,"cost":0.6667,"cur":"USD","inc":"FOB","sup":"GoMuc","code":"SP100013"},{"ean":"8858768842521","zh":"香脆鳀鱼","en":"Crispy Kozakana Fish\n(Original Flavor)","spec":"35g","pcs":24,"plt":0,"cost":0.7083,"cur":"USD","inc":"FOB","sup":"GoMuc","code":"SP100013"},{"ean":"8858768843313","zh":"香脆鳳尾魚","en":"Crispy Anchovy (Natural Flavor)","spec":"30g","pcs":24,"plt":0,"cost":0.725,"cur":"USD","inc":"FOB","sup":"GoMuc","code":"SP100013"},{"ean":"8858768832416","zh":"乾果混合堅果","en":"Trail Mix\n(Mixed Nuts and Dried Fruit)","spec":"30g","pcs":24,"plt":0,"cost":0.5542,"cur":"USD","inc":"FOB","sup":"GoMuc","code":"SP100013"},{"ean":"8858768832423","zh":"乾果混合堅果","en":"Daily Pack\n(Mixed Nuts and Dried Fruit)","spec":"30g","pcs":24,"plt":0,"cost":0.5542,"cur":"USD","inc":"FOB","sup":"GoMuc","code":"SP100013"},{"ean":"9555727900023","zh":"原味洋芋片","en":"Original","spec":"110g","pcs":24,"plt":0,"cost":13.5,"cur":"USD","inc":"FOB","sup":"Chizzpa","code":"SP100015"},{"ean":"9555727900122","zh":"酸奶洋蔥洋芋片","en":"Sour cheese & Onion","spec":"110g","pcs":24,"plt":0,"cost":13.5,"cur":"USD","inc":"FOB","sup":"Chizzpa","code":"SP100015"},{"ean":"9555727900726","zh":"勁辣洋芋片","en":"Hot and Spicy","spec":"110g","pcs":24,"plt":0,"cost":13.5,"cur":"USD","inc":"FOB","sup":"Chizzpa","code":"SP100015"},{"ean":"9555727900221","zh":"BBQ洋芋片","en":"BBQ","spec":"110g","pcs":24,"plt":0,"cost":13.5,"cur":"USD","inc":"FOB","sup":"Chizzpa","code":"SP100015"},{"ean":"8854579005698","zh":"KORIKO海苔夾心原味30g","en":"Sandwich seaweed 30 g. Original flavor","spec":"30g","pcs":24,"plt":0,"cost":0.7,"cur":"USD","inc":"FOB","sup":"NBF","code":"SP100014"},{"ean":"8854579005704","zh":"KORIKO海苔夾心韓式泡麵風味30g","en":"Sandwich seaweed 30 g. Korean noodle flavor","spec":"30g","pcs":24,"plt":0,"cost":0.7,"cur":"USD","inc":"FOB","sup":"NBF","code":"SP100014"},{"ean":"8854579006237","zh":"KORIKO海苔夾心芥末風味30g","en":"Seaweed sandwich 30 g.Wasabi flavor","spec":"30g","pcs":24,"plt":0,"cost":0.7,"cur":"USD","inc":"FOB","sup":"NBF","code":"SP100014"},{"ean":"8854579006596","zh":"KORIKO海苔夾心麻辣風味30g","en":"Seaweed sandwich 30 g. MALA flavor","spec":"30g","pcs":24,"plt":0,"cost":0.7,"cur":"USD","inc":"FOB","sup":"NBF","code":"SP100014"},{"ean":"8854579006220","zh":"KORIKO海苔夾心鹹蛋黃風味30g","en":"Seaweed sandwich 30 g. Salted egg flavor","spec":"30g","pcs":24,"plt":0,"cost":0.7,"cur":"USD","inc":"FOB","sup":"NBF","code":"SP100014"},{"ean":"8854579006008","zh":"KORIKO 海苔捲原味 3.6 g(10入裝)","en":"KORIKO ROLL SEAWEED ORIGINAL FLAVOUR 3.6 g*10pcs","spec":"36g","pcs":12,"plt":0,"cost":1.042,"cur":"USD","inc":"FOB","sup":"NBF","code":"SP100014"},{"ean":"8854579006015","zh":"KORIKO 海苔捲辣味 3.6 g(10入裝)","en":"KORIKO ROLL SEAWEED ORIGINAL FLAVOUR 3.6 g*10pcs","spec":"36g","pcs":12,"plt":0,"cost":1.042,"cur":"USD","inc":"FOB","sup":"NBF","code":"SP100014"},{"ean":"9556819800856","zh":"Go Bites 波浪洋芋片蝦辣風味","en":"Go Bites (Crinkle)-Tom Yam","spec":"60g","pcs":40,"plt":0,"cost":17.62,"cur":"USD","inc":"FOB","sup":"C&F","code":"SP100016"},{"ean":"9556819800207","zh":"Go Bites洋芋片原味","en":"Go Bites (Thin)-Original","spec":"60g","pcs":40,"plt":0,"cost":17.62,"cur":"USD","inc":"FOB","sup":"C&F","code":"SP100016"},{"ean":"6556819800863","zh":"Go Bites洋芋片番茄風味","en":"Go Bites (Thin)-Tomato","spec":"60g","pcs":40,"plt":0,"cost":17.62,"cur":"USD","inc":"FOB","sup":"C&F","code":"SP100016"},{"ean":"9556819800733","zh":"Go Bites波浪洋芋片海鹽風味","en":"Go Bites (Crinkle)-Sea Salt","spec":"60g","pcs":40,"plt":0,"cost":17.62,"cur":"USD","inc":"FOB","sup":"C&F","code":"SP100016"},{"ean":"9556819800764","zh":"Go Bites波浪洋芋片辣椒風味","en":"Go Bites (Crinkle)-Hot Chili","spec":"60g","pcs":40,"plt":0,"cost":17.62,"cur":"USD","inc":"FOB","sup":"C&F","code":"SP100016"},{"ean":"","zh":"切角番茄 袋裝","en":"Chopped tomato","spec":"3kg","pcs":0,"plt":0,"cost":0,"cur":"EUR","inc":"EXW","sup":"Pronat","code":"SP100033"},{"ean":"67980","zh":"#67980 起司棒","en":"67980Cheese Stick (40u)","spec":"82g","pcs":40,"plt":170,"cost":0.685,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"60165","zh":"#60165 巧克力雙色可頌","en":"60165 Choco Bicol. Croissant (36u)","spec":"90g","pcs":36,"plt":120,"cost":0.4519,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"","zh":"蘋果卡士達蛋撻","en":"65205 Apple Portuguese Egg Tart 蘋果葡式蛋塔","spec":"72g","pcs":44,"plt":170,"cost":0.401,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"65182","zh":"#65182 榛果巧克力蛋撻","en":"65182 Pastel Nata Cioc 葡式蛋塔巧克力口味","spec":"62g","pcs":36,"plt":170,"cost":0.404,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"67048","zh":"#67048 起司方塊派","en":"Cuadrado Caprese (48u)","spec":"136g","pcs":48,"plt":90,"cost":0.569,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"64142","zh":"#64142 阿爾伯特起司蛋糕","en":"64142 AA Cheese Cake (8U)","spec":"330g","pcs":8,"plt":90,"cost":6.805,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"22690","zh":"#22690 天然奶油脆皮酥","en":"Caprice Paille (55u)","spec":"90","pcs":55,"plt":140,"cost":0.555,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"85310","zh":"#85310 天然奶油蝴蝶酥","en":"Butter Palmier (90u)","spec":"90","pcs":90,"plt":90,"cost":0.536,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"60155","zh":"#60155 覆盆子雙色可頌","en":"Raspberry bicol.Croissant 36u","spec":"90","pcs":36,"plt":120,"cost":0.592,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"22180","zh":"#22180 天然穀物脆皮可頌","en":"Caprice Multicereal Croissant","spec":"80","pcs":55,"plt":90,"cost":0.411,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"65450","zh":"#65450 天然奶油脆皮蘋果口袋酥","en":"Apple Pocket (70u)","spec":"110","pcs":70,"plt":90,"cost":0.706,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"61946","zh":"#61946 榛果可可派","en":"Cocoa Hazelnut Panier (60u)","spec":"100","pcs":60,"plt":120,"cost":0.595,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"40298","zh":"#40298 地中海椒鹽扭結酥","en":"Mediterranian Bretzel (32u)","spec":"147","pcs":32,"plt":120,"cost":0.849,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"21680","zh":"#21680 拿玻里番茄起司派","en":"Napoli Envoltini (55u)","spec":"135","pcs":55,"plt":120,"cost":0.545,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"67903","zh":"#67903 奶油起司滿餡卷","en":"Cheese Snecken (36u)","spec":"111","pcs":36,"plt":80,"cost":0.709,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"62457","zh":"#62457 肉桂捲","en":"Cinnamon Roll PFMT (30u)","spec":"110","pcs":30,"plt":72,"cost":0.692,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"40297","zh":"#40297 起司蝴蝶酥","en":"Cheese Bretzel","spec":"145","pcs":32,"plt":120,"cost":0.794,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"67322","zh":"#67322 （暫定）晶脆巧巴達（2片）","en":"Cristallino Ciabatta (28px2u)","spec":"190","pcs":28,"plt":40,"cost":0.799,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"60036","zh":"#60036 （暫定）晶脆穀物角型麵包（2片）","en":"Cristallino Ciabatta Kornsptiz (28px2u)","spec":"196","pcs":28,"plt":40,"cost":0.95,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"65405","zh":"#65405 （暫定）晶脆高達起司巧巴達（2片）","en":"Cristallino Ciabatta Gouda (28px2u)","spec":"190","pcs":28,"plt":50,"cost":1.504,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"89838","zh":"#89838 （暫定）晶脆漢堡麵包（4入）","en":"Cristallino burger (14px4u)","spec":"300","pcs":14,"plt":40,"cost":1.418,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"69865","zh":"#69865 （暫定）晶脆漢堡麵包（6入）","en":"Cristallino burger (10px6u)","spec":"426","pcs":10,"plt":40,"cost":1.986,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"67515","zh":"#67515 （暫定）純素卡布雷斯小餐包","en":"Vegan Caprese Yummie (24u)","spec":"90","pcs":24,"plt":180,"cost":1.172,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"65510","zh":"#65510 （暫定）純素漢堡小餐包","en":"Vegan Burger Yummie (24u)","spec":"85","pcs":24,"plt":180,"cost":1.264,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"61391","zh":"#61391 解凍即食吉拿棒","en":"Churros (177u)","spec":"17","pcs":177,"plt":135,"cost":0.127,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"61105","zh":"#61105 （暫定）榛果可頌","en":"Caprice Hazelnut Croissant 48u","spec":"90","pcs":48,"plt":90,"cost":0.485,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"20260","zh":"#20260 甜心球","en":"Custard Long Dots (45u)SG","spec":"55","pcs":45,"plt":112,"cost":0.355,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"42880","zh":"#42880 （暫定）卡士達迷你球點心","en":"Custard Mini BallDots (40u)SG","spec":"40","pcs":40,"plt":150,"cost":0.258,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"8697343111689","zh":"Feast吉拿棒切薯條","en":"FEAST IQF CHURROS CUT POTATO 10x1 kg","spec":"1000g","pcs":10,"plt":70,"cost":1.15,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"8697343600022","zh":"Feast楔型薯塊","en":"FEAST IQF WEDGE POTATO 10x1 kg","spec":"1000g","pcs":10,"plt":100,"cost":1.07,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"8697343644255","zh":"Feast10*10mm 薯條","en":"FEAST IQF FRENCH FRIES 10*10 mm 10x1 kg","spec":"1000g","pcs":10,"plt":80,"cost":1.09,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"8697343600039","zh":"Feast7*7mm超細薯條","en":"FEAST IQF FRENCH FRIES 7*7 mm 10x1 kg","spec":"1000g","pcs":10,"plt":70,"cost":1.11,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"8697343650027","zh":"洋蔥圈","en":"FEAST IQF ONION RINGS 12*450 GR","spec":"450g","pcs":12,"plt":90,"cost":0.7,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"9697343550129","zh":"急速冷凍青花菜","en":"FEAST IQF BROCCOLI 12*500 g","spec":"500g","pcs":12,"plt":90,"cost":0.78,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"8697343550013","zh":"急速冷凍碗豆","en":"FEAST IQF PEAS 20*450 GR","spec":"450g","pcs":20,"plt":100,"cost":0.58,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"9697343550020","zh":"急速冷凍切四季豆","en":"FEAST IQF GREEN BEANS 16*450 GR","spec":"450g","pcs":16,"plt":100,"cost":0.54,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"辣味洋蔥圈","en":"FEAST IQF SPICY ONION RINGS 12*450 GR","spec":"450g","pcs":12,"plt":90,"cost":0.79,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"8697343111764","zh":"起司棒","en":"FEAST IQF CHEESE STICKS 12x300 GR (NOT FOR EU)","spec":"300g","pcs":12,"plt":200,"cost":1.67,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"8697343112150","zh":"可樂餅","en":"FEAST IQF POTATO CROQUETTE 16x450 GR","spec":"450g","pcs":16,"plt":100,"cost":0.58,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"8697343112211","zh":"玉米可樂餅","en":"FEAST IQF CORN POTATO CROQUETTE 20X450 GR","spec":"450g","pcs":20,"plt":100,"cost":0.88,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"8697343112228","zh":"薯餅","en":"FEAST IQF HASHBROWNS 20X450 GR","spec":"450g","pcs":20,"plt":100,"cost":0.72,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"8697343550136","zh":"急速冷凍鮮覆盆子","en":"FEAST IQF RASPBERRY 8X300 GR","spec":"300g","pcs":8,"plt":180,"cost":2.379,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"8697343550150","zh":"急速冷凍鮮草莓","en":"FEAST IQF STRAWBERRY 8X300 GR","spec":"300g","pcs":8,"plt":180,"cost":1.296,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"8697343550167","zh":"急速冷凍鮮酸櫻桃","en":"FEAST IQF SOUR CHERRY 8X300 GR","spec":"300g","pcs":8,"plt":180,"cost":1.764,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"8697343550143","zh":"急速冷凍鮮黑莓","en":"FEAST IQF BLACKBERRY 8X300 GR","spec":"300g","pcs":8,"plt":180,"cost":1.707,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"8697343111870","zh":"急速冷凍綜合鮮莓果","en":"FEAST IQF BLOOM (MIXED FRUITS) 8x300 GR","spec":"300g","pcs":8,"plt":180,"cost":2.418,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"8697343112402","zh":"急速冷凍藍莓","en":"FEAST IQF BLUEBERRY 10X250GR","spec":"250g","pcs":8,"plt":180,"cost":1.9925,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"800692083772","zh":"榛果義式冰淇淋","en":"G7 Nocciolato","spec":"300g","pcs":12,"plt":165,"cost":1.407,"cur":"Euro","inc":"EXW","sup":"G7","code":"SP100010"},{"ean":"800692083796","zh":"巧酥義式冰淇淋","en":"G7 Stracciatella","spec":"300g","pcs":12,"plt":165,"cost":1.407,"cur":"Euro","inc":"EXW","sup":"G7","code":"SP100010"},{"ean":"NRTYPLK1L0OMG06003","zh":"TYMBARK 燕麥杏仁奶 1L","en":"TYMBARK Plant Based Oat-Almond Drink 1L","spec":"1L","pcs":6,"plt":0,"cost":1.55,"cur":"EUR","inc":"EXW","sup":"Maspex","code":"SP100030"},{"ean":"NRTYPLK1L0OWS06003","zh":"TYMBARK 燕麥奶 1L","en":"TYMBARK Plant Based Oat Drink 1L","spec":"1L","pcs":6,"plt":0,"cost":1.39,"cur":"EUR","inc":"EXW","sup":"Maspex","code":"SP100030"},{"ean":"NRTYPLK500OKO06003","zh":"TYMBARK 燕麥椰子奶 500ml","en":"TYMBARK Plant Based Oat-Coconut Drink 500ml","spec":"500ml","pcs":6,"plt":0,"cost":0.89,"cur":"EUR","inc":"EXW","sup":"Maspex","code":"SP100030"},{"ean":"NRTYPLK500OOL06003","zh":"TYMBARK 燕麥榛果奶 500ml","en":"TYMBARK Plant Based Oat-Hazelnut Drink 500ml","spec":"500ml","pcs":6,"plt":0,"cost":0.89,"cur":"EUR","inc":"EXW","sup":"Maspex","code":"SP100030"},{"ean":"NRTYPLK500OWS06003","zh":"TYMBARK 燕麥奶 500ml","en":"TYMBARK Plant Based Oat Drink 500ml","spec":"500ml","pcs":6,"plt":0,"cost":0.79,"cur":"EUR","inc":"EXW","sup":"Maspex","code":"SP100030"},{"ean":"","zh":"Homhual 有果肉椰子水 310ml","en":"Homhual Thai Coconut Water with Pulp 310ml*24","spec":"310ml*24","pcs":24,"plt":0,"cost":11.4,"cur":"USD","inc":"FOB","sup":"Homhual","code":"SP100027"},{"ean":"","zh":"Homhual 無果肉椰子水 310ml","en":"Homhual Thai Coconut Water without Pulp 310ml*24","spec":"310ml*24","pcs":24,"plt":0,"cost":11.05,"cur":"USD","inc":"FOB","sup":"Homhual","code":"SP100027"},{"ean":"","zh":"FruitMania 蔓越莓乾 30g","en":"FruitMania Dried Cranberries 30g","spec":"30g*24","pcs":24,"plt":0,"cost":0,"cur":"USD","inc":"FOB","sup":"GoMuc","code":"SP100013"},{"ean":"","zh":"FruitMania 蜜棗乾 30g","en":"FruitMania Pitted Prunes 30g","spec":"30g*24","pcs":24,"plt":0,"cost":0,"cur":"USD","inc":"FOB","sup":"GoMuc","code":"SP100013"},{"ean":"","zh":"Luong GIA 越南乾果 50g","en":"Luong GIA Vietnam Dried Fruit 50g","spec":"50g","pcs":0,"plt":0,"cost":0,"cur":"USD","inc":"FOB","sup":"Luong GIA","code":"SP100028"},{"ean":"","zh":"Luong GIA 越南乾果 100g","en":"Luong GIA Vietnam Dried Fruit 100g","spec":"100g","pcs":0,"plt":0,"cost":0,"cur":"USD","inc":"FOB","sup":"Luong GIA","code":"SP100028"},{"ean":"","zh":"Prinze Snacks 泰國蝦零食","en":"Prinze Snacks Thailand Shrimp Snacks","spec":"待確認","pcs":0,"plt":0,"cost":0,"cur":"USD","inc":"FOB","sup":"Prinze Snacks","code":"SP100032"},{"ean":"","zh":"Sun Grains 菲律賓穀物零食","en":"Sun Grains Philippines Grain Snacks","spec":"待確認","pcs":0,"plt":0,"cost":0,"cur":"USD","inc":"FOB","sup":"Sun Grains","code":"SP100036"},{"ean":"","zh":"Yarra Valley Hilltop 澳洲乳製品","en":"Yarra Valley Hilltop Dairy Products","spec":"待確認","pcs":0,"plt":0,"cost":0,"cur":"USD","inc":"EXW","sup":"Yarra Valley","code":"SP100039"},{"ean":"8413060743503","zh":"Finca Las Zarras Basic quality dry red 11% (Bodegas Milenium S.L.)","en":"Finca Las Zarras Basic quality dry red 11%","spec":"750ml","pcs":75,"plt":0,"cost":0.9,"cur":"Euro","inc":"EXW","sup":"Bodegas Milenium","code":"SP100025"},{"ean":"8413060012227","zh":"Finca Las ZaBasic quality dry white 11% (Bodegas Milenium S.L.)","en":"Finca Las ZaBasic quality dry white 11%","spec":"750 ml","pcs":75,"plt":0,"cost":0.93,"cur":"Euro","inc":"EXW","sup":"Bodegas Milenium","code":"SP100025"},{"ean":"8413060743527","zh":"Vespertino Tempranillo, red 13% (Bodegas Milenium S.L.)","en":"Vespertino Tempranillo, red 13%","spec":"750ml","pcs":75,"plt":0,"cost":1.15,"cur":"Euro","inc":"EXW","sup":"Bodegas Milenium","code":"SP100025"},{"ean":"8413060743473","zh":"Vespertino Macabeo 11,5% (Bodegas Milenium S.L.)","en":"Vespertino Macabeo 11,5%","spec":"750ml","pcs":75,"plt":0,"cost":1.25,"cur":"Euro","inc":"EXW","sup":"Bodegas Milenium","code":"SP100025"},{"ean":"8413060749727","zh":"Viña Dante Standard quality Red 11% (Bodegas Milenium S.L.)","en":"Viña Dante Standard quality Red 11%","spec":"3L","pcs":90,"plt":0,"cost":3.45,"cur":"Euro","inc":"EXW","sup":"Bodegas Milenium","code":"SP100025"},{"ean":"8413060749703","zh":"Viña Dante Standard quality White dry 11% (Bodegas Milenium S.L.)","en":"Viña Dante Standard quality White dry 11%","spec":"3L","pcs":90,"plt":0,"cost":3.7,"cur":"Euro","inc":"EXW","sup":"Bodegas Milenium","code":"SP100025"},{"ean":"NRTYPLK500OPI06","zh":"TYMBARK 燕麥開心果奶 500ml","en":"TYMBARK oat-pistachio Plant Drink 6*0.5L","spec":"500ml","pcs":6,"plt":0,"cost":1.28,"cur":"EUR","inc":"EXW","sup":"Maspex","code":"SP100030"},{"ean":"NRTYPLK500OWW06","zh":"TYMBARK 燕麥香草奶 500ml","en":"TYMBARK JUST PLANTS Oat-Vanilla Plant Drink 6*0.5L","spec":"500ml","pcs":6,"plt":0,"cost":1.28,"cur":"EUR","inc":"EXW","sup":"Maspex","code":"SP100030"},{"ean":"","zh":"GoMuc 脆魚皮-鹹蛋口味 30g","en":"GoMuc Crispy Fish Skin (Salted Egg Flavor) 30g","spec":"30g","pcs":24,"plt":0,"cost":0.6292,"cur":"USD","inc":"FOB","sup":"GoMuc","code":"SP100013"},{"ean":"","zh":"GoMuc 脆魚皮-泰式酸辣口味 30g","en":"GoMuc Crispy Fish Skin (Tom Yum Flavor) 30g","spec":"30g","pcs":24,"plt":0,"cost":0.6292,"cur":"USD","inc":"FOB","sup":"GoMuc","code":"SP100013"},{"ean":"","zh":"GoMuc 脆魚皮-麻辣口味 30g","en":"GoMuc Crispy Fish Skin (Mala Flavor) 30g","spec":"30g","pcs":24,"plt":0,"cost":0.6292,"cur":"USD","inc":"FOB","sup":"GoMuc","code":"SP100013"},{"ean":"","zh":"FruitMania 椰棗 30g","en":"FruitMania Pitted Deglet Nour Dates 30g","spec":"30g","pcs":24,"plt":0,"cost":0.3188,"cur":"USD","inc":"FOB","sup":"GoMuc","code":"SP100013"},{"ean":"","zh":"FruitMania 奇異果乾 38g","en":"FruitMania Dehydrated Kiwi 38g","spec":"38g","pcs":24,"plt":0,"cost":0.35,"cur":"USD","inc":"FOB","sup":"GoMuc","code":"SP100013"},{"ean":"","zh":"FruitMania 去籽西梅 30g","en":"FruitMania Pitted Prunes 30g","spec":"30g","pcs":24,"plt":0,"cost":0.3813,"cur":"USD","inc":"FOB","sup":"GoMuc","code":"SP100013"},{"ean":"","zh":"FruitMania 蔓越莓乾 30g","en":"FruitMania Dried Cranberries 30g","spec":"30g","pcs":24,"plt":0,"cost":0.3646,"cur":"USD","inc":"FOB","sup":"GoMuc","code":"SP100013"},{"ean":"62459","zh":"#62459 迷你橄欖佛卡夏 110g","en":"Olives Mini Focaccia 110g","spec":"110g","pcs":36,"plt":55,"cost":1.175,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"62451","zh":"#62451 迷你四起司佛卡夏 105g","en":"4 Cheese Mini Focaccia 105g","spec":"105g","pcs":36,"plt":55,"cost":1.165,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"","zh":"FruitMania 椰棗 120g","en":"FruitMania Pitted Deglet Nour Dates 120g","spec":"120g","pcs":24,"plt":0,"cost":0.8292,"cur":"USD","inc":"FOB","sup":"GoMuc","code":"SP100013"},{"ean":"","zh":"Mas Choices 油湯鮪魚片罐頭 180g","en":"MC White Meat Tuna Flakes in Vegetable Oil 180g","spec":"NW180g DW110g","pcs":48,"plt":0,"cost":24.25,"cur":"USD","inc":"CIF","sup":"Mas Choices","code":"SP100022"},{"ean":"","zh":"Mas Choices 水煮鮪魚片罐頭 180g","en":"MC White Meat Tuna Flakes in Brine 180g","spec":"NW180g DW100g","pcs":48,"plt":0,"cost":23.28,"cur":"USD","inc":"CIF","sup":"Mas Choices","code":"SP100022"},{"ean":"","zh":"Mas Choices 油湯鮪魚片罐頭 185g","en":"MC White Meat Tuna Flakes in Vegetable Oil 185g","spec":"NW185g DW130g","pcs":48,"plt":0,"cost":37.5,"cur":"USD","inc":"CIF","sup":"Mas Choices","code":"SP100022"},{"ean":"","zh":"Mas Choices 水煮鮪魚片罐頭 185g","en":"MC White Meat Tuna Flakes in Brine 185g","spec":"NW185g DW130g","pcs":48,"plt":0,"cost":37.0,"cur":"USD","inc":"CIF","sup":"Mas Choices","code":"SP100022"},{"ean":"","zh":"韓國1KG冰塊(夾鏈袋)","en":"Korean Clear Ice 1KG Zipper Bag","spec":"1KG","pcs":10,"plt":50,"cost":7.35,"cur":"USD","inc":"CIF","sup":"韓國冰塊(NEXO)","code":"SP200005"},{"ean":"","zh":"韓國500G冰塊(夾鏈袋)","en":"Korean Clear Ice 500G Zipper Bag","spec":"500G","pcs":18,"plt":50,"cost":8.85,"cur":"USD","inc":"CIF","sup":"韓國冰塊(NEXO)","code":"SP200005"},{"ean":"","zh":"韓國500G冰塊(無夾鏈袋)","en":"Korean Clear Ice 500G Plain Bag","spec":"500G","pcs":18,"plt":50,"cost":8.65,"cur":"USD","inc":"CIF","sup":"韓國冰塊(NEXO)","code":"SP200005"},{"ean":"","zh":"韓國冰塊杯(常規)","en":"Korean Clear Ice Cup 180G","spec":"180G","pcs":15,"plt":50,"cost":3.854,"cur":"USD","inc":"CIF","sup":"韓國冰塊(NEXO)","code":"SP200005"},{"ean":"","zh":"韓國威士忌冰球杯","en":"Korean Whiskey Ball Ice Cup 130G","spec":"130G","pcs":15,"plt":50,"cost":9.854,"cur":"USD","inc":"CIF","sup":"韓國冰塊(NEXO)","code":"SP200005"},{"ean":"","zh":"Di Biase 義大利急速冷凍鮮藍莓","en":"Di Biase IQF Italian Fresh Blueberry","spec":"450g","pcs":8,"plt":180,"cost":2.862,"cur":"Euro","inc":"CIF","sup":"Di Biase","code":"SP200006"},{"ean":"","zh":"Di Biase 義大利急速冷凍綜合鮮莓果","en":"Di Biase IQF Italian Fresh Mixed Berries","spec":"450g","pcs":8,"plt":180,"cost":2.262,"cur":"Euro","inc":"CIF","sup":"Di Biase","code":"SP200006"},{"ean":"","zh":"Di Biase 義大利急速冷凍覆盆莓","en":"Di Biase IQF Italian Fresh Raspberry","spec":"1000g","pcs":0,"plt":0,"cost":7.0,"cur":"Euro","inc":"EXW","sup":"Di Biase","code":"SP200006"},{"ean":"","zh":"Di Biase 義大利急速冷凍覆盆莓","en":"Di Biase IQF Italian Fresh Raspberry","spec":"450g","pcs":0,"plt":0,"cost":3.6,"cur":"Euro","inc":"EXW","sup":"Di Biase","code":"SP200006"},{"ean":"","zh":"Di Biase 義大利急速冷凍鮮藍莓","en":"Di Biase IQF Italian Fresh Blueberry","spec":"1000g","pcs":0,"plt":0,"cost":4.9,"cur":"Euro","inc":"EXW","sup":"Di Biase","code":"SP200006"},{"ean":"","zh":"Di Biase 義大利急速冷凍綜合森林莓果","en":"Di Biase IQF Italian Fresh Mixed Forest Fruits","spec":"1000g","pcs":0,"plt":0,"cost":4.2,"cur":"Euro","inc":"EXW","sup":"Di Biase","code":"SP200006"},{"ean":"","zh":"Feast 急速冷凍玉米粒 450g","en":"FEAST IQF CORN KERNELS 20*450 GR","spec":"450g","pcs":20,"plt":100,"cost":0.63,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 急速冷凍洋蔥丁 6x6mm 1kg","en":"FEAST IQF 6*6 MM ONION 10*1000 GR","spec":"1000g","pcs":10,"plt":80,"cost":1.12,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 急速冷凍菠菜 450g","en":"FEAST IQF SPINACH 12*450 GR","spec":"450g","pcs":12,"plt":100,"cost":0.54,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 急速冷凍秋葵 450g","en":"FEAST IQF OKRA 16*450 GR","spec":"450g","pcs":16,"plt":100,"cost":1.1,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 急速冷凍綜合蔬菜 450g","en":"FEAST IQF MIX VEGETABLES 20*450 GR","spec":"450g","pcs":20,"plt":100,"cost":0.55,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 急速冷凍玉米段 700g","en":"FEAST IQF CORN OF THE COB 8*700 GR","spec":"700g","pcs":8,"plt":130,"cost":1.72,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 公爵馬鈴薯 450g","en":"FEAST IQF DUCHESSE POTATOES 12X450GR","spec":"450g","pcs":12,"plt":100,"cost":0.76,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 起司圈 300g","en":"FEAST IQF CHEESY RINGS 4X300GR (NOT FOR EU)","spec":"300g","pcs":4,"plt":100,"cost":1.61,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 波浪薯條 1kg","en":"FEAST IQF CRINKLE CUT POTATO 10x1 kg","spec":"1000g","pcs":10,"plt":70,"cost":1.15,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 波浪粗薯條 1kg","en":"FEAST IQF CRINKLE STEAK FRIES 10x1 kg","spec":"1000g","pcs":10,"plt":56,"cost":1.16,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 粗薯條 10x20mm 1kg","en":"FEAST IQF STEAK FRIES (10X20MM) 10x1 kg","spec":"1000g","pcs":10,"plt":56,"cost":1.17,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 波浪扁切薯條 1kg","en":"FEAST IQF CRINKLE FLAT SLICED FRENCH FRIES 10x1kg","spec":"1000g","pcs":10,"plt":56,"cost":1.17,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 沾醬薯片 1kg","en":"FEAST IQF DIPPERS CUT 10X1 kg","spec":"1000g","pcs":10,"plt":56,"cost":1.17,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 有機急速冷凍碗豆 450g","en":"FEAST IQF ORGANIC PEAS 12x450 g","spec":"450g","pcs":12,"plt":130,"cost":0.69,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 有機急速冷凍青花菜 450g","en":"FEAST IQF ORGANIC BROCCOLI 12x450 g","spec":"450g","pcs":12,"plt":90,"cost":0.81,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 有機急速冷凍菠菜 450g","en":"FEAST IQF ORGANIC SPINACH 12X450 g","spec":"450g","pcs":12,"plt":100,"cost":0.65,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 馬賽克蛋糕 750g","en":"FEAST IQF MOSAIC CAKE 6*(1*750 g)","spec":"750g","pcs":6,"plt":96,"cost":4.92,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 濃巧克力蛋糕 600g","en":"FEAST IQF INTENSE CHOCOLATE CAKE 6*(1*600 g)","spec":"600g","pcs":6,"plt":85,"cost":5.58,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 覆盆子起司蛋糕 800g","en":"FEAST IQF RASPBERRY CHEESECAKE 6*(1*800 g)","spec":"800g","pcs":6,"plt":85,"cost":6.14,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 檸檬起司蛋糕 800g","en":"FEAST IQF LEMON CHEESECAKE 6*(1*800 g)","spec":"800g","pcs":6,"plt":85,"cost":6.15,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 愛心起司蛋糕 480g","en":"FEAST IQF HEART-SHAPED CHEESECAKE 6*(6*80 g)","spec":"480g","pcs":6,"plt":85,"cost":2.76,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 開心果蛋糕 600g","en":"FEAST PISTACHIO CAKE 6*(1*600 g)","spec":"600g","pcs":6,"plt":85,"cost":6.22,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 紅絲絨草莓卷蛋糕 600g","en":"FEAST IQF RED VELVET STRAWBERRY ROLL CAKE 6*600 g","spec":"600g","pcs":6,"plt":96,"cost":4.6,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 檸檬卷蛋糕 600g","en":"FEAST IQF LEMON ROLL CAKE 6*600 g","spec":"600g","pcs":6,"plt":96,"cost":5.06,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 覆盆子巧克力雙餡柏林甜甜圈 170g","en":"FEAST IQF RASPBERRY & CHOCOLATE DUO BERLINER 170 g x 6 ad","spec":"170g","pcs":6,"plt":96,"cost":9,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast ECO 檸檬起司蛋糕 650g","en":"FEAST IQF ECO LEMON CHEESECAKE 6x (1 * 650 GR)","spec":"650g","pcs":6,"plt":120,"cost":4.36,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast ECO 覆盆子起司蛋糕 650g","en":"FEAST IQF ECO RASPBERRY CHEESECAKE 6x (1 * 650 GR)","spec":"650g","pcs":6,"plt":120,"cost":4.34,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast ECO 巧克力蛋糕 650g","en":"FEAST IQF ECO CHOCOLATE CAKE 6x (1 * 650 GR)","spec":"650g","pcs":6,"plt":100,"cost":4.39,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast ECO 提拉米蘇 600g","en":"FEAST IQF ECO TIRAMISU 6x (1 * 600 GR)","spec":"600g","pcs":6,"plt":100,"cost":3.86,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast ECO 巴斯克起司蛋糕 600g","en":"FEAST IQF ECO SAN SEBASTIAN CHEESECAKE 6x (1 * 600 GR)","spec":"600g","pcs":6,"plt":120,"cost":4.03,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 蘋果酥塔 100g","en":"FEAST IQF APPLE CRUMBLE TART 5 X (100 GR X 12 PIECES)","spec":"100g","pcs":60,"plt":100,"cost":9.85,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast Devils Pasta 550g","en":"FEAST IQF DEVILS PASTA 4 X (550 GR X 1 PIECE)","spec":"550g","pcs":4,"plt":100,"cost":3.56,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 覆盆子起司蛋糕","en":"FEAST IQF RASPBERRY CHEESECAKE 10*(12 slc.*133,3 g)","spec":"133.3g*12片/整顆","pcs":120,"plt":36,"cost":10.13,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 檸檬起司蛋糕","en":"FEAST IQF LEMON CHEESECAKE 10*(12 slc.*133,3 g)","spec":"133.3g*12片/整顆","pcs":120,"plt":36,"cost":10.72,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 愛心覆盆子起司蛋糕 50g","en":"FEAST HEART SHAPED RASPBERRY CHEESECAKE 5X(50 gr*30 pcs)","spec":"50g","pcs":150,"plt":36,"cost":9.89,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 紐約起司蛋糕","en":"FEAST IQF NEWYORK CHEESECAKE 10*(9 slc.*180 g)","spec":"180g*9片/整顆","pcs":90,"plt":36,"cost":11.6,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 惡魔巧克力蛋糕","en":"FEAST IQF DEVIL'S CAKE 6*(10 slc.*130 g)","spec":"130g*10片/整顆","pcs":60,"plt":36,"cost":10.97,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 泡芙蛋糕","en":"FEAST IQF PROFITEROL CAKE 6*(10 slc.*160 g)","spec":"160g*10片/整顆","pcs":60,"plt":36,"cost":14.24,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 開心果蛋糕","en":"FEAST IQF PISTACHIO CAKE 6*(10 slc.*125 g)","spec":"125g*10片/整顆","pcs":60,"plt":36,"cost":9.5,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 拿鐵蛋糕","en":"FEAST IQF LATTE CAKE 6*(10 slc.*120 g)","spec":"120g*10片/整顆","pcs":60,"plt":36,"cost":8.47,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 提拉米蘇方形蛋糕","en":"FEAST IQF TIRAMISU SQUARE 6*(9 slc.*135 g)","spec":"135g*9片/整顆","pcs":54,"plt":36,"cost":9.1,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 醬料馬賽克蛋糕","en":"FEAST IQF MOSAIC CAKE WITH SAUCE 6*(16 slc.*135 g)","spec":"135g*16片/整顆","pcs":96,"plt":36,"cost":13.98,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 黑森林櫻桃蛋糕","en":"FEAST IQF BLACK FOREST CAKE WITH CHERRY 6*(10 slc.*120 g)","spec":"120g*10片/整顆","pcs":60,"plt":36,"cost":11.97,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 覆盆子巧克力單人蛋糕","en":"FEAST IQF RASPBERRY AND CHOCOLATE MONO CAKE 6*(9 slc.*175 g)","spec":"175g*9入/整組","pcs":54,"plt":36,"cost":14.94,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 拿鐵單人蛋糕","en":"FEAST IQF LATTE MONO CAKE 6*(9 slc.*150 g)","spec":"150g*9入/整組","pcs":54,"plt":36,"cost":11.79,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 巴斯克起司蛋糕","en":"FEAST IQF SAN SEBASTIAN CHEESECAKE 10* (10*145 g)","spec":"145g*10片/整顆","pcs":100,"plt":36,"cost":10.13,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 鳳梨杏仁單人蛋糕","en":"FEAST IQF PINEAPPLE & ALMOND MONO CAKE 10*(9 pcs. * 150 gr )","spec":"150g*9片","pcs":90,"plt":36,"cost":11.94,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 大理石蛋糕","en":"FEAST IQF MARBLE CAKE 6X (16 PCS. *100 gr)","spec":"100g*16片","pcs":96,"plt":36,"cost":12.44,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 巧克力布朗尼","en":"FEAST IQF CHOCO BROWNIE 10*(9 pcs. * 150 gr )","spec":"150g*9片","pcs":90,"plt":36,"cost":10.62,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 餅乾派","en":"FEAST IQF COOKIE PIE 10*(10 pcs.*75 gr )","spec":"75g*10片","pcs":100,"plt":36,"cost":7.69,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 綜合莓果起司蛋糕","en":"FEAST IQF VERY BERRY CHEESECAKE 10x(130 g x 10 dl)","spec":"130g*10片","pcs":100,"plt":36,"cost":9.28,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 蓮花餅乾起司蛋糕","en":"FEAST IQF LOTUS CHEESECAKE 10x(133 g x 12 Ad)","spec":"133g*12入","pcs":120,"plt":36,"cost":13.77,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 酸櫻桃布朗尼","en":"FEAST IQF SOUR CHERRY BROWNIE 10x(100 g x 9 ad)","spec":"100g*9入","pcs":90,"plt":36,"cost":12.55,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 巧克力布朗尼","en":"FEAST IQF CHOCOLATE BROWNIE 100 g x 9 ad","spec":"100g*9入","pcs":9,"plt":36,"cost":10.11,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 巧克力柳橙蛋糕","en":"FEAST CHOCOLATE ORANGE SLICED CAKE 6X(130 GR*16 Pcs)","spec":"130g*16片/整顆","pcs":96,"plt":36,"cost":16.49,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 胡蘿蔔蛋糕","en":"FEAST CARROT CAKE 6X(100 gr*16 pcs.)","spec":"100g*16片","pcs":96,"plt":36,"cost":7.49,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 巧克力紅絲絨條蛋糕","en":"FEAST CHOCOLATE RED VELVET BAR CAKE 4x(50 gr x 30 Ad)","spec":"50g*30入","pcs":120,"plt":36,"cost":10.16,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 紅絲絨條蛋糕","en":"FEAST RED VELVET BAR CAKE 5x(50 gr x 30 Ad)","spec":"50g*30入","pcs":150,"plt":36,"cost":10.21,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 黑森林櫻桃條蛋糕","en":"FEAST BLACKFOREST CHERRY BAR CAKE 6x(180 GR x 10 DL)","spec":"180g*10入","pcs":60,"plt":36,"cost":18.31,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 蘋果派","en":"FEAST IQF APPLE PIE 5x(100 g x 12 ad)","spec":"100g*12入","pcs":60,"plt":36,"cost":9.85,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 全素覆盆子派","en":"FEAST IQF VEGAN RASPBERRY PIE 100 g x 12 dl","spec":"100g*12入","pcs":12,"plt":36,"cost":12.44,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 巧克力餅乾","en":"FEAST IQF CHOCOLATE COOKIE 6*(15 pcs.*70 g)","spec":"70g*15入","pcs":90,"plt":36,"cost":11.19,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 黑莓馬芬","en":"FEAST IQF BLACKBERRY MUFFIN 6x(140 gr x 9 pcs. )","spec":"140g*9入","pcs":54,"plt":36,"cost":9.22,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 巧克力酥粒馬芬","en":"FEAST IQF CHOCOLATE CRUMBLE MUFFIN 6*(9 pcs.*135 g)","spec":"135g*9入","pcs":54,"plt":36,"cost":9.04,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 藍莓酥粒馬芬","en":"FEAST IQF BLUEBERRY CRUMBLE MUFFIN 6x(120 gr x 9 pcs. )","spec":"120g*9入","pcs":54,"plt":36,"cost":7.9,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 紅杯子蛋糕","en":"FEAST IQF RED CUP CAKE 6x(95 g x 9 ad)","spec":"95g*9入","pcs":54,"plt":36,"cost":6.09,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 香草柏林甜甜圈","en":"FEAST BERLINER WITH VANILLA 6x(85 g x 10 Ad)","spec":"85g*10入","pcs":60,"plt":36,"cost":10.61,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 巧克力柏林甜甜圈","en":"FEAST BERLINER WITH CHOCOLATE 6x(85 g x 10 Ad)","spec":"85g*10入","pcs":60,"plt":36,"cost":7.02,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 覆盆子柏林甜甜圈","en":"FEAST BERLINER WITH RASPBERRY 6x(85 g x 10 Ad)","spec":"85g*10入","pcs":60,"plt":36,"cost":6.25,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 葡萄乾餅乾","en":"FEAST IQF RAISIN COOKIE 80 GR X 10 pcs","spec":"80g*10入","pcs":10,"plt":36,"cost":0.8,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 口袋馬賽克蛋糕","en":"FEAST IQF POCKET MOSAIC CAKE 4X(70 Gr. *30 pcs)","spec":"70g*30入","pcs":120,"plt":36,"cost":15.08,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 迷你餅乾","en":"FEAST IQF MINI COOKIE 100 g x 12 pcs","spec":"100g*12入","pcs":12,"plt":36,"cost":14.29,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 布朗尼杯","en":"FEAST IQF BROWNIE CUP 88 g x 20 pcs","spec":"88g*20入","pcs":20,"plt":36,"cost":25.43,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast 椰子馬卡龍","en":"FEAST IQF COCONUT MACARON 64 g x 12 ad","spec":"64g*12入","pcs":12,"plt":36,"cost":25.43,"cur":"EUR","inc":"EXW","sup":"Feast","code":"SP200001"},{"ean":"","zh":"Feast IQF 巧克力舒芙蕾 100g","en":"FEAST IQF CHOCOLATE SOUFLE 6x(100 gr x 18 pieces)","spec":"100g","pcs":0,"plt":24,"cost":0.9,"cur":"EUR","inc":"","sup":"Feast","code":""},{"ean":"","zh":"VIRU 急速冷凍藍莓","en":"VIRU IQF BLUEBERRY 12x450g","spec":"450g","pcs":12,"plt":90,"cost":1.485,"cur":"USD","inc":"FOB","sup":"VIRU SA","code":"SP200011"},{"ean":"","zh":"VIRU 急速冷凍綜合莓","en":"VIRU IQF MIXED BERRY 12x450g (Strawberry50%/Raspberry15%/Blackberry15%/Blueberry20%)","spec":"450g","pcs":12,"plt":90,"cost":2.025,"cur":"USD","inc":"FOB","sup":"VIRU SA","code":"SP200011"},{"ean":"","zh":"VIRU 急速冷凍草莓","en":"VIRU IQF STRAWBERRY 12x450g","spec":"450g","pcs":12,"plt":90,"cost":1.0125,"cur":"USD","inc":"FOB","sup":"VIRU SA","code":"SP200011"},{"ean":"","zh":"VIRU 急速冷凍酪梨丁 15x15mm","en":"VIRU IQF AVOCADO DICES 15x15mm 12x450g","spec":"450g","pcs":12,"plt":90,"cost":1.5975,"cur":"USD","inc":"FOB","sup":"VIRU SA","code":"SP200011"},{"ean":"65090","zh":"#65090 巧克力碎粒可頌","en":"Midi Dark Croissant (90u)","spec":"55g","pcs":90,"plt":120,"cost":0.235444,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"66910","zh":"#66910 榛果巧克力派","en":"Praliné Lattice (54u)","spec":"100g","pcs":54,"plt":160,"cost":0.476852,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"49670","zh":"#49670 迷你蘋果派","en":"Mini Apple Pocket (2.6kg)MB","spec":"40g","pcs":65,"plt":170,"cost":0.228615,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"61790","zh":"#61790 巴黎可頌","en":"Caprice Paris Croissant T&S (30u)","spec":"52g","pcs":30,"plt":90,"cost":0.598333,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"68754","zh":"#68754 原味佛卡夏","en":"Plain Focaccia (32u)","spec":"155g","pcs":32,"plt":70,"cost":0.785937,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"60930","zh":"#60930 可可極致馬芬","en":"Tulipe Cocoa Extrem SG","spec":"110g","pcs":20,"plt":170,"cost":0.853,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"65051","zh":"#65051 開心果馬芬","en":"Muffin Pistachio","spec":"106g","pcs":20,"plt":170,"cost":0.798,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"67983","zh":"#67983 橄欖迷迭香扭結酥","en":"Olives and Rosemary Twist","spec":"85g","pcs":50,"plt":152,"cost":0.5516,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"66640","zh":"#66640 卡士達迷你捲","en":"Mini Cream Flute","spec":"15g","pcs":220,"plt":170,"cost":0.075045,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"66650","zh":"#66650 草莓迷你捲","en":"Mini Strawberry Flute","spec":"15g","pcs":220,"plt":170,"cost":0.085682,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"66645","zh":"#66645 可可迷你捲","en":"Mini Cacao Flute SG","spec":"15g","pcs":220,"plt":170,"cost":0.073364,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"108","zh":"#108 （暫定）奶油迷你可頌","en":"Butter Mini Croissant (260u)","spec":"25g × 260個/箱","pcs":260,"plt":96,"cost":0.115354,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"522","zh":"#522 直條奶油可頌（已發酵）","en":"Straight Margarine Croissant (100u) MB","spec":"70g × 100個/箱","pcs":100,"plt":50,"cost":0.201,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"25101","zh":"#25101 彎月奶油可頌（未發酵）","en":"Curved Margarine Croissant (84u)","spec":"85g × 84個/箱","pcs":84,"plt":90,"cost":0.229,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"21441","zh":"#21441 （暫定）地中海佛卡夏","en":"Mediterranean Focaccia (40u)","spec":"105g × 40個/箱","pcs":40,"plt":56,"cost":0.350804,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"21451","zh":"#21451 （暫定）羅馬佛卡夏","en":"Roman Focaccia (40u)","spec":"105g × 40個/箱","pcs":40,"plt":56,"cost":0.409054,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"21791","zh":"#21791 （暫定）卡布里斯葡萄乾小餐包","en":"Caprice Small Pain Raisin 150u","spec":"30g × 150個/箱","pcs":150,"plt":96,"cost":0.145881,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"22133","zh":"#22133 （暫定）迷你巴黎可頌","en":"Mini Paris Croissant (140u)","spec":"25g × 140個/箱","pcs":140,"plt":120,"cost":0.103286,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"23721","zh":"#23721 （暫定）迷你多穀物巴黎可頌","en":"Paris Mini Multicereal Croissant (140u)","spec":"25g × 140個/箱","pcs":140,"plt":96,"cost":0.137301,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"27293","zh":"#27293 （暫定）半截法棍","en":"Demi Baguette (76u)","spec":"122g × 76個/箱","pcs":76,"plt":28,"cost":0.261635,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"27301","zh":"#27301 （暫定）小餐包","en":"Petit Pain (90u)","spec":"65g × 90個/箱","pcs":90,"plt":42,"cost":0.153402,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"27310","zh":"#27310 （暫定）迷你小餐包","en":"Small Roll (100u)","spec":"35g × 100個/箱","pcs":100,"plt":64,"cost":0.085631,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"27470","zh":"#27470 3 Cereal Small Roll (100u)","en":"3 Cereal Small Roll (100u)","spec":"35g × 100個/箱","pcs":100,"plt":64,"cost":0.104631,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"27641","zh":"#27641 （暫定）餐飲巧巴達","en":"Catering Ciabatta (85u)","spec":"65g × 85個/箱","pcs":85,"plt":36,"cost":0.189556,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"28450","zh":"#28450 （暫定）鮪魚酥皮派","en":"Tuna Puff Pastry (5u)","spec":"135g × 56個/箱","pcs":56,"plt":120,"cost":0.522708,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"28810","zh":"#28810 （暫定）愛琴海帕尼尼","en":"Aegean Panini (30u)","spec":"95g × 30個/箱","pcs":30,"plt":64,"cost":0.396771,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"28820","zh":"#28820 （暫定）黑白芝麻帕尼尼","en":"Panini sesame black&white(30u)","spec":"100g × 30個/箱","pcs":30,"plt":64,"cost":0.412104,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"28880","zh":"#28880 （暫定）經典帕尼尼","en":"Classic Panini (30u)","spec":"95g × 30個/箱","pcs":30,"plt":64,"cost":0.345104,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"29231","zh":"#29231 （暫定）卡布里斯巴黎可頌","en":"Caprice Paris Croissant (125u)","spec":"60g × 125個/箱","pcs":125,"plt":50,"cost":0.24288,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"29253","zh":"#29253 （暫定）餐飲可頌","en":"Catering Croissant (160u) MB","spec":"45g × 160個/箱","pcs":160,"plt":40,"cost":0.123844,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"37585","zh":"#37585 （暫定）起司蛋糕（預切）","en":"Cheesecake precut (1u)","spec":"1650g × 1個/箱","pcs":1,"plt":168,"cost":26.62,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"37588","zh":"#37588 （暫定）純素蘋果蛋糕（預切）","en":"Apple Vegan Cake precut (1u)","spec":"1.75g × 1個/箱","pcs":1,"plt":168,"cost":19.764048,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"40022","zh":"#40022 （暫定）三明治麵包","en":"Sandwich(65u)","spec":"120g × 65個/箱","pcs":65,"plt":28,"cost":0.277143,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"60150","zh":"#60150 （暫定）菠菜鹹派","en":"Spinach Quiche 18u","spec":"148g × 18個/箱","pcs":18,"plt":170,"cost":0.986405,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"60260","zh":"#60260 （暫定）三起司鹹派","en":"Three Cheese Quiche (18u)","spec":"147g × 18個/箱","pcs":18,"plt":170,"cost":1.301961,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"60731","zh":"#60731 （暫定）米奇造型小餐包","en":"Mickey Mouse Roll 50u","spec":"65g × 50個/箱","pcs":50,"plt":64,"cost":0.285062,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"61580","zh":"#61580 （暫定）迷你卡布里斯綜合點心","en":"Mini Caprice Assortment 200u","spec":"28g × 200個/箱","pcs":200,"plt":72,"cost":0.173881,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"61581","zh":"#61581 （暫定）迷你巧克力麵包","en":"Mini Pain au Chocolat (150u)","spec":"30g × 150個/箱","pcs":150,"plt":72,"cost":0.169174,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"61584","zh":"#61584 （暫定）起司蛋糕（整顆）","en":"Cheesecake 1,1Kg AA (1u)","spec":"1.1g × 1個/箱","pcs":1,"plt":390,"cost":17.330513,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"61980","zh":"#61980 （暫定）焦糖胡桃鬱金香馬芬","en":"Caramel & Pecan Tulip Muffin 20u","spec":"110g × 20個/箱","pcs":20,"plt":136,"cost":0.705456,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"62150","zh":"#62150 （暫定）起司風味鬱金香蛋糕杯","en":"Cheesecake Flavor Tulipe (20u)","spec":"110g × 20個/箱","pcs":20,"plt":136,"cost":0.710456,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"62335","zh":"#62335 （暫定）純素馬芬","en":"Vegan Muffin (20u)","spec":"90g × 20個/箱","pcs":20,"plt":136,"cost":0.728956,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"63225","zh":"#63225 （暫定）瑞士布里歐修","en":"Swiss Brioche (30u)","spec":"55g × 30個/箱","pcs":30,"plt":72,"cost":0.650204,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"63490","zh":"#63490 （暫定）迷你甜酥皮綜合點心","en":"MiniSweet PuffPastry Assortment 180u","spec":"38g × 180個/箱","pcs":180,"plt":72,"cost":0.120645,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"63650","zh":"#63650 （暫定）植物油小可頌","en":"Small Margarine Croissant (200u)","spec":"25g × 200個/箱","pcs":200,"plt":72,"cost":0.065831,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"64340","zh":"#64340 （暫定）軟式半截法棍","en":"Soft Demi Baguette (66u)","spec":"122g × 66個/箱","pcs":66,"plt":28,"cost":0.286429,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"64471","zh":"#64471 （暫定）中型巴黎可頌","en":"Caprice Midi Paris Croiss 100u","spec":"45g × 100個/箱","pcs":100,"plt":90,"cost":0.1993,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"64670","zh":"#64670 （暫定）半截法棍（原味）","en":"Demi Baguette (76u)","spec":"110g × 76個/箱","pcs":76,"plt":28,"cost":0.278477,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"64980","zh":"#64980 （暫定）蔬菜格紋酥派","en":"Vegetable Lattice (56u)","spec":"110g × 56個/箱","pcs":56,"plt":120,"cost":0.586458,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"65124","zh":"#65124 （暫定）起司蛋糕（2入）","en":"Cheescake 1,1kg AA (2u)","spec":"1.1g × 2個/箱","pcs":2,"plt":126,"cost":18.136032,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"66233","zh":"#66233 （暫定）蓮花餅乾蛋糕（預切）","en":"Cake w/Lotus Biscoff Prec(21u)","spec":"100g × 21個/箱","pcs":21,"plt":108,"cost":0.92321,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"66234","zh":"#66234 （暫定）可可奶油蛋糕（預切）","en":"Cocoa/Cream Gateau precut 21u","spec":"110g × 21個/箱","pcs":21,"plt":108,"cost":0.985591,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"66254","zh":"#66254 （暫定）草莓奶油蛋糕（預切）","en":"Cream & Strawberry Gateau precut (21u)","spec":"100g × 21個/箱","pcs":21,"plt":108,"cost":0.667972,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"66274","zh":"#66274 （暫定）黑森林蛋糕（預切）","en":"Black Forest Gateau precut (21u)","spec":"83g × 21個/箱","pcs":21,"plt":216,"cost":0.671429,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"66340","zh":"#66340 （暫定）起司蛋糕捲","en":"Cheesecake Roulette (58u)","spec":"90g × 58個/箱","pcs":58,"plt":96,"cost":0.402105,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"67820","zh":"#67820 （暫定）綜合晚餐小餐包","en":"Assorted Dinner Rolls (100u)","spec":"42g × 100個/箱","pcs":100,"plt":42,"cost":0.181562,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"68732","zh":"#68732 （暫定）美式胡蘿蔔蛋糕","en":"American Carrot Cake","spec":"1.25g × 1個/箱","pcs":1,"plt":216,"cost":16.208704,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"69231","zh":"#69231 （暫定）可頌甜甜圈","en":"Crodots 24u (MB)","spec":"77g × 24個/箱","pcs":24,"plt":120,"cost":0.685069,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"69241","zh":"#69241 （暫定）黑巧克力可頌甜甜圈","en":"Dark Crodots 22U (MB)","spec":"95g × 22個/箱","pcs":22,"plt":120,"cost":0.834167,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"69281","zh":"#69281 （暫定）巧克力可頌","en":"Choco croissant","spec":"100g × 50個/箱","pcs":50,"plt":72,"cost":0.396922,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"69302","zh":"#69302 （暫定）奶油泡芙","en":"Cream Delight","spec":"100g × 56個/箱","pcs":56,"plt":72,"cost":0.226538,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"69311/69313","zh":"#69311/69313 Decorated Choco Delight (56u)","en":"Decorated Choco Delight (56u)","spec":"103g × 56個/箱","pcs":56,"plt":72,"cost":0.297252,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"69321","zh":"#69321 （暫定）迷你奶油泡芙","en":"Cream Mini delight","spec":"45g × 130個/箱","pcs":130,"plt":72,"cost":0.102893,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"69742","zh":"#69742 （暫定）美式黑巧克力蛋糕","en":"American Dark Cake","spec":"1200g × 1個/箱","pcs":1,"plt":216,"cost":15.35,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"64245","zh":"#64245 （暫定）粉紅爆珠甜甜圈","en":"Pink PopDots (88u)","spec":"21g × 88個/箱","pcs":88,"plt":160,"cost":0.144105,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"64220","zh":"#64220 （暫定）黑巧克力爆珠甜甜圈","en":"Dark PopDots (1.6kg) MB","spec":"16g × 100個/箱","pcs":100,"plt":160,"cost":0.100712,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"63885","zh":"#63885 （暫定）軟心棕葉酥","en":"Soft Palmier (33u)","spec":"170g × 33個/箱","pcs":33,"plt":140,"cost":0.556753,"cur":"Euro","inc":"FOB","sup":"Europastry","code":"SP200002"},{"ean":"64820","zh":"#64820 （暫定）葡式蛋塔（外帶版）","en":"Pastel de Nata GO (60u)","spec":"62g × 60個/箱","pcs":60,"plt":120,"cost":0.320833,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"16303","zh":"#16303 （暫定）提拉米蘇蛋糕","en":"Tiramisu Gateau (1u)","spec":"1800g × 1個/箱","pcs":1,"plt":216,"cost":11.14,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"63191","zh":"#63191 （暫定）杏仁塔","en":"Almond Tart (4u)","spec":"600g × 4個/箱","pcs":4,"plt":112,"cost":6.6225,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"67220","zh":"#67220 （暫定）肉桂卷","en":"Cinnamon Roll S‚lection Or 48u","spec":"86g × 48個/箱","pcs":48,"plt":120,"cost":0.520979,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"69212","zh":"#69212 （暫定）頂級巴黎可頌","en":"Premium Paris Croissant(125u)","spec":"60g × 125個/箱","pcs":125,"plt":50,"cost":0.26968,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"61685","zh":"#61685 （暫定）蘇菲可頌","en":"Sophie Croissant (50u)","spec":"70g × 50個/箱","pcs":50,"plt":90,"cost":0.379,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"68105","zh":"#68105 （暫定）迷你蘇菲可頌","en":"Mini Sophie (4,5kg)","spec":"11g × 386個/箱","pcs":386,"plt":140,"cost":0.048834,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"},{"ean":"45161","zh":"#45161 （暫定）葡式蛋塔","en":"Pastel Nata (104u)","spec":"66g × 104個/箱","pcs":104,"plt":90,"cost":0.273846,"cur":"Euro","inc":"CIF","sup":"Europastry","code":"SP200002"}];
+
+// ── Golden Jade address (fixed) ─────────────
+const GJ = {
+  name:'Golden Jade Terre Co., Ltd',
+  a1:'6F-3, No. 16, Beiping E. Rd., ZhongZheng Dist.',
+  a2:'Taipei City 100009 Taiwan R.O.C.',
+  attn:'Tina Huang',
+  email:'tinahuang@goldenjadeterre.com'
+};
+
+// ── Customer address book ────────────────────
+const CUSTS = {
+  '美廉社':{en:'Simple Mart Plus Co. Ltd',a1:'B1F, No.4, Sec. 3, Minquan E. Rd., Zhongshan Dist.',a2:'Taipei City 104, Taiwan'},
+  '東森':{en:'Eastern Home Shopping and Leisure Co., LTD',a1:'No. 258, Jingping Road, Zhonghe Dist.',a2:'New Taipei City 23581, Taiwan'},
+  '生活良好':{en:'Taiwan Better Life International Co., Ltd.',a1:'3F., No. 33, Jingye 4th Rd., Zhongshan Dist.',a2:'Taipei City 104052, Taiwan (R.O.C.)'},
+  '悠旅生活':{en:'U-Life International Co., Ltd',a1:'',a2:'Taiwan'},
+  '好市多':{en:'Costco Wholesale Taiwan',a1:'',a2:'Taiwan'},
+  '高玉':{en:'Golden Jade Terre Co., Ltd',a1:'6F-3, No. 16, Beiping E. Rd., ZhongZheng Dist.',a2:'Taipei City 100009 Taiwan R.O.C.'},
+};
+
+// ── Supplier contact book ───────────────────
+const SUPS = {
+  'SP100022':{name:'MAS CHOICES Corporation Ltd.',attn:'Ms Tikumporn',email:'sales@maschoices.com',a1:'115/257 Moo 7 Soi Suanpak 50, Chimplee, Taling Chan, Bangkok',a2:'10170 Thailand'},
+  'SP100003':{name:'Agro Wellness Co., Ltd',attn:'',email:'',a1:'',a2:'Thailand'},
+  'SP100005':{name:'Shoon Fatt Biscuits & Confectionery (M) Sdn Bhd',attn:'',email:'',a1:'',a2:'Malaysia'},
+  'SP100006':{name:'Francestle Co., Ltd',attn:'',email:'',a1:'',a2:''},
+  'SP100012':{name:'Abc',attn:'',email:'',a1:'',a2:''},
+  'SP100013':{name:'GoMuc GmbH',attn:'',email:'',a1:'',a2:'Germany'},
+  'SP100014':{name:'NBF',attn:'',email:'',a1:'',a2:''},
+  'SP100015':{name:'Chizzpa',attn:'',email:'',a1:'',a2:''},
+  'SP100016':{name:'C&F',attn:'',email:'',a1:'',a2:''},
+  'SP100025':{name:'Bodegas Milenium S.L.',attn:'',email:'',a1:'',a2:'Spain'},
+  'SP100027':{name:'Homhual Co., Ltd',attn:'',email:'',a1:'',a2:'Thailand'},
+  'SP100028':{name:'Luong GIA Co., Ltd',attn:'',email:'',a1:'',a2:'Vietnam'},
+  'SP100030':{name:'Maspex Group',attn:'',email:'',a1:'',a2:'Poland'},
+  'SP100032':{name:'Prinze Snacks',attn:'',email:'',a1:'',a2:''},
+  'SP100033':{name:'Pronat',attn:'',email:'',a1:'',a2:''},
+  'SP100034':{name:'PT Managhora Indonesia',attn:'',email:'',a1:'',a2:'Indonesia'},
+  'SP100036':{name:'Sun Grains',attn:'',email:'',a1:'',a2:''},
+  'SP100039':{name:'Yarra Valley Farms',attn:'',email:'',a1:'',a2:'Australia'},
+  'SP200001':{name:'Feast Food Group',attn:'',email:'',a1:'',a2:'Turkey'},
+  'SP200002':{name:'Europastry S.A.',attn:'',email:'',a1:'Av. Parc Logístic, 12-20, ZAL Port',a2:'08040 Barcelona, Spain'},
+  'SP200005':{name:'NEXO International Co., Ltd',attn:'',email:'',a1:'',a2:'South Korea'},
+  'SP200006':{name:'Di Biase',attn:'',email:'',a1:'',a2:'Italy'},
+  'SP200010':{name:'G7',attn:'',email:'',a1:'',a2:''},
+  'SP200011':{name:'VIRU SA',attn:'',email:'info@pierorecchia.it',a1:'',a2:''},
+};
+
+// ── State ────────────────────────────────────
+let currentOrder = null;
+
+// ── File loading ─────────────────────────────
+function doDrop(ev){
+  ev.preventDefault();
+  document.getElementById('drop-zone').classList.remove('over');
+  const f=ev.dataTransfer.files[0];
+  if(f) parseFile(f);
+}
+function loadFile(inp){ if(inp.files[0]) parseFile(inp.files[0]); }
+function parseFile(f){
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      currentOrder=JSON.parse(e.target.result);
+      showOrderMeta(currentOrder, f.name);
+    }catch(err){alert('JSON 格式錯誤：'+err.message);}
+  };
+  r.readAsText(f,'UTF-8');
+}
+
+function showOrderMeta(o, fname){
+  const items=(o.items||[]).filter(it=>isBuy(it));
+  const byS={};
+  items.forEach(it=>{const k=it.supCode||it.supplier;(byS[k]=byS[k]||[]).push(it);});
+  const nS=Object.keys(byS).length;
+  const el=document.getElementById('order-info');
+  el.style.display='block';
+  el.innerHTML=`
+    <b>✅ ${fname||'訂單'}</b> &nbsp;|&nbsp;
+    客戶：<b>${o.customer||'—'}</b> &nbsp;|&nbsp;
+    日期：${o.orderDate||'—'} &nbsp;|&nbsp;
+    GJ PO：<b>${o.gjPO||o.orderId||'—'}</b> &nbsp;|&nbsp;
+    客戶PO：${o.custPO||'—'} &nbsp;|&nbsp;
+    採購項目：<b>${items.length}</b> 項
+    ${nS>1?`<br><span style="color:#e67e22">⚠ 涉及 <b>${nS}</b> 家供應商，將產生 ${nS} 份 PO</span>`:''}
+    ${items.length===0?'<br><span style="color:#c0392b">⚠ 此訂單無買進/買進轉手項目，無需對外採購</span>':''}
+  `;
+  document.getElementById('config-row').style.display='flex';
+  const dz=document.getElementById('drop-zone');
+  dz.classList.add('loaded');
+  dz.innerHTML=`✅ ${fname} — 點擊重新載入<input type="file" id="fin" accept=".json" style="display:none" onchange="loadFile(this)">`;
+}
+
+function isBuy(it){
+  return ['買進','買進轉手'].includes(it.cooperMode||'');
+}
+
+// ── PO Queue (72h retention, multi-order) ────────────
+const PO_QUEUE_KEY = 'gj_po_queue';
+const PO_QUEUE_TTL = 72 * 60 * 60 * 1000; // 72 hours in ms
+
+function queueReadAll(){
+  try{ return JSON.parse(localStorage.getItem(PO_QUEUE_KEY)||'[]'); }catch(e){ return []; }
+}
+function queueSave(list){ localStorage.setItem(PO_QUEUE_KEY, JSON.stringify(list)); }
+function queuePurgeOld(list){ return list.filter(e=> Date.now()-new Date(e.queuedAt).getTime() < PO_QUEUE_TTL); }
+function queueRemove(id){
+  const list = queuePurgeOld(queueReadAll()).filter(e=>e.id!==id);
+  queueSave(list);
+}
+
+function timeAgo(isoStr){
+  const s = Math.floor((Date.now()-new Date(isoStr).getTime())/1000);
+  if(s<60) return `${s}秒前`;
+  const m=Math.floor(s/60); if(m<60) return `${m}分鐘前`;
+  const h=Math.floor(m/60); if(h<24) return `${h}小時前`;
+  return `${Math.floor(h/24)}天前`;
+}
+
+function loadFromData(order, label){
+  currentOrder = order;
+  showOrderMeta(order, label || `訂單_${order.customer||''}_${order.orderDate||''}`);
+  const items=(order.items||[]).filter(isBuy);
+  if(items.length) buildAllPO();
+}
+
+function showToast(msg, color){
+  let t=document.getElementById('gj-toast');
+  if(!t){
+    t=document.createElement('div');
+    t.id='gj-toast';
+    t.style.cssText='position:fixed;top:18px;left:50%;transform:translateX(-50%);color:#fff;padding:10px 22px;border-radius:8px;font-size:14px;font-weight:700;z-index:9999;box-shadow:0 2px 8px rgba(0,0,0,.3);transition:opacity .4s';
+    document.body.appendChild(t);
+  }
+  t.style.background = color||'#1e8449';
+  t.textContent=msg;
+  t.style.opacity='1';
+  setTimeout(()=>{ t.style.opacity='0'; }, 3500);
+}
+
+function renderQueuePanel(){
+  const list = queuePurgeOld(queueReadAll());
+  queueSave(list);
+  const panel = document.getElementById('gj-queue-panel');
+  if(!panel) return;
+  if(!list.length){ panel.style.display='none'; return; }
+  panel.style.display='block';
+  const badge = document.getElementById('gj-queue-badge');
+  if(badge) badge.textContent = list.length;
+  const tbody = document.getElementById('gj-queue-tbody');
+  if(!tbody) return;
+  tbody.innerHTML = list.map(e=>{
+    const o=e.order;
+    const hasBuy=(o.items||[]).some(isBuy);
+    return `<tr>
+      <td style="padding:6px 10px;font-weight:700">${o.customer||'—'}</td>
+      <td style="padding:6px 10px">${o.gjPO||o.custPO||'—'}</td>
+      <td style="padding:6px 10px">${o.orderDate||'—'}</td>
+      <td style="padding:6px 10px;color:#888;font-size:12px">${timeAgo(e.queuedAt)}</td>
+      <td style="padding:6px 10px">${hasBuy
+        ? `<button onclick="queueLoad('${e.id}')" style="background:#1a6b3c;color:#fff;border:none;border-radius:5px;padding:4px 12px;cursor:pointer;font-size:13px">載入</button>`
+        : `<span style="color:#999;font-size:12px">無採購項目</span>`}
+        &nbsp;<button onclick="queueDismiss('${e.id}')" style="background:#e74c3c;color:#fff;border:none;border-radius:5px;padding:4px 8px;cursor:pointer;font-size:12px">✕</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function queueLoad(id){
+  const list = queueReadAll();
+  const entry = list.find(e=>e.id===id);
+  if(!entry){ showToast('找不到該筆訂單','#c0392b'); return; }
+  queueRemove(id);
+  loadFromData(entry.order);
+  showToast('✅ 已載入：'+(entry.order.gjPO||entry.order.customer||'訂單'));
+  renderQueuePanel();
+}
+
+function queueDismiss(id){
+  queueRemove(id);
+  showToast('已從待辦清單移除','#7f8c8d');
+  renderQueuePanel();
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  // 遷移舊版單筆資料 → queue
+  const legacy = localStorage.getItem('gj_po_pending');
+  if(legacy){
+    try{
+      const o = JSON.parse(legacy);
+      const list = queueReadAll();
+      list.unshift({id: Date.now().toString(), queuedAt: o._exported||new Date().toISOString(), order: o});
+      queueSave(list);
+    }catch(e){}
+    localStorage.removeItem('gj_po_pending');
+  }
+  renderQueuePanel();
+});
+
+// ── Product matching ─────────────────────────
+function matchProd(item){
+  const ean=String(item.ean||'');
+  if(ean){const p=PRODS.find(p=>p.ean===ean);if(p)return p;}
+  const en=(item.englishName||'').toLowerCase().trim();
+  if(en){const p=PRODS.find(p=>(p.en||'').toLowerCase().trim()===en);if(p)return p;}
+  const zh=(item.name||'').trim();
+  if(zh){const p=PRODS.find(p=>(p.zh||'').includes(zh)||zh.includes((p.zh||'').replace(/^#\d+\s*/,'')));if(p)return p;}
+  return null;
+}
+
+// ── PO Generation ────────────────────────────
+function buildAllPO(){
+  if(!currentOrder){alert('請先載入訂單 JSON');return;}
+  const items=(currentOrder.items||[]).filter(isBuy);
+  if(!items.length){alert('此訂單沒有買進/買進轉手項目');return;}
+
+  // Group by supplier
+  const byS={};
+  items.forEach(it=>{
+    const k=it.supCode||it.supplier||'UNKNOWN';
+    if(!byS[k])byS[k]={supCode:it.supCode,supplier:it.supplier,cur:it.currency||'USD',inc:it.supIncoterm||'CIF',pay:it.supPayment||'',items:[]};
+    byS[k].items.push(it);
+  });
+
+  const etd=document.getElementById('inp-etd').value;
+  const eta=document.getElementById('inp-eta').value;
+  const note=document.getElementById('inp-note').value.trim();
+  const groups=Object.values(byS);
+
+  let html='';
+  groups.forEach((g,i)=>{ html+=buildOnePO(currentOrder,g,etd,eta,note,i,groups.length); });
+
+  const w=document.getElementById('po-wrapper');
+  w.innerHTML=html;
+  w.style.display='block';
+  w.scrollIntoView({behavior:'smooth'});
+}
+
+function fmtDate(iso){
+  if(!iso)return'';
+  const d=new Date(iso);
+  const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return`${String(d.getDate()).padStart(2,'0')}-${M[d.getMonth()]}-${d.getFullYear()}`;
+}
+function today(){
+  const d=new Date();
+  return`${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
+}
+function n2(n){return typeof n==='number'?n.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2}):'';}
+
+function buildOnePO(order,grp,etd,eta,note,idx,total){
+  const sup=SUPS[grp.supCode]||{name:grp.supplier||'[供應商]',attn:'',email:'',a1:'',a2:''};
+  const cust=CUSTS[order.customer]||{en:order.customer||'',a1:'',a2:'Taiwan'};
+
+  // PO number: if single supplier, use gjPO; if multiple, append letter
+  const gjPO=order.gjPO||order.orderId||'GJ-PO';
+  const poNum=total>1?`${gjPO}-${String.fromCharCode(65+idx)}`:gjPO;
+  const refNum=`${poNum} (${order.custPO||gjPO})`;
+
+  // Port from
+  const a2=sup.a2||'';
+  const portFrom=a2.includes('Spain')?'BARCELONA, SPAIN':
+    a2.includes('Turkey')?'ISTANBUL, TURKEY':
+    a2.includes('Thailand')?'THAILAND':
+    a2.includes('Korea')?'SOUTH KOREA':
+    a2.includes('Malaysia')?'MALAYSIA':
+    a2.includes('Vietnam')?'VIETNAM':
+    a2.includes('Indonesia')?'INDONESIA':
+    a2.includes('Italy')?'ITALY':
+    a2.includes('Poland')?'POLAND':
+    a2.includes('Australia')?'AUSTRALIA':
+    a2.includes('Germany')?'GERMANY':'[PORT OF ORIGIN]';
+
+  // Build rows
+  let rows='', totUnit=0, totCA=0, totAmt=0, totPL=0;
+  grp.items.forEach(item=>{
+    const p=matchProd(item);
+    const ean=p?p.ean:(item.ean||'');
+    const en=p?p.en:(item.englishName||item.name||'');
+    const zh=p?p.zh:(item.name||'');
+    const spec=p?p.spec:(item.spec||'');
+    const pcs=p?p.pcs:0;
+    const plt=p?p.plt:0;
+    const costUnit=p?p.cost:0;
+    const unitCA=costUnit&&pcs?+(costUnit*pcs).toFixed(2):null;
+    const qtyCA=Number(item.qty)||0;
+    const qtyUnit=pcs?qtyCA*pcs:null;
+    const qtyPL=plt?+(qtyCA/plt).toFixed(2):null;
+    const lineAmt=unitCA!=null?+(unitCA*qtyCA).toFixed(2):null;
+    if(qtyUnit!=null)totUnit+=qtyUnit;
+    totCA+=qtyCA;
+    if(qtyPL!=null)totPL+=qtyPL;
+    if(lineAmt!=null)totAmt+=lineAmt;
+
+    rows+=`<tr>
+      <td class="tl"><span contenteditable="true">${ean}</span></td>
+      <td class="tl"><span contenteditable="true">${ean}</span></td>
+      <td class="tl" contenteditable="true">${en}</td>
+      <td class="tl" contenteditable="true">${zh}</td>
+      <td contenteditable="true">${spec}</td>
+      <td class="tr" contenteditable="true">${pcs||''}</td>
+      <td class="tr" contenteditable="true">${plt||''}</td>
+      <td class="tr" contenteditable="true">${qtyUnit!=null?qtyUnit.toLocaleString():''}</td>
+      <td class="tr" contenteditable="true">${qtyCA?qtyCA.toLocaleString():''}</td>
+      <td class="tr" contenteditable="true">${qtyPL!=null?qtyPL:''}</td>
+      <td class="tr" contenteditable="true">${unitCA!=null?n2(unitCA):''}</td>
+      <td class="tr" contenteditable="true">${lineAmt!=null?n2(lineAmt):''}</td>
+    </tr>`;
+  });
+
+  const cur=grp.cur||'USD';
+  const noteRow=note?`<tr><td colspan="12" class="tl" style="font-style:italic;color:#555;font-size:7pt">${note}</td></tr>`:'';
+  const totAmtFmt=totAmt>0?`${cur} ${n2(totAmt)}`:'[待計算]';
+  const pageBreak=idx>0?'page-break-before:always;margin-top:20px':'';
+
+  return`<div class="po-doc" style="${pageBreak}">
+
+<div class="date-top">Date: <span contenteditable="true">${today()}</span></div>
+
+<div class="po-grid2">
+  <div class="cell">
+    <div class="cell-label">Buyer</div>
+    <div class="cell-title">${GJ.name}</div>
+    <div>${GJ.a1}</div>
+    <div>${GJ.a2}</div>
+    <div>Attn: ${GJ.attn}</div>
+    <div>E-mail: ${GJ.email}</div>
+  </div>
+  <div class="cell">
+    <div class="cell-label">Supplier</div>
+    <div class="cell-title" contenteditable="true">${sup.name}</div>
+    <div contenteditable="true">${sup.a1||'[地址待補]'}</div>
+    <div contenteditable="true">${sup.a2||''}</div>
+    <div>Attn: <span contenteditable="true">${sup.attn||'[聯絡人待補]'}</span></div>
+    <div>E-mail: <span contenteditable="true">${sup.email||'[Email待補]'}</span></div>
+  </div>
+</div>
+
+<div class="po-grid3">
+  <div class="cell"><div class="cell-label">Currency</div><div contenteditable="true">${cur}</div></div>
+  <div class="cell"><div class="cell-label">Trade Term</div><div contenteditable="true">${grp.inc} Keelung, Taiwan</div></div>
+  <div class="cell"><div class="cell-label">Payment</div><div contenteditable="true">${grp.pay||'[付款條件待補]'}</div></div>
+</div>
+
+<div class="po-grid12">
+  <div class="cell" style="font-size:8pt">
+    <div><b>SHIPMENT</b></div>
+    <div>FROM: <span contenteditable="true">${portFrom}</span></div>
+    <div>TO: KEELUNG TAIWAN</div>
+  </div>
+  <div class="cell">
+    <div class="cell-label">Consignee</div>
+    <div style="font-weight:700" contenteditable="true">${cust.en}</div>
+    <div contenteditable="true">${cust.a1||'[地址待補 — 請填客戶收貨地址]'}</div>
+    <div contenteditable="true">${cust.a2||'Taiwan'}</div>
+    <div style="margin-top:4px" class="order-num">Order # 訂單: <span contenteditable="true">${refNum}</span></div>
+  </div>
+</div>
+
+<table class="pot">
+<thead><tr>
+  <th>GJ Code<br>貨號</th>
+  <th>EAN<br>國際條碼</th>
+  <th>Product Name (EN)<br>英文品名</th>
+  <th>Product Name (CN)<br>中文品名</th>
+  <th>Pack Size<br>規格</th>
+  <th>Pcs/CA<br>入/箱</th>
+  <th>CA/PL<br>箱/板</th>
+  <th>Order Qty (Unit)<br>訂量（個）</th>
+  <th>Order Qty (CA)<br>訂量（箱）</th>
+  <th>Order Qty (PL)<br>訂量（板）</th>
+  <th>Unit Price (CA)<br>單價/箱</th>
+  <th>Total Amount<br>總金額</th>
+</tr></thead>
+<tbody>${rows}</tbody>
+<tfoot>
+  ${noteRow}
+  <tr class="tot-row">
+    <td colspan="7" style="text-align:right"><b>合計 Grand TOTAL</b></td>
+    <td class="tr">${totUnit>0?totUnit.toLocaleString():''}</td>
+    <td class="tr">${totCA>0?totCA.toLocaleString():''}</td>
+    <td class="tr">${totPL>0?totPL.toFixed(2):''}</td>
+    <td></td>
+    <td class="tr"><b>${totAmtFmt}</b></td>
+  </tr>
+</tfoot>
+</table>
+
+<div class="remarks">
+  <b>Remark:</b>
+  <p>1. Shipping documents: Commercial Invoice, Packing List, Certificate of Origin, Health Certificate (if not necessary, will be confirmed by mail).</p>
+  <p>2. Based on local regulation, for shipments import to Taiwan, all wooden packing materials MUST be fumigated as follow ISPM-No. 15 method and marked with "IPPC" logo clearly on the packing materials surface.</p>
+  <p>3. Organic products must have the certificate symbol on the pack or bottle. Supplier MUST provide "ECOCERT CERTIFICATE OF PRODUCTS FROM ORGANIC PRODUCTION" for import Customs clearance. Without ECOCERT CERTIFICATE, please DO NOT ship organic products.</p>
+  <p class="etd-line">SHIPMENT &nbsp;&nbsp; ETD <span contenteditable="true">${fmtDate(etd)||'[ETD]'}</span> &nbsp;&nbsp;&nbsp; ETA <span contenteditable="true">${fmtDate(eta)||'[ETA]'}</span></p>
+</div>
+
+<div class="sig-grid">
+  <div class="sig-block">
+    <b>BUYER</b>
+    <div class="sig-line">
+      <div>${GJ.attn}</div>
+      <div contenteditable="true">${today()}</div>
+      <div>${GJ.name}</div>
+      <div style="color:#888">Date</div>
+    </div>
+  </div>
+  <div class="sig-block">
+    <b>SUPPLIER</b>
+    <div class="sig-line">
+      <div contenteditable="true">${sup.name}</div>
+      <div style="color:#888">Date</div>
+    </div>
+  </div>
+</div>
+
+</div>`;
+}
+</script>
+</body>
+</html>
