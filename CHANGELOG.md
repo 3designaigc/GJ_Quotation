@@ -20,8 +20,14 @@
 
 `高玉產品報價資料庫_*.html` 是**完全靜態HTML表格**（產品烤進 td），`sync_html_data.py` 不會更新它（它找 `let DB`，此檔無）。舊快照停在 2026-06-02 共 517 筆，缺今天新增的 122 筆。
 - 依現有 36 欄模板（含 data-status/supplier/category/search 篩選屬性）從 products_final.json 重建
-- 新檔 `高玉產品報價資料庫_最後更新20260606_2152.html`（639 筆），舊檔移 `90_舊版備份/`
 - ⚠️ 此為**內部完整DB**（含成本/利潤/合作模式），非客戶報價單
+
+#### 靜態DB 改為自動更新（不再手動）
+
+- 新增 `03_腳本/generate_static_db.py`：從 products_final.json 重建靜態DB
+- 改用**固定檔名** `高玉產品報價資料庫.html`（時間戳放頁內 meta：「共 N 筆 ｜ 更新 …」），每次覆蓋
+- `sync_html_data.py` 新增 **Step 8** 自動呼叫，**改完產品跑一次 sync，靜態DB跟著更新**，無需手動重生
+- 舊的帶時間戳快照已移除
 
 ---
 
