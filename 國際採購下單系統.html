@@ -152,7 +152,9 @@ table.pot tr.tot-row td{border:1px solid #99a}
             <th style="padding:4px 8px;text-align:left">供應商</th>
             <th style="padding:4px 8px;text-align:left">產品</th>
             <th style="padding:4px 8px">規格</th>
+            <th style="padding:4px 8px">廠商報價(整箱)</th>
             <th style="padding:4px 8px">箱數</th>
+            <th style="padding:4px 8px">小計</th>
             <th style="padding:4px 8px">移除</th>
           </tr></thead>
           <tbody id="m-cart"></tbody>
@@ -431,9 +433,11 @@ function mSearch(){
   box.style.display='block';
   box.innerHTML=hits.length?hits.map((p,i)=>{
     const gi=PRODS.indexOf(p);
+    const ctn=(p.cost&&p.pcs)?+(p.cost*p.pcs).toFixed(2):null;
     return `<div onclick="mAdd(${gi})" style="padding:5px 10px;border-bottom:1px solid #f0f0f0;cursor:pointer;font-size:12px" onmouseover="this.style.background='#eaf3fb'" onmouseout="this.style.background='#fff'">
       <b>${p.zh||p.en}</b> <span style="color:#888">${p.spec||''}</span>
-      <span style="color:#4a90d9;float:right">${p.sup||''} ${p.code||''}</span></div>`;
+      <span style="color:#4a90d9;float:right">${p.sup||''} ${p.code||''}</span>
+      <div style="color:#1e8449;font-size:11px;margin-top:2px">廠商報價 ${p.cur||''} ${p.cost||0}/${p.pcs||'?'}入 ｜整箱 ${p.cur||''} ${ctn!=null?ctn.toLocaleString():'—'} ${p.inc||''}</div></div>`;
   }).join(''):'<div style="padding:8px;color:#999">找不到產品</div>';
 }
 function mAdd(gi){
@@ -447,15 +451,24 @@ function mAdd(gi){
 function mRenderCart(){
   const wrap=document.getElementById('m-cart-wrap');
   wrap.style.display=manualCart.length?'block':'none';
-  document.getElementById('m-cart').innerHTML=manualCart.map((c,i)=>`<tr>
+  let grand={};
+  document.getElementById('m-cart').innerHTML=manualCart.map((c,i)=>{
+    const ctn=(c.p.cost&&c.p.pcs)?+(c.p.cost*c.p.pcs).toFixed(2):null;   // 整箱報價
+    const sub=ctn!=null?+(ctn*c.qty).toFixed(2):null;                     // 小計
+    if(sub!=null){grand[c.p.cur]=(grand[c.p.cur]||0)+sub;}
+    return `<tr>
     <td style="padding:4px 8px;border-bottom:1px solid #eee">${c.p.sup||''} <span style="color:#888">${c.p.code||''}</span></td>
     <td style="padding:4px 8px;border-bottom:1px solid #eee">${c.p.zh||c.p.en}</td>
     <td style="padding:4px 8px;border-bottom:1px solid #eee;text-align:center">${c.p.spec||''}</td>
+    <td style="padding:4px 8px;border-bottom:1px solid #eee;text-align:right">${ctn!=null?(c.p.cur||'')+' '+ctn.toLocaleString():'—'} <span style="color:#888;font-size:11px">${c.p.inc||''}</span></td>
     <td style="padding:4px 8px;border-bottom:1px solid #eee;text-align:center">
-      <input type="number" min="1" value="${c.qty}" onchange="manualCart[${i}].qty=Math.max(1,parseInt(this.value)||1)" style="width:70px;text-align:right"> 箱</td>
+      <input type="number" min="1" value="${c.qty}" onchange="manualCart[${i}].qty=Math.max(1,parseInt(this.value)||1);mRenderCart()" style="width:64px;text-align:right"> 箱</td>
+    <td style="padding:4px 8px;border-bottom:1px solid #eee;text-align:right;font-weight:700">${sub!=null?(c.p.cur||'')+' '+sub.toLocaleString():'—'}</td>
     <td style="padding:4px 8px;border-bottom:1px solid #eee;text-align:center">
       <span onclick="mRemove(${i})" style="cursor:pointer;color:#c0392b;font-weight:700">✕</span></td>
-  </tr>`).join('');
+  </tr>`;}).join('') +
+  (manualCart.length?`<tr style="background:#eef6ff;font-weight:700"><td colspan="5" style="padding:6px 8px;text-align:right">合計</td>
+    <td style="padding:6px 8px;text-align:right">${Object.entries(grand).map(([k,v])=>k+' '+v.toLocaleString()).join(' / ')||'—'}</td><td></td></tr>`:'');
 }
 function mRemove(i){ manualCart.splice(i,1); mRenderCart(); }
 function mClear(){ manualCart=[]; mRenderCart(); }
