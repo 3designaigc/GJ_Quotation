@@ -2,6 +2,16 @@
 
 ---
 
+## 2026-06-07（更新 28）— 跨裝置支援（Mac/iPad/iPhone）
+
+- **補 viewport**：採購下單/台幣價審核/公式檢視/現金流原本缺 viewport → 補上，iPad/iPhone 不再整頁縮小
+- **成本工具上 Netlify**（Tina 決定，跨裝置）：`台幣價審核.html`、`台幣公式設定檢視.html` + 含 Tina 全部 tab 的 index.html 推上 github/Netlify
+  - Tina 可在 iPad/iPhone 登入用手動給價/看公式；tab 僅 tina_huang，業務帳號看不到
+  - ⚠️ 原始檔可被直接抓（同成本利潤報表，已接受）；compute_twd 重生後需 push 才更新 Netlify
+- 裝置現況：iPad 全順；iPhone 可用（寬表格需橫向滑，完整手機版表格為後續工程）
+
+---
+
 ## 2026-06-07（更新 27）— 資料夾整理
 
 - 刪 .DS_Store ×6、孤兒舊靜態DB ×3（歷史版本內）
