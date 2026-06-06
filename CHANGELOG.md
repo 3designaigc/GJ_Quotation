@@ -2,6 +2,20 @@
 
 ---
 
+## 2026-06-07（更新 29）— 全同步一鍵化（杜絕選擇性推送）
+
+問題：先前推 github 時「選擇性只推有變的檔」，造成 main 與 github 時間差/看似沒同步。
+修正：新增 `03_腳本/publish_all.py`，**一個指令把整條管線全量跑完**：
+```
+update_all（資料→HTML）→ compute_twd（台幣審核/公式頁）
+→ 複製全部交付HTML+del資料+CHANGELOG → github
+→ git add -A / commit / push（Netlify）→ rsync 全資料夾 → Seagate
+```
+原則：**每次都全量更新+同步+上傳，不再由人/AI 挑要推哪些**。三處（本機/GitHub/Seagate）必然一致。
+日常只要：改資料 → `python3 03_腳本/publish_all.py`。
+
+---
+
 ## 2026-06-07（更新 28）— 跨裝置支援（Mac/iPad/iPhone）
 
 - **補 viewport**：採購下單/台幣價審核/公式檢視/現金流原本缺 viewport → 補上，iPad/iPhone 不再整頁縮小
