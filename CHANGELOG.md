@@ -29,6 +29,11 @@
 - `sync_html_data.py` 新增 **Step 8** 自動呼叫，**改完產品跑一次 sync，靜態DB跟著更新**，無需手動重生
 - 舊的帶時間戳快照已移除
 
+#### 一鍵全跑 update_all.py
+
+新增 `03_腳本/update_all.py`：依序執行 `sync_html_data.py`（產品側）+ `rebuild_html.py`（訂單側）。
+改完 products 或 orders 後跑這一行即可，不必記兩個指令。
+
 ---
 
 ## 2026-06-06（更新 21）
