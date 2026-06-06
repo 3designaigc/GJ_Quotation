@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>每日訂單匯入摘要 2026-06-05</title>
+<style>
+:root{--gold:#C8A84B;--bg:#F7F5F0;--card:#fff;--border:#E0D9CC}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,'PingFang TC',sans-serif;background:var(--bg);color:#2C2C2C;font-size:14px}
+.hdr{background:linear-gradient(135deg,#1A1A1A,#2C2415);color:#fff;padding:14px 24px;
+  display:flex;align-items:center;gap:12px;border-bottom:3px solid var(--gold)}
+.hdr-logo{font-size:20px;font-weight:700;color:var(--gold);letter-spacing:2px}
+.hdr-title{font-size:16px;opacity:.9}
+.hdr-date{margin-left:auto;font-size:12px;opacity:.5}
+.main{max-width:960px;margin:24px auto;padding:0 20px}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+.stat{background:var(--card);border-radius:10px;border:1px solid var(--border);
+  padding:18px 20px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.stat-n{font-size:32px;font-weight:700;color:var(--gold)}
+.stat-l{font-size:12px;color:#888;margin-top:4px}
+.section{background:var(--card);border-radius:10px;border:1px solid var(--border);
+  padding:18px 22px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.section h3{font-size:13px;font-weight:700;color:#555;text-transform:uppercase;
+  letter-spacing:1px;margin-bottom:14px;padding-bottom:10px;
+  border-bottom:2px solid #F5E6B8}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#F0ECE4;color:#555;font-size:11px;text-transform:uppercase;
+  letter-spacing:.5px;padding:8px 12px;text-align:left;border-bottom:2px solid var(--border)}
+td{padding:9px 12px;border-bottom:1px solid #F5F2ED;vertical-align:top}
+.r{text-align:right;font-variant-numeric:tabular-nums}
+.empty{color:#999;font-style:italic;padding:16px 0;text-align:center}
+.flag-badge{display:inline-block;padding:3px 8px;border-radius:10px;
+  font-size:11px;font-weight:700;margin-right:6px}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="hdr-logo">高玉</div>
+  <div class="hdr-title">每日訂單匯入摘要</div>
+  <div class="hdr-date">2026-06-05 07:09</div>
+</div>
+<div class="main">
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-n">0</div>
+      <div class="stat-l">自動匯入訂單</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n" style="color:#C8A84B">2</div>
+      <div class="stat-l">待審核訂單</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n" style="color:#1565C0">NT$0</div>
+      <div class="stat-l">今日匯入總金額</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>✅ 自動匯入（0 張）</h3>
+    <div class="empty">今日無自動匯入訂單</div>
+  </div>
+
+  <div class="section">
+    <h3>⚠️ 待審核（2 張）— 請至 order_review.html 核准或退件</h3>
+    <table><thead><tr><th>客戶</th><th>檔案</th><th>價格旗標</th></tr></thead><tbody><tr><td>好市多</td><td>訂單_好市多_Bianco Forno_20260602.json</td><td><div style="font-size:12px;margin:2px 0">🔴 虧損風險：Bianco Forno 蝴蝶酥 480g — 成交價 4.225 EUR 低於成本底線 4.6475 EUR（有虧損風險）</div><div style="font-size:12px;margin:2px 0">🔴 虧損風險：Bianco Forno 義大利杏仁餅乾 750g — 成交價 7.245 EUR 低於成本底線 7.9695 EUR（有虧損風險）</div></td></tr><tr><td>美廉社</td><td>訂單_美廉社_SM-260515.json</td><td><div style="font-size:12px;margin:2px 0">⚪ 新品未建檔：泰國MAS油漬鮪魚罐頭180g — 產品不在資料庫，無法自動比對價格</div><div style="font-size:12px;margin:2px 0">⚪ 新品未建檔：泰國MAS水煮鮪魚罐頭180g — 產品不在資料庫，無法自動比對價格</div></td></tr></tbody></table>
+  </div>
+
+  
+</div>
+</body>
+</html>
