@@ -2,6 +2,28 @@
 
 ---
 
+## 2026-06-06（更新 26）
+
+### 台幣公式改為「設定表驅動」— 改公式/加廠商只動一張表
+
+把 Feast/Europastry/VIRU 三家寫死的公式，重構成**參數設定表** `data/twd_formula_config.json`。
+- compute_twd.py 改用**通用公式**讀設定表計算（cost_basis EXW/FOB/CIF、匯率、運費、TDS%、關稅%、VAT%、冷凍倉儲、內陸pct/fixed、貼標、利潤%）
+- **改公式** = 改表裡數字；**新廠商** = 加一筆（key=供應商編號）→ 自動套用，不必改程式
+- 已驗證設定表算出的值與原公式完全一致（吉拿棒138.02、VIRU藍莓118.66、Europastry佛卡夏86.0）
+
+未來維護台幣公式只需編輯 `twd_formula_config.json` 一處，徹底解決公式散落。
+
+**新增唯讀檢視頁** `01_交付_HTML/台幣公式設定檢視.html`：清楚顯示各供應商參數 + 白話公式
+（如 Feast：成本EXW→加海運費→加TDS8%→×37→加關稅25%→…→÷(1−25%)）。
+Tina 只看不改，要改公式/加廠商直接告訴 Claude。由 compute_twd.py 一併產生。內部頁，不上 GitHub。
+
+**入口加連結（僅 Tina Huang）**：本機 index.html 的 `tina_huang.systems` 加了
+「🌐 國際採購下單」「🧮 台幣價審核」「📐 台幣公式設定」三個 tab；tina_kao / noah_tseng 沒有。
+⚠️ **本機 index.html 與 cost 頁僅本機+Resilio，不推 github**（github/Netlify 的 index 不含這些 tab，
+公開站看不到、原始檔也不在站上）。→ 本機=管理層含成本工具；github/Netlify=業務公開層。
+
+---
+
 ## 2026-06-06（更新 25）
 
 ### 國際採購下單系統：新增「自行下單」+ 修復 const PRODS 格式 bug
@@ -27,8 +49,11 @@
 把 Feast/Europastry/VIRU 的台幣公式做成自動化，**改成本後自動算建議價、Tina 打V審核/修正、才寫回 products_final.json**。
 
 **新增 3 件：**
-- `03_腳本/compute_twd.py`：對「公式」品項套各自公式算建議台幣價 → 產生審核頁 `01_交付_HTML/台幣價審核.html`（不直接寫主檔）；只列**有變動**的，**跳過手動成交價**
+- `03_腳本/compute_twd.py`：對「公式」品項套各自公式算建議台幣價 → 產生審核頁 `01_交付_HTML/台幣價審核.html`（不直接寫主檔）；**跳過手動成交價**
 - `01_交付_HTML/台幣價審核.html`：Tina 打✓核准 / 填修正值 / 匯出核准 JSON
+  **（2026-06-06 升級為手動給價工作台）**：每項顯示 **現行成本(台幣)/現價/利潤率/來源**，
+  手動輸入新價時**即時顯示利潤率**，可搜尋全部 203 項（Feast/Europastry/VIRU）；
+  無公式變動時預設顯示全部當參考。⚠️ 此頁含成本/利潤，僅本機+Resilio，不上 GitHub。
 - `03_腳本/apply_twd.py`：讀核准 JSON → 寫回 products_final.json（修正過的標記`台幣價來源=手動修正`，之後不再被公式覆蓋）
 
 **新增欄位 `台幣價來源`**（products_final.json）：`公式` / `手動成交價` / `手動修正`
