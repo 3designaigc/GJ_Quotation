@@ -162,7 +162,8 @@ body.confirmed .draft-mark{display:none}
           <input type="text" id="m-search" oninput="mSearch()" placeholder="中/英文/EAN/供應商…" style="width:240px">
         </label>
       </div>
-      <div id="m-results" style="max-height:200px;overflow:auto;border:1px solid #eee;border-radius:6px;margin-bottom:10px;display:none"></div>
+      <div id="m-results" style="max-height:220px;overflow:auto;border:1px solid #eee;border-radius:6px;margin-bottom:6px;display:none"></div>
+      <button id="m-addsel" class="btn btn-go" style="display:none;margin-bottom:12px" onclick="mAddSelected()">➕ 加入所選產品</button>
       <div id="m-cart-wrap" style="display:none">
         <div style="font-weight:700;color:#555;margin-bottom:4px">已加入採購項目：</div>
         <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px">
@@ -431,6 +432,7 @@ function matchProd(item){
 
 // ── 自行下單 Manual Order ────────────────────
 let manualCart = [];
+let mSupCode = '';   // 鎖定的供應商編號（一張訂單限一家）
 function mToggle(){
   const b=document.getElementById('manual-body');
   const open=b.style.display==='none';
@@ -442,48 +444,63 @@ function mCustChange(){
   document.getElementById('m-custOther').style.display=
     document.getElementById('m-cust').value==='__other'?'inline-block':'none';
 }
+function mSupName(code){ const p=PRODS.find(x=>x.code===code); return p?(p.sup||code):code; }
 function mRenderResults(hits){
-  const box=document.getElementById('m-results');
-  box.style.display='block';
-  box.innerHTML=hits.length?hits.map(p=>{
+  const box=document.getElementById('m-results'); box.style.display='block';
+  const addBtn=document.getElementById('m-addsel');
+  if(!hits.length){ box.innerHTML='<div style="padding:8px;color:#999">無產品</div>'; if(addBtn)addBtn.style.display='none'; return; }
+  box.innerHTML=hits.map(p=>{
     const gi=PRODS.indexOf(p);
     const ctn=(p.cost&&p.pcs)?+(p.cost*p.pcs).toFixed(2):null;
-    return `<div onclick="mAdd(${gi})" style="padding:5px 10px;border-bottom:1px solid #f0f0f0;cursor:pointer;font-size:12px" onmouseover="this.style.background='#eaf3fb'" onmouseout="this.style.background='#fff'">
+    const dup=manualCart.find(c=>c.p===p);
+    return `<label style="display:block;padding:5px 10px;border-bottom:1px solid #f0f0f0;font-size:12px;cursor:pointer">
+      <input type="checkbox" class="m-pick" value="${gi}" ${dup?'checked disabled':''} style="margin-right:6px;vertical-align:top">
       <b>${p.zh||p.en}</b> <span style="color:#888">${p.spec||''}</span>
-      <span style="color:#4a90d9;float:right">${p.sup||''} ${p.code||''}</span>
-      <div style="color:#1e8449;font-size:11px;margin-top:2px">廠商報價 ${p.cur||''} ${p.cost||0}/${p.pcs||'?'}入 ｜整箱 ${p.cur||''} ${ctn!=null?ctn.toLocaleString():'—'} ${p.inc||''} ｜付款 ${p.pay||'—'}</div></div>`;
-  }).join(''):'<div style="padding:8px;color:#999">找不到產品</div>';
+      <span style="color:#4a90d9;float:right">${p.code||''}</span>
+      <div style="color:#1e8449;font-size:11px;margin:2px 0 0 22px">整箱 ${p.cur||''} ${ctn!=null?ctn.toLocaleString():'—'} ${p.inc||''} ｜付款 ${p.pay||'—'}${dup?' <b style="color:#e67e22">✓已加入</b>':''}</div></label>`;
+  }).join('');
+  if(addBtn)addBtn.style.display='inline-block';
+}
+function mAddSelected(){
+  const picks=[...document.querySelectorAll('.m-pick:checked:not(:disabled)')];
+  if(!picks.length){alert('請先勾選產品（可多選）');return;}
+  picks.forEach(chk=>{ const p=PRODS[+chk.value]; if(!manualCart.find(c=>c.p===p)) manualCart.push({p,qty:1}); });
+  showToast('已加入 '+picks.length+' 項','#1e8449');
+  mRenderCart();
+  const code=document.getElementById('m-sup').value;
+  const q=document.getElementById('m-search').value.trim();
+  if(q) mSearch(); else if(code) mPickSupplier();
 }
 function mPopulateSuppliers(){
   const sel=document.getElementById('m-sup'); if(!sel||sel.dataset.done)return;
   const seen={}; PRODS.forEach(p=>{ if(p.code&&!seen[p.code]) seen[p.code]={code:p.code,sup:p.sup}; });
   const list=Object.values(seen).sort((a,b)=>(a.sup||'').localeCompare(b.sup||''));
-  sel.innerHTML='<option value="">— 選供應商,帶出全部產品 —</option>'+
+  sel.innerHTML='<option value="">— 請先選供應商（一張訂單限一家）—</option>'+
     list.map(s=>`<option value="${s.code}">${s.sup||''} (${s.code})</option>`).join('');
   sel.dataset.done='1';
 }
 function mPickSupplier(){
   const code=document.getElementById('m-sup').value;
   document.getElementById('m-search').value='';
-  if(!code){document.getElementById('m-results').style.display='none';return;}
+  if(!code){document.getElementById('m-results').style.display='none';document.getElementById('m-addsel').style.display='none';return;}
+  // 一張訂單限一家:購物車已有別家 → 確認清空
+  if(manualCart.length && mSupCode && mSupCode!==code){
+    if(!confirm('一張訂單僅限「同一供應商」。\n切換到「'+mSupName(code)+'」會清空目前清單,確定?')){
+      document.getElementById('m-sup').value=mSupCode; return;
+    }
+    manualCart=[]; mRenderCart();
+  }
+  mSupCode=code;
   mRenderResults(PRODS.filter(p=>p.code===code));
 }
 function mSearch(){
+  const code=document.getElementById('m-sup').value;
+  const box=document.getElementById('m-results');
+  if(!code){ box.innerHTML='<div style="padding:8px;color:#c0392b">請先選供應商（一張訂單限一家）</div>';box.style.display='block';document.getElementById('m-addsel').style.display='none'; return; }
   const q=document.getElementById('m-search').value.trim().toLowerCase();
-  if(q.length<1){document.getElementById('m-results').style.display='none';return;}
-  if(document.getElementById('m-sup')) document.getElementById('m-sup').value='';
-  mRenderResults(PRODS.filter(p=>
-    (p.zh||'').toLowerCase().includes(q)||(p.en||'').toLowerCase().includes(q)||
-    String(p.ean||'').includes(q)||(p.sup||'').toLowerCase().includes(q)||
-    (p.code||'').toLowerCase().includes(q)).slice(0,60));
-}
-function mAdd(gi){
-  const p=PRODS[gi];
-  if(manualCart.find(c=>c.p===p)){showToast('此產品已在清單中','#e67e22');return;}
-  manualCart.push({p, qty:1});
-  document.getElementById('m-search').value='';
-  document.getElementById('m-results').style.display='none';
-  mRenderCart();
+  if(q.length<1){ mRenderResults(PRODS.filter(p=>p.code===code)); return; }
+  mRenderResults(PRODS.filter(p=>p.code===code && (
+    (p.zh||'').toLowerCase().includes(q)||(p.en||'').toLowerCase().includes(q)||String(p.ean||'').includes(q))));
 }
 function mRenderCart(){
   const wrap=document.getElementById('m-cart-wrap');
@@ -510,7 +527,7 @@ function mRenderCart(){
     <td style="padding:6px 8px;text-align:right">${Object.entries(grand).map(([k,v])=>k+' '+v.toLocaleString()).join(' / ')||'—'}</td><td></td></tr>`:'');
 }
 function mRemove(i){ manualCart.splice(i,1); mRenderCart(); }
-function mClear(){ manualCart=[]; mRenderCart(); }
+function mClear(){ manualCart=[]; mSupCode=''; document.getElementById('m-sup').value=''; document.getElementById('m-results').style.display='none'; document.getElementById('m-addsel').style.display='none'; mRenderCart(); }
 function mGenerate(){
   if(!manualCart.length){alert('請先加入至少一項產品');return;}
   const sel=document.getElementById('m-cust').value;
