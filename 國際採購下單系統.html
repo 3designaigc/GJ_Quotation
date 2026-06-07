@@ -858,7 +858,7 @@ function buildTdsPO(order,grp,etd,eta,note,idx,total,tds){
     <div>Attn: ${GJ.attn}</div><div>E-mail: ${GJ.email}</div>
   </div>
   <div class="cell">
-    <div class="cell-label">Supplier（透過 TDS 採購 Feast）</div>
+    <div class="cell-label">Supplier (Feast purchased via TDS) ｜ 透過 TDS 採購 Feast</div>
     <div class="cell-title" contenteditable="true">${tdsSup.name}</div>
     <div contenteditable="true">${tdsSup.a1||''}</div>
     <div contenteditable="true">${tdsSup.a2||''}</div>
@@ -894,7 +894,7 @@ function buildTdsPO(order,grp,etd,eta,note,idx,total,tds){
   <th>Product Name (EN)<br>英文品名</th><th>Product Name (CN)<br>中文品名</th>
   <th>Pack Size<br>規格</th><th>Pcs/CA<br>入/箱</th><th>CA/PL<br>箱/板</th>
   <th>Order Qty (Unit)<br>訂量（包）</th><th>Order Qty (CA)<br>訂量（箱）</th><th>Order Qty (PL)<br>訂量（板）</th>
-  <th>Unit Price<br>單價/包</th><th>TDS ${pct}%<br>${pct}%佣金</th><th>Total Amount<br>總金額(含${pct}%)</th>
+  <th>Unit Price<br>單價/包</th><th>TDS Comm. ${pct}%<br>${pct}%佣金</th><th>Total Amount (incl. ${pct}%)<br>總金額(含${pct}%)</th>
 </tr></thead>
 <tbody>${rows}</tbody>
 <tfoot>
@@ -912,8 +912,8 @@ function buildTdsPO(order,grp,etd,eta,note,idx,total,tds){
 
 <div class="remarks">
   <p><b>Remark:</b></p>
-  <p>1. 本訂單透過 TDS 採購 Feast 產品,Total Amount 已含 TDS ${pct}% 佣金。</p>
-  <p>2. Shipping documents / COO / B/L 請於出貨後盡速提供。</p>
+  <p>1. This order purchases Feast products via TDS; Total Amount already includes TDS ${pct}% commission. ｜ 本訂單透過 TDS 採購,總額已含 ${pct}% 佣金。</p>
+  <p>2. Please provide shipping documents / COO / B/L as soon as available after shipment. ｜ 出貨後請盡速提供相關文件。</p>
   ${etd||eta?`<p class="etd-line">SHIPMENT &nbsp; ${etd?'ETD '+fmtDate(etd):''} &nbsp; ${eta?'ETA '+fmtDate(eta):''}</p>`:''}
 </div>
 
