@@ -2,6 +2,20 @@
 
 ---
 
+## 2026-06-07（更新 32）— Feast 走 TDS 專屬 PO 格式
+
+依實際訂單「土耳其FEAST 26FZ0001.xlsx」做出 Feast/TDS 專屬採購 PO 版型：
+- **路由**：`const TDS_RATE={'SP200001':0.08}`；buildAllPO 偵測供應商→Feast 走 buildTdsPO,其餘走 buildOnePO
+- **抬頭 SUPPLIER = TDS**（Mirko Puri,非 Feast）
+- **欄位**：單價/包(EXW) + 「TDS 8%佣金」欄 + 總金額；數量 包/箱/板 三欄
+- **8% 算法**：總額 = 單價 × 數量(包) × 1.08（與 Excel 對帳吻合,如楔型薯塊 1.12×800×1.08=967.68 ✅）
+- Europastry/VIRU 直接買 → 用一般 buildOnePO（無8%欄,總額不×1.08）
+- 草稿浮水印/確認蓋章/PDF 同其他 PO
+
+說明：採購系統選 Feast 自動產出此格式;Europastry/VIRU 自動用直接格式。
+
+---
+
 ## 2026-06-07（更新 31）— 採購系統升級：選供應商→建單→蓋章→PDF
 
 國際採購下單系統「自行下單」大升級：
