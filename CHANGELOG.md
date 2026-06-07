@@ -2,6 +2,19 @@
 
 ---
 
+## 2026-06-07（更新 36）— 修復現金流預估表（EVENTS 被誤灌 orders）
+
+⚠️ Bug:連動工作時我把 orders.json 直接灌進現金流 `const EVENTS`,但現金流 JS 需要的是
+**衍生的應收/應付事件結構**(po/counterpart/type/date_est/foreign_amt/twd_amt/mode/pay_nature/ym),
+欄位不同 → 整表 undefined/非數值。
+修復:
+- 從 rebuild_html.py **移除** EVENTS 注入(只保留日期戳更新)
+- 從 git 1c8f5bb(6/3,133筆)還原正確的現金流 EVENTS + 補 viewport
+- ⚠️ 現金流 EVENTS 為衍生結構,**不可直接灌 orders.json**;目前為靜態,
+  若要隨訂單自動更新需另寫 orders→應收應付事件 產生器(待辦)
+
+---
+
 ## 2026-06-07（更新 35）— 採購 PO 中英對照齊全
 
 - 確認採購單(寄外國供應商)所有中文都有對應英文
