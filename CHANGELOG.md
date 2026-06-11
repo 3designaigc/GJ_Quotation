@@ -7,7 +7,9 @@
 依 Tina 兩封報價郵件（首爾食品展接洽）入系統：
 - **Chaeum F&B（SP100056）**｜USD·FCA｜有機果汁 3 款（檸檬/西梅汁 2.40、藍莓泥 4.93 /盒）｜聯絡 Brad CHUN brad.chun@chaeumfnb.com。備註:有自有廠可OEM;報價為有機,台灣可改一般原料降成本。
 - **WHALEZ「Juice-Up!」（SP100057）**｜KRW·FOB｜10 款 80ml×10入（南瓜/西梅/石榴/蘋果/梨桔梗/血橙/ABC/檸檬/紅豆/黑豆）｜FOB 7,500 KRW/盒（最貴量級）｜聯絡 Sean(CEO) whalezjuice@naver.com。
-- 參數（Tina）：一般通路、利潤 20%、USD 匯率 31、KRW 49=1台幣、成本價用最貴量級（盒價）。
+- 參數（Tina）：一般通路、USD 匯率 31、KRW 49=1台幣、成本價用最貴量級（盒價）。
+- 利潤：原 20%，2026-06-11 Tina 調為 **28%**（新產品想多賺一點）→ 最低報價:有機檸檬/西梅 3.33、藍莓泥 6.85 USD;WHALEZ 各款 10,417 KRW。
+- 桌面原始報價（Juice-Up xlsx、Offer Sheet pdf）已歸檔 `02_訂單資料/原始附件/`。
 - 寫入 `products_final.json`(639→652)、`supplier_master.json`(+2,含完整聯絡/地址)、`交易模式對應.json`(兩家→買進轉手C)。
 - `import_order.py` DEFAULT_RATES 補 KRW(0.0204)。已 publish_all 全同步。
 - ⚠️ 待補:WHALEZ 賞味期、兩家 EAN/條碼、MOQ;**成本計算主檔.xlsx 需連動**(外幣一般通路)。
