@@ -2,6 +2,20 @@
 
 ---
 
+## 2026-06-11（更新 51）— 修復訂單加總金額 bug（Kao 回報 SM-260531 GoMuc）
+
+**根因**:訂單分頁「單價」欄語意=每個(×箱入數加總),但客戶PO(美廉)用**箱價**(如38.48/箱)→ Kao 照PO填箱價,總額被多乘24/48倍。報價分頁(每個)與訂單分頁兩套基準且欄位未標示。
+**修法(訂單側統一「箱單價」基準,與客戶PO一致)**:
+- `defaultOrderPrice`/`ensureOrderItem`:預設帶入=每個底線×箱入數;報價分頁帶入訂單自動×箱入數;回寫報價分頁÷回每個。
+- `renderSimpleOrder`/`doPrintOrder`/`doExportCSV`/通知摘要:小計=**箱價×箱數**;底線警示(最低/公司底線)×箱入數同基準;欄名改「**箱單價**(同客戶PO;Feast台幣=/個)」。
+- Feast台幣不受影響(ctn=1 維持/個)。
+- 匯出JSON:`qty=箱數`(原誤為個數)、`agreedPrice=箱價`、新增 `priceBasis:'carton'/'unit'`、minPrice/floor 各×箱入數;`totalAgreed=箱價×箱數`。
+- `import_order.py`:check_prices 底線×箱入數(依priceBasis)再比;build_records 成本(每個)×箱入數×箱數。
+- 驗算:GoMuc烤魷魚 38.48×25箱=962.00=美廉PO ✓(舊bug會算成46,176)。
+- SM-260531 訂單本身以 Kao email 的PDF為準;系統修復後可重新輸入/匯入。
+
+---
+
 ## 2026-06-11（更新 50）— Surgenuin 冷凍麵餃 12 品入系統（星巴克,台幣套 Europastry 公式）
 
 依 Surgenuin 價目表(2026-06-11,有效至 12-11;TuttoFood米蘭接洽)入系統:
