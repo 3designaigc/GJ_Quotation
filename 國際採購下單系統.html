@@ -90,7 +90,27 @@ body.confirmed .draft-mark{display:none}
   .po-doc{box-shadow:none;page-break-after:always}
   .po-doc:last-child{page-break-after:auto}
   [contenteditable]{background:transparent!important}
-  @page{size:A4 landscape;margin:8mm 10mm}
+  @page{size:A4 landscape;margin:6mm 8mm}
+  /* 一頁化:全面壓縮間距與字級(2026-06-12) */
+  .po-doc{padding:4px 8px;font-size:8pt;max-width:none;margin-bottom:0}
+  .po-letterhead{padding:0 0 5px;margin-bottom:5px;border-bottom-width:2px}
+  .po-logo{width:32px;height:32px}
+  .po-co-name{font-size:10pt}
+  .po-doc-title{font-size:12pt}
+  .po-doc-date{font-size:8pt;margin-top:1px}
+  .po-grid2,.po-grid3,.po-grid12{gap:4px;margin-bottom:4px}
+  .cell{padding:3px 6px;font-size:7.5pt}
+  .cell-title{font-size:8.5pt}
+  .order-num{padding:3px;font-size:8.5pt}
+  table.pot{font-size:7pt;margin-bottom:4px}
+  table.pot th{padding:2px 2px;font-size:6.5pt}
+  table.pot td{padding:2px 3px}
+  .remarks{font-size:6.8pt;line-height:1.3;margin-top:3px}
+  .etd-line{margin-top:3px}
+  .sig-grid{margin-top:5px;padding-top:4px;gap:24px}
+  .sig-block{font-size:7.5pt}
+  .sig-line{margin-top:12px;padding-top:2px}
+  .gj-seal{bottom:14px;width:110px}
 }
 </style>
 </head>
@@ -233,7 +253,7 @@ const SUPS = {
   'SP100005':{name:'Shoon Fatt Biscuit & Confectionery Factory Sdn Bhd',attn:'Gene Lo',email:'info@shoonfatt.com',a1:'Lot 11776, Jalan Kampung Banjar, 36000 Teluk Intan, Perak',a2:'Malaysia'},
   'SP100006':{name:'Francestle Co., Ltd',attn:'',email:'',a1:'',a2:''},
   'SP100012':{name:'PT ABC President Indonesia',attn:'Aji Setiawan',email:'aji.setiawan@abcpresident.com',a1:'1st Floor Unit A-H, EightyEight@Casablanca Office Tower A, Jl. Casablanca Raya Kav. 88, Kota Administrasi Jakarta Selatan, DKI Jakarta 12870',a2:'Indonesia'},
-  'SP100013':{name:'S.RUAMTHAI CO., LTD.',attn:'Thanaporn Nuansanam (Nong)',email:'',a1:'24/15, Mu 1, Bang Nam Chuet Sub-District, Mueang Samut Sakhon District',a2:'Samut Sakhon Province 74000, Thailand'},
+  'SP100013':{name:'S.RUAMTHAI CO., LTD.',attn:'Thanaporn Nuansanam (Nong)',email:'srg.ex@thaisquid.com',a1:'24/15, Mu 1, Bang Nam Chuet Sub-District, Mueang Samut Sakhon District',a2:'Samut Sakhon Province 74000, Thailand'},
   'SP100014':{name:'Nature Best Food Co., Ltd.',attn:'Opel',email:'nbf@nbf-group.com',a1:'599 Moo 17, Theparak Rd., Bangsaothong, Samut Prakan 10570',a2:'Thailand'},
   'SP100015':{name:'Food Excellence Specialist Sdn. Bhd.',attn:'Celeste Tan',email:'',a1:'PLO 88/89 Jalan Nibong 5, Tanjung Langsat Industrial Complex, 81700 Pasir Gudang, Johor',a2:'Malaysia'},
   'SP100016':{name:'C&F Enterprise Sdn Bhd',attn:'Nicole Chan',email:'nicole@harihari.com.my',a1:'Lot 17, EOIZ, KKIP, Phase II, Jalan Sepangar, Menggatal, Kota Kinabalu, Sabah',a2:'Malaysia'},
@@ -685,6 +705,7 @@ function buildOnePO(order,grp,etd,eta,note,idx,total){
   <div class="po-lh-right">
     <div class="po-doc-title">PURCHASE ORDER</div>
     <div class="po-doc-date">Date: <span contenteditable="true">${today()}</span></div>
+    <div class="po-doc-date">Supplier E-mail: <span contenteditable="true">${sup.email||'[Email待補]'}</span></div>
   </div>
 </div>
 
@@ -847,6 +868,7 @@ function buildTdsPO(order,grp,etd,eta,note,idx,total,tds){
   <div class="po-lh-right">
     <div class="po-doc-title">PURCHASE ORDER</div>
     <div class="po-doc-date">Date: <span contenteditable="true">${today()}</span></div>
+    <div class="po-doc-date">Supplier E-mail: <span contenteditable="true">${tdsSup.email||'[Email待補]'}</span></div>
   </div>
 </div>
 
