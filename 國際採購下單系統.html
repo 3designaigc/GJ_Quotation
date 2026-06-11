@@ -74,6 +74,10 @@ table.pot tr.tot-row td{border:1px solid #99a}
 .gj-seal{display:none;position:absolute;left:14%;bottom:30px;width:130px;opacity:.92;
   transform:rotate(-7deg);pointer-events:none;z-index:5}
 body.confirmed .gj-seal{display:block}
+.gj-seal-date{display:none;position:absolute;left:14%;bottom:12px;width:130px;text-align:center;
+  font-family:'Courier New',monospace;font-size:9.5pt;font-weight:700;color:#C0392B;
+  letter-spacing:1px;transform:rotate(-7deg);opacity:.92;pointer-events:none;z-index:5}
+body.confirmed .gj-seal-date{display:block}
 /* 草稿浮水印：未確認時顯示 */
 .draft-mark{position:absolute;top:42%;left:50%;transform:translate(-50%,-50%) rotate(-20deg);
   font-size:74px;font-weight:900;color:rgba(200,0,0,.10);letter-spacing:8px;
@@ -110,7 +114,8 @@ body.confirmed .draft-mark{display:none}
   .sig-grid{margin-top:5px;padding-top:4px;gap:24px}
   .sig-block{font-size:7.5pt}
   .sig-line{margin-top:12px;padding-top:2px}
-  .gj-seal{bottom:14px;width:110px}
+  .gj-seal{bottom:16px;width:110px}
+  .gj-seal-date{bottom:2px;width:110px;font-size:8pt}
 }
 </style>
 </head>
@@ -831,7 +836,7 @@ function buildOnePO(order,grp,etd,eta,note,idx,total){
   </div>
 </div>
 
-<img class="gj-seal" src="${SEAL}" alt="高玉企業發票章">
+<img class="gj-seal" src="${SEAL}" alt="高玉企業發票章"><div class="gj-seal-date">${today()}</div>
 <div class="draft-mark">草稿 DRAFT</div>
 </div>`;
 }
@@ -974,7 +979,7 @@ function buildTdsPO(order,grp,etd,eta,note,idx,total,tds){
   </div>
 </div>
 
-<img class="gj-seal" src="${SEAL}" alt="高玉企業發票章">
+<img class="gj-seal" src="${SEAL}" alt="高玉企業發票章"><div class="gj-seal-date">${today()}</div>
 <div class="draft-mark">草稿 DRAFT</div>
 </div>`;
 }
