@@ -151,6 +151,12 @@ body.confirmed .draft-mark{display:none}
     <input type="file" id="fin" accept=".json" style="display:none" onchange="loadFile(this)">
   </div>
 
+  <!-- ── 自動帶入的待下單訂單(sync時從 04_訂單匯入/ 注入) ── -->
+  <div id="inbox-panel" style="display:none;border:2px solid #27ae60;border-radius:8px;margin-bottom:12px;background:#F4FBF5;padding:8px 12px">
+    <div style="font-weight:700;color:#1e8449;margin-bottom:6px">📥 待下單訂單(系統自動帶入)</div>
+    <div id="inbox-list"></div>
+  </div>
+
   <!-- ── 自行下單 Manual Order ── -->
   <div id="manual-panel" style="border:2px solid #4a90d9;border-radius:10px;margin-bottom:12px;background:#fff">
     <div onclick="mToggle()" style="cursor:pointer;padding:11px 16px;background:#eaf3fb;border-radius:8px 8px 0 0;font-weight:700;color:#1a3a5c;display:flex;justify-content:space-between;align-items:center">
@@ -279,6 +285,25 @@ const SUPS = {
 
 // ── State ────────────────────────────────────
 let currentOrder = null;
+const ORDER_INBOX=[{"file":"訂單_美廉社_SM-260515_鮪魚罐頭.json","order":{"_version":"2.0","_reviewed":true,"_reviewedAt":"2026-06-01","orderId":"SM-260515","orderDate":"2026-05-20","gjPO":"SM-260515","custPO":"SM-260515","customer":"美廉社","custPayment":"45 days after B/L copy","isTWD":false,"salesOwner":"Tina Kao","note":"泰國鮪魚罐頭 CIF Keelung / NEXO Resources Sdn Bhd. / 1*20' container","blDate":"2026-05-30","invoice":"","rates":{"USD":32.0},"items":[{"name":"Mas Choices 油湯鮪魚片罐頭 180g","englishName":"MC White Meat Tuna Flakes in Vegetable Oil 180g","spec":"NW180g DW110g","origin":"泰國","category":"鮪魚罐頭","supplier":"Mas Choices","supCode":"SP100022","currency":"USD","qty":700,"agreedPrice":30.24,"cooperMode":"買進轉手","supPayment":"訂金30%, BL 70%","supIncoterm":"CIF","custIncoterm":"CIF"},{"name":"Mas Choices 水煮鮪魚片罐頭 180g","englishName":"MC White Meat Tuna Flakes in Brine 180g","spec":"NW180g DW100g","origin":"泰國","category":"鮪魚罐頭","supplier":"Mas Choices","supCode":"SP100022","currency":"USD","qty":680,"agreedPrice":28.8,"cooperMode":"買進轉手","supPayment":"訂金30%, BL 70%","supIncoterm":"CIF","custIncoterm":"CIF"}]}},{"file":"訂單_生活良好_26FP26004-2_茶葉海運.json","order":{"_version":"2.0","_reviewed":true,"_reviewedAt":"2026-06-01","orderId":"26FP26004-2","orderDate":"2026-05-26","gjPO":"26FP26004-2","custPO":"26FP26004-2","customer":"生活良好","custPayment":"T/T 75 days after Receiving Goods","isTWD":false,"salesOwner":"Tina Kao","note":"土耳其茶葉海運訂單 CIF Keelung","blDate":"2026-06-10","invoice":"","rates":{"EUR":37.0},"items":[{"name":"Dogadan洋甘菊花草茶1.4g*20入","englishName":"Dogadan Camomile Herbal Tea","spec":"1.4g*20","origin":"土耳其","category":"花草茶","supplier":"Dogadan","supCode":"SP100048","currency":"EUR","qty":720,"agreedPrice":1.54,"cooperMode":"收佣金","supPayment":"TDS清帳","supIncoterm":"FOB","custIncoterm":"CIF"},{"name":"Dogadan薄荷花草茶1.3g*20入","englishName":"Dogadan Mint Herbal Tea","spec":"1.3g*20","origin":"土耳其","category":"花草茶","supplier":"Dogadan","supCode":"SP100048","currency":"EUR","qty":1296,"agreedPrice":1.54,"cooperMode":"收佣金","supPayment":"TDS清帳","supIncoterm":"FOB","custIncoterm":"CIF"},{"name":"Dogadan巴西莓鳳梨綠茶1.7g*20入","englishName":"Dogadan Acai Green Tea with Pineapple","spec":"1.7g*20","origin":"土耳其","category":"花草茶","supplier":"Dogadan","supCode":"SP100048","currency":"EUR","qty":864,"agreedPrice":1.54,"cooperMode":"收佣金","supPayment":"TDS清帳","supIncoterm":"FOB","custIncoterm":"CIF"},{"name":"Dogadan蘋果茶1.95g*20入","englishName":"Dogadan Apple Tea","spec":"1.95g*20","origin":"土耳其","category":"花草茶","supplier":"Dogadan","supCode":"SP100048","currency":"EUR","qty":1872,"agreedPrice":1.54,"cooperMode":"收佣金","supPayment":"TDS清帳","supIncoterm":"FOB","custIncoterm":"CIF"},{"name":"Dogadan玫瑰果茶2.4g*20入","englishName":"Dogadan Rosehip Tea","spec":"2.4g*20","origin":"土耳其","category":"花草茶","supplier":"Dogadan","supCode":"SP100048","currency":"EUR","qty":1008,"agreedPrice":1.54,"cooperMode":"收佣金","supPayment":"TDS清帳","supIncoterm":"FOB","custIncoterm":"CIF"},{"name":"Dogadan檸檬茶2g*20入","englishName":"Dogadan Lemon Tea","spec":"2g*20","origin":"土耳其","category":"花草茶","supplier":"Dogadan","supCode":"SP100048","currency":"EUR","qty":1584,"agreedPrice":1.54,"cooperMode":"收佣金","supPayment":"TDS清帳","supIncoterm":"FOB","custIncoterm":"CIF"}]}},{"file":"訂單_生活良好_26FP26004-1_茶葉.json","order":{"_version":"2.0","_reviewed":true,"_reviewedAt":"2026-06-01","orderId":"26FP26004-1","orderDate":"2026-05-26","gjPO":"26FP26004-1","custPO":"26FP26004-1","customer":"生活良好","custPayment":"T/T 7 days after Receiving Goods","isTWD":false,"salesOwner":"Tina Kao","note":"土耳其茶葉空運訂單","blDate":"2026-06-05","invoice":"","rates":{"EUR":37.0},"items":[{"name":"Dogadan洋甘菊花草茶1.4g*20入","englishName":"Dogadan Camomile Herbal Tea","spec":"1.4g*20","origin":"土耳其","category":"花草茶","supplier":"Dogadan","supCode":"SP100048","currency":"EUR","qty":288,"agreedPrice":1.54,"cooperMode":"收佣金","supPayment":"TDS清帳","supIncoterm":"FOB","custIncoterm":"CIF"},{"name":"Dogadan薄荷花草茶1.3g*20入","englishName":"Dogadan Mint Herbal Tea","spec":"1.3g*20","origin":"土耳其","category":"花草茶","supplier":"Dogadan","supCode":"SP100048","currency":"EUR","qty":288,"agreedPrice":1.54,"cooperMode":"收佣金","supPayment":"TDS清帳","supIncoterm":"FOB","custIncoterm":"CIF"},{"name":"Dogadan巴西莓鳳梨綠茶1.7g*20入","englishName":"Dogadan Acai Green Tea with Pineapple","spec":"1.7g*20","origin":"土耳其","category":"花草茶","supplier":"Dogadan","supCode":"SP100048","currency":"EUR","qty":288,"agreedPrice":1.54,"cooperMode":"收佣金","supPayment":"TDS清帳","supIncoterm":"FOB","custIncoterm":"CIF"},{"name":"Dogadan蘋果茶1.95g*20入","englishName":"Dogadan Apple Tea","spec":"1.95g*20","origin":"土耳其","category":"花草茶","supplier":"Dogadan","supCode":"SP100048","currency":"EUR","qty":288,"agreedPrice":1.54,"cooperMode":"收佣金","supPayment":"TDS清帳","supIncoterm":"FOB","custIncoterm":"CIF"},{"name":"Dogadan玫瑰果茶2.4g*20入","englishName":"Dogadan Rosehip Tea","spec":"2.4g*20","origin":"土耳其","category":"花草茶","supplier":"Dogadan","supCode":"SP100048","currency":"EUR","qty":288,"agreedPrice":1.54,"cooperMode":"收佣金","supPayment":"TDS清帳","supIncoterm":"FOB","custIncoterm":"CIF"},{"name":"Dogadan檸檬茶2g*20入","englishName":"Dogadan Lemon Tea","spec":"2g*20","origin":"土耳其","category":"花草茶","supplier":"Dogadan","supCode":"SP100048","currency":"EUR","qty":288,"agreedPrice":1.54,"cooperMode":"收佣金","supPayment":"TDS清帳","supIncoterm":"FOB","custIncoterm":"CIF"}]}}];   // sync_html_data 自動注入(04_訂單匯入/ 最近的訂單JSON)
+
+function renderInbox(){
+  if(!ORDER_INBOX.length) return;
+  const p=document.getElementById('inbox-panel'), l=document.getElementById('inbox-list');
+  p.style.display='block';
+  l.innerHTML=ORDER_INBOX.map((e,i)=>{
+    const o=e.order||{};
+    const n=(o.items||[]).length;
+    return `<div style="display:flex;gap:10px;align-items:center;padding:5px 8px;border-bottom:1px solid #d8ead9;font-size:13px">
+      <b>${o.gjPO||o.orderId||'—'}</b>
+      <span>${o.custPO||''}</span>
+      <span>客戶:${o.customer||'—'}</span>
+      <span style="color:#888">${o.orderDate||''}｜${n}項｜${e.file||''}</span>
+      <button onclick="loadFromData(ORDER_INBOX[${i}].order,ORDER_INBOX[${i}].file)"
+        style="margin-left:auto;background:#27ae60;color:#fff;border:none;border-radius:6px;padding:4px 14px;cursor:pointer">載入下單</button>
+    </div>`;
+  }).join('');
+}
 
 // ── File loading ─────────────────────────────
 function doDrop(ev){
@@ -420,6 +445,7 @@ function queueDismiss(id){
 }
 
 document.addEventListener('DOMContentLoaded', ()=>{
+  renderInbox();
   // 遷移舊版單筆資料 → queue
   const legacy = localStorage.getItem('gj_po_pending');
   if(legacy){
