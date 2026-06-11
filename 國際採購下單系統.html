@@ -352,6 +352,12 @@ function showOrderMeta(o, fname){
   dz.innerHTML=`✅ ${fname} — 點擊重新載入<input type="file" id="fin" accept=".json" style="display:none" onchange="loadFile(this)">`;
 }
 
+function payEn(s){
+  return (s||'').replace(/訂金/g,'Deposit ').replace(/尾款/g,'Balance ')
+    .replace(/到貨/g,'after arrival ').replace(/月結/g,'monthly ')
+    .replace(/天/g,' days').replace(/清帳/g,' settlement').replace(/\s+/g,' ').trim();
+}
+
 function isBuy(it){
   return ['買進','買進轉手'].includes(it.cooperMode||'');
 }
@@ -762,7 +768,7 @@ function buildOnePO(order,grp,etd,eta,note,idx,total){
 <div class="po-grid3">
   <div class="cell"><div class="cell-label">Currency</div><div contenteditable="true">${cur}</div></div>
   <div class="cell"><div class="cell-label">Trade Term</div><div contenteditable="true">${grp.inc||'[交易條件]'}</div></div>
-  <div class="cell"><div class="cell-label">Payment</div><div contenteditable="true">${grp.pay||'[付款條件待補]'}</div></div>
+  <div class="cell"><div class="cell-label">Payment</div><div contenteditable="true">${payEn(grp.pay)||'[付款條件待補]'}</div></div>
 </div>
 
 <div class="po-grid12">
@@ -923,7 +929,7 @@ function buildTdsPO(order,grp,etd,eta,note,idx,total,tds){
 <div class="po-grid3">
   <div class="cell"><div class="cell-label">Currency</div><div contenteditable="true">${cur}</div></div>
   <div class="cell"><div class="cell-label">Trade Term</div><div contenteditable="true">${grp.inc||'EXW'}</div></div>
-  <div class="cell"><div class="cell-label">Payment</div><div contenteditable="true">${grp.pay||'[付款條件待補]'}</div></div>
+  <div class="cell"><div class="cell-label">Payment</div><div contenteditable="true">${payEn(grp.pay)||'[付款條件待補]'}</div></div>
 </div>
 
 <div class="po-grid12">
