@@ -210,6 +210,7 @@ body.confirmed .draft-mark{display:none}
           <tbody id="m-cart"></tbody>
         </table>
         <button class="btn btn-go" onclick="mGenerate()">⚡ 產生採購 PO</button>
+        <button class="btn" style="background:#0a5238;color:#fff" onclick="mExportJSON()">💾 匯出採購單 JSON（給小T建檔）</button>
         <button class="btn" style="background:#999;color:#fff" onclick="mClear()">清空</button>
       </div>
     </div>
@@ -607,6 +608,35 @@ function mGenerate(){
   };
   loadFromData(order, '自行下單_'+cust);
   showToast('已產生 PO 草稿（可在下方編輯/列印）','#1e8449');
+}
+
+// 匯出採購單 JSON（補貨採購單 → 給小T建檔進帳本/現金流/物流）
+function mExportJSON(){
+  if(!manualCart.length){alert('請先加入至少一項產品');return;}
+  const sel=document.getElementById('m-cust').value;
+  const cust=sel==='__other'?document.getElementById('m-custOther').value.trim():sel;
+  if(!cust){alert('請選擇或輸入客戶/通路');return;}
+  const date=document.getElementById('m-date').value||today();
+  const gjPO=document.getElementById('m-gjPO').value.trim()||('GJ-'+date.replace(/\//g,''));
+  const items=manualCart.map(c=>{
+    const cost=+(c.p.cost||0);
+    return {supCode:c.p.code, supplier:c.p.sup, currency:c.p.cur, supIncoterm:c.p.inc,
+      supPayment:(c.p.pay||''), ean:c.p.ean, name:c.p.zh, englishName:c.p.en, spec:c.p.spec,
+      qty:c.qty, unitCost:cost, lineTotal:+(cost*c.qty).toFixed(2),
+      cooperMode:'買進', customCarton:c.customCarton};
+  });
+  const total=+items.reduce((a,it)=>a+(it.lineTotal||0),0).toFixed(2);
+  const order={_type:'採購補貨', _exported:new Date().toISOString(),
+    通路客戶:cust, orderDate:date, gjPO:gjPO,
+    custPO:document.getElementById('m-custPO').value.trim(),
+    currency:(items[0]||{}).currency||'', total:total, items:items};
+  const blob=new Blob([JSON.stringify(order,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='採購補貨_'+cust+'_'+gjPO+'.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  showToast('已匯出採購單 JSON ✓ 請存桌面給小T建檔','#0a5238');
 }
 
 // ── PO Generation ────────────────────────────
