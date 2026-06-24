@@ -2807,7 +2807,7 @@
   {
     "供應商編號": "SP100009",
     "型態": "常溫",
-    "中文品名": "1895 Primitivo di Manduria DOC",
+    "中文品名": "VERGA 1895 普里米蒂沃曼杜里亞紅酒 DOC 750ml",
     "英文品名": "1895 Primitivo di Manduria DOC",
     "規格": "750ml",
     "EAN": "8000128150023",
@@ -2840,7 +2840,7 @@
   {
     "供應商編號": "SP100009",
     "型態": "常溫",
-    "中文品名": "1895 Borolo DOCG",
+    "中文品名": "VERGA 1895 巴羅洛紅酒 DOCG 750ml",
     "英文品名": "1895 Borolo DOCG",
     "規格": "750ml",
     "EAN": "8000128150030",
@@ -2971,7 +2971,7 @@
   {
     "供應商編號": "SP100009",
     "型態": "常溫",
-    "中文品名": "Pinot Grigio Delle Venezie DOC",
+    "中文品名": "VERGA 灰皮諾白酒 DOC 750ml",
     "英文品名": "Pinot Grigio Delle Venezie DOC",
     "規格": "750ml",
     "EAN": "8000128035139",
@@ -3004,7 +3004,7 @@
   {
     "供應商編號": "SP100009",
     "型態": "常溫",
-    "中文品名": "Rosso Toscana IGT",
+    "中文品名": "VERGA 托斯卡尼紅酒 IGT 750ml",
     "英文品名": "Rosso Toscana IGT",
     "規格": "750ml",
     "EAN": "8000128164242",
@@ -8478,7 +8478,7 @@
   {
     "供應商編號": "SP100035",
     "型態": "常溫",
-    "中文品名": "Sternburg Wheat Beer 4.8%",
+    "中文品名": "Sternburg 小麥啤酒 4.8% 0.5L罐",
     "英文品名": "Sternburg Wheat Beer 4.8% 0.5L Can",
     "規格": "500ml*24",
     "EAN": "",
@@ -8510,7 +8510,7 @@
   {
     "供應商編號": "SP100035",
     "型態": "常溫",
-    "中文品名": "Sternburg Alcoholfree <0.5%",
+    "中文品名": "Sternburg 無酒精啤酒 <0.5% 0.5L罐",
     "英文品名": "Sternburg Alcoholfree <0.5% 0.5L Can",
     "規格": "500ml*24",
     "EAN": "",
@@ -8958,7 +8958,7 @@
   {
     "供應商編號": "SP100052",
     "型態": "常溫",
-    "中文品名": "Primitivo Puglia  IGT IL POGGIO DEI VIGNETI (CASA VINICOLA NATALE VERGA SPA)",
+    "中文品名": "TDS 普里米蒂沃普利亞紅酒 IGT (Il Poggio dei Vigneti) 750ml",
     "英文品名": "Primitivo Puglia  IGT IL POGGIO DEI VIGNETI",
     "規格": "750ml",
     "EAN": "8000128003619",
@@ -8990,7 +8990,7 @@
   {
     "供應商編號": "SP100052",
     "型態": "常溫",
-    "中文品名": "Merlot Vino d’Italia IGT IL POGGIO DEI VIGNETI (CASA VINICOLA NATALE VERGA SPA)",
+    "中文品名": "TDS 梅洛紅酒 IGT (Il Poggio dei Vigneti) 750ml",
     "英文品名": "Merlot Vino d’Italia IGT IL POGGIO DEI VIGNETI",
     "規格": "750ml",
     "EAN": "8000128005231",
@@ -9022,7 +9022,7 @@
   {
     "供應商編號": "SP100052",
     "型態": "常溫",
-    "中文品名": "Barbera Asti - Piemonte DOCG I BALZI (CASA VINICOLA NATALE VERGA SPA)",
+    "中文品名": "TDS 巴貝拉阿斯蒂紅酒 DOCG (I Balzi) 750ml",
     "英文品名": "Barbera Asti - Piemonte DOCG I BALZI",
     "規格": "750ml",
     "EAN": "8000128164099",
@@ -9054,7 +9054,7 @@
   {
     "供應商編號": "SP100052",
     "型態": "常溫",
-    "中文品名": "Rosso Veneto IGT I BALZI (CASA VINICOLA NATALE VERGA SPA)",
+    "中文品名": "TDS 維內托紅酒 IGT (I Balzi) 750ml",
     "英文品名": "Rosso Veneto IGT I BALZI",
     "規格": "750ml",
     "EAN": "8000128164570",
@@ -9086,7 +9086,7 @@
   {
     "供應商編號": "SP100052",
     "型態": "常溫",
-    "中文品名": "MOSCATO “NATURA”( Varietal sparkling wine) (VINOPERA S.r.l. Socio Unico)",
+    "中文品名": "TDS 蜜思嘉氣泡酒 NATURA 750ml",
     "英文品名": "MOSCATO “NATURA”( Varietal sparkling wine)",
     "規格": "750 ml",
     "EAN": "8007651551969",
@@ -9118,7 +9118,7 @@
   {
     "供應商編號": "SP100052",
     "型態": "常溫",
-    "中文品名": "PROSECCO DOC(EXTRA DRY MILLESIMATO) (VINOPERA S.r.l. Socio Unico)",
+    "中文品名": "TDS 普羅賽克氣泡酒 DOC 年份 Extra Dry 750ml",
     "英文品名": "PROSECCO DOC(EXTRA DRY MILLESIMATO)",
     "規格": "750 ml",
     "EAN": "8007651551976",
@@ -9150,7 +9150,7 @@
   {
     "供應商編號": "SP100052",
     "型態": "常溫",
-    "中文品名": "SPUMANTE BRUT “NATURA” (Sparkling wine) (VINOPERA S.r.l. Socio Unico)",
+    "中文品名": "TDS 氣泡酒 Brut NATURA 750ml",
     "英文品名": "SPUMANTE BRUT “NATURA” (Sparkling wine)",
     "規格": "750 ml",
     "EAN": "8007651551921",
@@ -9182,7 +9182,7 @@
   {
     "供應商編號": "SP100052",
     "型態": "常溫",
-    "中文品名": "Bianco Spumante (Casa Vinicola Morando)",
+    "中文品名": "TDS 白氣泡酒 Bianco Spumante 750ml",
     "英文品名": "Bianco Spumante",
     "規格": "750 ml",
     "EAN": "",
@@ -9214,7 +9214,7 @@
   {
     "供應商編號": "SP100052",
     "型態": "常溫",
-    "中文品名": "PROSECCO DOCG VALDOBBIADENE SUPERIORE MILLESIMATO SPUMANTE (Contarini Vini e Spumanti Srl)",
+    "中文品名": "TDS 普羅賽克氣泡酒 DOCG 瓦多比亞德內Superiore 年份 750ml",
     "英文品名": "PROSECCO DOCG VALDOBBIADENE SUPERIORE MILLESIMATO SPUMANTE",
     "規格": "750 ml",
     "EAN": "8005400874840",
@@ -9246,7 +9246,7 @@
   {
     "供應商編號": "SP100052",
     "型態": "常溫",
-    "中文品名": "PROSECCO DOC TREVISO MILLESIMATO EXTRA DRY SPUMANTE (Contarini Vini e Spumanti Srl)",
+    "中文品名": "TDS 普羅賽克氣泡酒 DOC 特雷維索 年份 Extra Dry 750ml",
     "英文品名": "PROSECCO DOC TREVISO MILLESIMATO EXTRA DRY SPUMANTE",
     "規格": "750",
     "EAN": "8005400904448",
@@ -9278,7 +9278,7 @@
   {
     "供應商編號": "SP100052",
     "型態": "常溫",
-    "中文品名": "BLANC DE BLANCS MILLESIMATO EXTRA DRY (Contarini Vini e Spumanti Srl)",
+    "中文品名": "TDS 白中白氣泡酒 年份 Extra Dry 750ml",
     "英文品名": "BLANC DE BLANCS MILLESIMATO EXTRA DRY",
     "規格": "750",
     "EAN": "8005400004049",
@@ -9310,7 +9310,7 @@
   {
     "供應商編號": "SP100052",
     "型態": "常溫",
-    "中文品名": "DIRUPO VALDOBBIADENE DOCG EXTRA DRY (Azienda Agricola Andreola)",
+    "中文品名": "TDS DIRUPO 瓦多比亞德內氣泡酒 DOCG Extra Dry 750ml",
     "英文品名": "DIRUPO VALDOBBIADENE DOCG EXTRA DRY",
     "規格": "750",
     "EAN": "8033286330303",
@@ -9342,7 +9342,7 @@
   {
     "供應商編號": "SP100052",
     "型態": "常溫",
-    "中文品名": "Col di Vite Sparkling Wine (La Tordera)",
+    "中文品名": "TDS Col di Vite 氣泡酒 750ml",
     "英文品名": "Col di Vite Sparkling Wine",
     "規格": "750",
     "EAN": "8033011560937",
@@ -9374,7 +9374,7 @@
   {
     "供應商編號": "SP100052",
     "型態": "常溫",
-    "中文品名": "Col di Vite Prosecco DOC Extra Dry (La Tordera)",
+    "中文品名": "TDS Col di Vite 普羅賽克 DOC Extra Dry 750ml",
     "英文品名": "Col di Vite Prosecco DOC Extra Dry",
     "規格": "750 ml",
     "EAN": "8033011560913",
@@ -9406,7 +9406,7 @@
   {
     "供應商編號": "SP100052",
     "型態": "常溫",
-    "中文品名": "Col di Vite Prosecco DOC Rosè Millesimita (La Tordera)",
+    "中文品名": "TDS Col di Vite 普羅賽克粉紅氣泡酒 DOC 年份 750ml",
     "英文品名": "Col di Vite Prosecco DOC Rosè Millesimita",
     "規格": "750 ml",
     "EAN": "8033011560920",
@@ -9438,7 +9438,7 @@
   {
     "供應商編號": "SP100052",
     "型態": "常溫",
-    "中文品名": "Prosecco DOC Spumante Extra Dry (Terre dei Buth)",
+    "中文品名": "TDS 普羅賽克氣泡酒 DOC Extra Dry 750ml",
     "英文品名": "Prosecco DOC Spumante Extra Dry",
     "規格": "750",
     "EAN": "80 5274049 452 8",
@@ -9470,7 +9470,7 @@
   {
     "供應商編號": "SP100052",
     "型態": "常溫",
-    "中文品名": "PROSECCO DOC - Spumante BRUT (Terre dei Buth)",
+    "中文品名": "TDS 普羅賽克氣泡酒 DOC Brut 750ml",
     "英文品名": "PROSECCO DOC - Spumante BRUT",
     "規格": "750",
     "EAN": "80 5274049 453 5",
@@ -9502,7 +9502,7 @@
   {
     "供應商編號": "SP100052",
     "型態": "常溫",
-    "中文品名": "Prosecco DOC Rosé Spumante BrutMillesimato (Terre dei Buth)",
+    "中文品名": "TDS 普羅賽克粉紅氣泡酒 DOC Brut 年份 750ml",
     "英文品名": "Prosecco DOC Rosé Spumante BrutMillesimato",
     "規格": "750",
     "EAN": "80 5274049 652 2",
@@ -9534,7 +9534,7 @@
   {
     "供應商編號": "SP100052",
     "型態": "常溫",
-    "中文品名": "Prosecco DOC Frizzante (Terre dei Buth)",
+    "中文品名": "TDS 普羅賽克微氣泡酒 DOC Frizzante 750ml",
     "英文品名": "Prosecco DOC Frizzante",
     "規格": "750",
     "EAN": "Crown cap: 80 5274049 455 9\nString closure \"spago\": 80 5274049 456 6",
@@ -9566,7 +9566,7 @@
   {
     "供應商編號": "SP100052",
     "型態": "常溫",
-    "中文品名": "Prosecco DOC extra dry \"Bollo rosso\" (San Martino Vini)",
+    "中文品名": "TDS 普羅賽克 DOC Extra Dry (Bollo rosso) 750ml",
     "英文品名": "Prosecco DOC extra dry \"Bollo rosso\"",
     "規格": "750 ml",
     "EAN": "",
@@ -9598,7 +9598,7 @@
   {
     "供應商編號": "SP100052",
     "型態": "常溫",
-    "中文品名": "Prosecco DOC brut \"99\" (San Martino Vini)",
+    "中文品名": "TDS 普羅賽克 DOC Brut (99) 750ml",
     "英文品名": "Prosecco DOC brut \"99\"",
     "規格": "750ml",
     "EAN": "",
@@ -9630,7 +9630,7 @@
   {
     "供應商編號": "SP100052",
     "型態": "常溫",
-    "中文品名": "Prosecco DOC Treviso millesimato extra dry (San Martino Vini)",
+    "中文品名": "TDS 普羅賽克 DOC 特雷維索 年份 Extra Dry 750ml",
     "英文品名": "Prosecco DOC Treviso millesimato extra dry",
     "規格": "750",
     "EAN": "",
@@ -9662,7 +9662,7 @@
   {
     "供應商編號": "SP100052",
     "型態": "常溫",
-    "中文品名": "Prosecco DOC Treviso millesimato dry (San Martino Vini)",
+    "中文品名": "TDS 普羅賽克 DOC 特雷維索 年份 Dry 750ml",
     "英文品名": "Prosecco DOC Treviso millesimato dry",
     "規格": "750",
     "EAN": "",
@@ -9694,7 +9694,7 @@
   {
     "供應商編號": "SP100052",
     "型態": "常溫",
-    "中文品名": "Prosecco DOC Treviso millesimato rose brut (San Martino Vini)",
+    "中文品名": "TDS 普羅賽克粉紅 DOC 特雷維索 年份 Brut 750ml",
     "英文品名": "Prosecco DOC Treviso millesimato rose brut",
     "規格": "750",
     "EAN": "",
@@ -9726,7 +9726,7 @@
   {
     "供應商編號": "SP100052",
     "型態": "常溫",
-    "中文品名": "Prosecco Superiore Conegliano-Valdobbiadene DOCG millesimato extra dry (San Martino Vini)",
+    "中文品名": "TDS 普羅賽克Superiore科內利亞諾-瓦多比亞德內 DOCG 年份 Extra Dry 750ml",
     "英文品名": "Prosecco Superiore Conegliano-Valdobbiadene DOCG millesimato extra dry",
     "規格": "750",
     "EAN": "",
@@ -9758,7 +9758,7 @@
   {
     "供應商編號": "SP100052",
     "型態": "常溫",
-    "中文品名": "Prosecco DOC brut (Beavita)",
+    "中文品名": "TDS 普羅賽克 DOC Brut 750ml",
     "英文品名": "Prosecco DOC brut",
     "規格": "750",
     "EAN": "",
@@ -9790,7 +9790,7 @@
   {
     "供應商編號": "SP100052",
     "型態": "常溫",
-    "中文品名": "Prosecco Superiore Conegliano-Valdobbiadene DOCG extra dry (Beavita)",
+    "中文品名": "TDS 普羅賽克Superiore科內利亞諾-瓦多比亞德內 DOCG Extra Dry 750ml",
     "英文品名": "Prosecco Superiore Conegliano-Valdobbiadene DOCG extra dry",
     "規格": "750",
     "EAN": "",
@@ -9822,7 +9822,7 @@
   {
     "供應商編號": "SP100025",
     "型態": "常溫",
-    "中文品名": "Finca Las Zarras Basic quality dry red 11% (Bodegas Milenium S.L.)",
+    "中文品名": "Bodegas 拉薩拉斯莊園紅酒(不甜) 11% 750ml",
     "英文品名": "Finca Las Zarras Basic quality dry red 11%",
     "規格": "750ml",
     "EAN": "8413060743503",
@@ -9854,7 +9854,7 @@
   {
     "供應商編號": "SP100025",
     "型態": "常溫",
-    "中文品名": "Finca Las ZaBasic quality dry white 11% (Bodegas Milenium S.L.)",
+    "中文品名": "Bodegas 拉薩拉斯莊園白酒(不甜) 11% 750ml",
     "英文品名": "Finca Las ZaBasic quality dry white 11%",
     "規格": "750 ml",
     "EAN": "8413060012227",
@@ -9886,7 +9886,7 @@
   {
     "供應商編號": "SP100025",
     "型態": "常溫",
-    "中文品名": "Vespertino Tempranillo, red 13% (Bodegas Milenium S.L.)",
+    "中文品名": "Bodegas Vespertino 田帕尼優紅酒 13% 750ml",
     "英文品名": "Vespertino Tempranillo, red 13%",
     "規格": "750ml",
     "EAN": "8413060743527",
@@ -9918,7 +9918,7 @@
   {
     "供應商編號": "SP100025",
     "型態": "常溫",
-    "中文品名": "Vespertino Macabeo 11,5% (Bodegas Milenium S.L.)",
+    "中文品名": "Bodegas Vespertino 馬卡貝歐白酒 11.5% 750ml",
     "英文品名": "Vespertino Macabeo 11,5%",
     "規格": "750ml",
     "EAN": "8413060743473",
@@ -9950,7 +9950,7 @@
   {
     "供應商編號": "SP100025",
     "型態": "常溫",
-    "中文品名": "Viña Dante Standard quality Red 11% (Bodegas Milenium S.L.)",
+    "中文品名": "Bodegas Viña Dante 紅酒 11% 3L",
     "英文品名": "Viña Dante Standard quality Red 11%",
     "規格": "3L",
     "EAN": "8413060749727",
@@ -9982,7 +9982,7 @@
   {
     "供應商編號": "SP100025",
     "型態": "常溫",
-    "中文品名": "Viña Dante Standard quality White dry 11% (Bodegas Milenium S.L.)",
+    "中文品名": "Bodegas Viña Dante 白酒(不甜) 11% 3L",
     "英文品名": "Viña Dante Standard quality White dry 11%",
     "規格": "3L",
     "EAN": "8413060749703",
@@ -14389,7 +14389,7 @@
   {
     "供應商編號": "SP200001",
     "型態": "冷凍",
-    "中文品名": "Feast Devils Pasta 550g",
+    "中文品名": "Feast Devils Pasta 惡魔義大利麵 550g",
     "英文品名": "FEAST IQF DEVILS PASTA 4 X (550 GR X 1 PIECE)",
     "規格": "550g",
     "EAN": "",
@@ -18154,7 +18154,7 @@
     "供應商編號": "SP200002",
     "供應商": "Europastry",
     "型態": "冷凍",
-    "中文品名": "#27470 3 Cereal Small Roll (100u)",
+    "中文品名": "Europastry 三穀小餐包 35g (100入/箱)",
     "英文品名": "3 Cereal Small Roll (100u)",
     "規格": "35g × 100個/箱",
     "產地": "西班牙",
@@ -19558,7 +19558,7 @@
     "供應商編號": "SP200002",
     "供應商": "Europastry",
     "型態": "冷凍",
-    "中文品名": "#69311/69313 Decorated Choco Delight (56u)",
+    "中文品名": "Europastry 巧克力裝飾酥點 103g (56入/箱)",
     "英文品名": "Decorated Choco Delight (56u)",
     "規格": "103g × 56個/箱",
     "產地": "西班牙",
@@ -21569,7 +21569,7 @@
     "台幣總成本": 0,
     "台幣10%底線": 0,
     "外幣10%底線": 2.772,
-    "中文品名": "Selme EVOO 500ml",
+    "中文品名": "Kozakli Selme 特級初榨橄欖油 500ml",
     "英文品名": "Selme Extra Virgin Olive Oil 500ml",
     "規格": "500ml",
     "成本價": 2.52,
@@ -23586,7 +23586,7 @@
     "樣品狀態": "",
     "台幣最低報價": 0,
     "台幣10%底線": 0,
-    "中文品名": "BEYOĞLU Artisan 80g",
+    "中文品名": "BEYOĞLU 手工酥點 Artisan 80g",
     "英文品名": "BEYOĞLU Artisan",
     "規格": "80g",
     "箱入數": 36,
@@ -23650,7 +23650,7 @@
     "樣品狀態": "",
     "台幣最低報價": 0,
     "台幣10%底線": 0,
-    "中文品名": "Rosso Bianco Angel Hair 45g",
+    "中文品名": "BEYOĞLU Rosso Bianco 天使細麵酥 45g",
     "英文品名": "Rosso Bianco Angel Hair",
     "規格": "45g",
     "箱入數": 144,
