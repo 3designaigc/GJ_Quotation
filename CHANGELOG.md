@@ -2,6 +2,16 @@
 
 ---
 
+## 2026-06-26（更新 56）— NEXO文件全面蓋高玉發票章＋SM-260415客戶確認
+
+**NEXO 文件加蓋高玉發票章(Tina指示:我可控制的對外文件一律蓋章)** — `gen_nexo_docs.py` sign_block() 加章:**只蓋高玉開立文件**(logo:True的PI/CI/PL GJ→NEXO,簽名線上方24mm);NEXO自家文件(NEXO→SM/PO_NEXO-GJ)不蓋我方章(無NEXO章)。章圖=assets/發票章_透明.png。現存5單(0415/0435/0444/0515/0531)全重生蓋章;Drive更新4單(0415/0435/0444/0531),**0515因缺毛重暫留本機**待重量補齊一起上。
+
+**SM-260415 文件客戶已確認** — 屬切分點前舊NEXO單(文件核對系統不追舊單,無狀態欄),作資訊接收;蓋章文件已上傳Drive。
+
+儀表板(物流貨況/現金流)隨publish重生更新。
+
+---
+
 ## 2026-06-26（更新 55）— SM-260435/260444 NEXO地址改正重出＋業務週報/TDS週報/供應商主檔Excel自動化
 
 **SM-260435、SM-260444 NEXO地址改正** — 客戶(美廉社)把PO上NEXO地址改正(舊Jalan Matang/Selangor錯址→正確「1st Floor, Lot 10524, Block 16, 151 Jalan Tun Jugah, 93350 Kuching, Sarawak」)。系統 gen_nexo_docs.py 第42行早於6/22已是正確址→兩單各重出7份NEXO文件(地址正確、check_nexo_docs數學/邏輯全過)，rclone原地更新Drive(同名保留file id、📎不斷)；客戶改正PO另存各資料夾源頭存證。
