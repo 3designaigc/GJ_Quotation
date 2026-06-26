@@ -2,6 +2,15 @@
 
 ---
 
+## 2026-06-26（更新 58）— 消除幽靈「寄倉」模式→正名「買進」(Tina更正)
+
+**Tina指正:沒有「寄倉」這種交易模式。** 買進=高玉進口商台幣到倉直售台灣通路(家樂福/星巴克/萊爾富/全聯/Feast/Europastry/VIRU);買進轉手=高玉轉賣NEXO再給客戶。「寄倉」是早期(6/07)建檔誤用標籤,全面移除。
+- orders.json 54筆:交易模式/高玉模式 寄倉→買進、record_type 寄倉→銷售(Europastry37+Feast17)。
+- 交易模式對應 _類別D、opex _進口人判定、gen_pnl 註記、rebuild_html 統計、交易模式與現金流規則.md → 全去「寄倉」。
+- ⚠️**財務中性已驗證**:改前後 PnL(2025營收64,054,922/淨利4,047,749、2026營收40,632,072/淨利3,428,332)、對外收入102,294,464、毛利11,662,293 **完全一致**;進口費用本就不計(已含到岸成本)、營收用record_type≠採購故不受標籤影響。程式編譯通過。
+
+---
+
 ## 2026-06-26（更新 57）— SP100013 供應商正名 GoMuc→S. Ruamthai＋S.Ruamthai簽章PI歸檔
 
 **SP100013 供應商正名(Tina:GoMuc是品牌、供應商是S. Ruamthai)** — 一次改齊全主檔:products_final 19支(供應商→S. Ruamthai、品牌補GoMuc6/Tana4/FruitMania9)、supplier_master(名稱+品牌欄+備註)、交易模式對應(+S. Ruamthai/C並保留GoMuc別名給歷史單)、報價歷史21筆、orders.json 19筆(品牌補GoMuc)。供應商主檔Excel隨publish自動重生。
