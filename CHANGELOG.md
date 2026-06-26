@@ -2,6 +2,17 @@
 
 ---
 
+## 2026-06-26（更新 53）— 義大利咖啡建檔(Attibassi/Meseta/Grandeca)34支
+
+**新供應商 SP100063「Attibassi / Meseta (Co.Ind)」** — 桌面兩份2026 Export pricelist建檔。
+- 三品牌同一供應商(同集團Co.Ind S.p.A.生產):Attibassi 9支、Meseta 22支、Grandeca低咖啡因3支。
+- 類型:咖啡豆11、研磨咖啡6、Nespresso膠囊10、E.S.E.咖啡包3、Dolce Gusto膠囊4。
+- 建檔規則(Tina確認):**全通路、利潤20%、成本用€每單支(single)、幣別EUR、常溫**。箱入數=single packs/group、箱/板=group packages/pallet(逐支抓報價單棧板資訊)。新增欄`阿拉比卡%`、`咖啡碼`。
+- ⚠️去重:Grandeca(011020/010896/011016)兩檔重複→保留一次;E.S.E.三支EAN皆"no"→改用產品碼當去重鍵(否則只留1支)。
+- 付款條件待補;COO/EXW待向供應商確認。
+
+---
+
 ## 2026-06-24（更新 52）— 通路級台幣公式(萊爾富)＋VE啤酒106支＋好市多模式＋箱板統整＋SM-260515改量
 
 **1. 通路級台幣公式架構(萊爾富,Tina選B:同產品多通路各存台幣)**
