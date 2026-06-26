@@ -2,6 +2,17 @@
 
 ---
 
+## 2026-06-26（更新 60）— 跨裝置共用審核佇列(GAS→Drive→拉單器)＋Prisma成本改每單片
+
+**Prisma Foods Egypt 31支成本正名** — 原為整箱價(海鹽40g 3.1/箱)→違反「成本每單位」規則,÷箱入改每片(0.2583);最低報價由整箱3.45變每片0.287。外幣10%底線同步重算。
+
+**跨裝置共用審核佇列(解決「業務送單後Tina無法審核」)** — 純前端localStorage是單裝置,跨裝置看不到。新架構:
+- 業務報價系統送單時並行 `fetch` POST 訂單JSON 到 **Google Apps Script 網頁程式**(掛3designaigc帳號,`業務送單佇列_AppsScript.gs`)→自動寫 ①Drive資料夾「業務待審核訂單」②Sheet「業務送單佇列」(任何裝置即時可看)。
+- `03_腳本/pull_cloud_orders.py` 拉Drive新訂單(rclone --drive-root-folder-id)→04_訂單匯入/→`import_order.py --auto`→待審核/已匯入+pending_data.js→order_review。台帳 data/雲端訂單已拉取.json 防重複。
+- ⚠️GAS部署一次性(Tina已部署,URL已填入業務HTML);拉單器待掛排程(每30分)。端到端已測通(3測試單流到待審核,已清)。
+
+---
+
 ## 2026-06-26（更新 59）— 冷凍烘焙經銷通路公式桶(Europastry,兩種交易模式)
 
 **新通路級台幣公式桶 CH_FROZEN_DIST「冷凍烘焙經銷」(Europastry首例,105支全上)** — 報關後港口交貨給經銷商,兩種交易模式:
