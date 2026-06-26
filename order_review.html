@@ -209,7 +209,9 @@ tfoot td.r{text-align:right;font-variant-numeric:tabular-nums}
 <div class="hdr">
   <div class="hdr-logo">高玉</div>
   <div class="hdr-title">訂單審核工具</div>
-  <div class="hdr-ver">v2.1 · 2026-06-02 · 限 Tina 使用</div>
+  <div class="hdr-ver">v2.2 · 2026-06-26 · 限 Tina 使用</div>
+  <button onclick="if(confirm('清空本機未處理的送單佇列？（測試／殘留用）')){localStorage.removeItem('gj_order_import_queue');localStorage.removeItem('gj_po_queue');location.reload();}"
+    style="margin-left:auto;background:#fff;border:1px solid #C9A84C;color:#8a6d2b;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer">🗑 清空本機佇列</button>
 </div>
 
 <div id="pending-bar" class="pending-bar hidden">
