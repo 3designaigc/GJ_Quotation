@@ -2,6 +2,14 @@
 
 ---
 
+## 2026-06-26（更新 57）— SP100013 供應商正名 GoMuc→S. Ruamthai＋S.Ruamthai簽章PI歸檔
+
+**SP100013 供應商正名(Tina:GoMuc是品牌、供應商是S. Ruamthai)** — 一次改齊全主檔:products_final 19支(供應商→S. Ruamthai、品牌補GoMuc6/Tana4/FruitMania9)、supplier_master(名稱+品牌欄+備註)、交易模式對應(+S. Ruamthai/C並保留GoMuc別名給歷史單)、報價歷史21筆、orders.json 19筆(品牌補GoMuc)。供應商主檔Excel隨publish自動重生。
+
+**S.Ruamthai PI(GJT002-26)蓋章歸檔** — 泰國供應商開給高玉的PI,高玉發票章蓋於左下簽名區;歸檔 Drive `SM260531-26FA0009/PI_工廠S.Ruamthai_GJT002-26_SM-260531_已蓋章_小T.pdf`+本機留底。屬SM-260531(GoMuc/Tana/FruitMania泰式零食,客戶美廉社)。
+
+---
+
 ## 2026-06-26（更新 56）— NEXO文件全面蓋高玉發票章＋SM-260415客戶確認
 
 **NEXO 文件加蓋高玉發票章(Tina指示:我可控制的對外文件一律蓋章)** — `gen_nexo_docs.py` sign_block() 加章:**只蓋高玉開立文件**(logo:True的PI/CI/PL GJ→NEXO,簽名線上方24mm);NEXO自家文件(NEXO→SM/PO_NEXO-GJ)不蓋我方章(無NEXO章)。章圖=assets/發票章_透明.png。現存5單(0415/0435/0444/0515/0531)全重生蓋章;Drive更新4單(0415/0435/0444/0531),**0515因缺毛重暫留本機**待重量補齊一起上。
