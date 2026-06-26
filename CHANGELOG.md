@@ -2,7 +2,15 @@
 
 ---
 
-## 2026-06-26（更新 53）— 義大利咖啡建檔(Attibassi/Meseta/Grandeca)34支
+## 2026-06-26（更新 53）— 義大利咖啡34支＋順發新品3支
+
+**順發 SP100005 新增3支(Gene Lo報價 SF Price Quotation)** — USD/CIF、馬來西亞、通路美廉社/全通路、利潤20%、付款「30% deposit, 70% against B/L」。
+- #9 特級奶油蘇打餅乾(獨立包) 280g×16/箱 CIF USD0.89 BBD540天 EAN 955 6184 280 093
+- #10 烘烤洋芋脆片(酸奶油洋蔥香草) 40g×30/箱 CIF USD0.33 EAN 955 6184 040 017
+- #11 烘烤洋芋脆片(炙烤蔬菜) 40g×30/箱 CIF USD0.33 EAN 955 6184 040 000
+- 成本=**CIF USD/UNIT**(每單支);箱入=CIF/CTN÷CIF/UNIT(16、30);⚠️無棧板欄→東南亞規則用 **箱/板≈1.1÷M3** 換算(0.0324→34、0.0515→21)。
+
+**義大利咖啡(Attibassi/Meseta/Grandeca)34支** — 詳見下。
 
 **新供應商 SP100063「Attibassi / Meseta (Co.Ind)」** — 桌面兩份2026 Export pricelist建檔。
 - 三品牌同一供應商(同集團Co.Ind S.p.A.生產):Attibassi 9支、Meseta 22支、Grandeca低咖啡因3支。
