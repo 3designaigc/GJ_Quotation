@@ -2,6 +2,16 @@
 
 ---
 
+## 2026-06-28（更新 62）— 冷凍烘焙經銷 模式B(CIF外幣)業務HTML顯示完成
+
+**模式B 接上業務報價系統** — 完成 [[twd_channel_frozen_dist]] 的待辦。業務選「冷凍烘焙經銷·CIF外幣€」客戶→Europastry 顯示/成交/底線改用 r[26]通路外幣報價(CIF×1.1111)。
+- 新增 `let fxChan` ＋ `baseMP(r)`(fxChan時回 r[26][通路].報價,否則 r[15] f15)；**把業務HTML 11處 r[15] 全改 baseMP(r)**(顯示/初始價/購物車底線/送出鎖/列印/匯出),價格=底線=fxQuote(同一般外幣 r[15] 既是顯示也是底線)。
+- selCust 設 `fxChan=cust.fxchan`(兩處含__other__重置)；CUSTS+「冷凍烘焙經銷·CIF外幣€」(fxchan);客戶下拉+模式A/B兩選項。
+- 驗證:const D 105支帶 r[26];Python模擬 baseMP 正確(選CIF外幣→0.7611€/選星巴克→一般f15/清空→還原);<script>平衡、CUSTS/D可解析。⚠️未做瀏覽器點擊實測(無serverId),建議上線後點一次確認。
+- ⚠️模式B 底線=fxQuote(CIF+10%,不可折讓更低);若要留折讓空間到CIF,再加 fxFloor。
+
+---
+
 ## 2026-06-28（更新 61）— NEXO開立文件加 NEXO 簽名＋業務週報加美廉日韓採購線
 
 **NEXO 簽名（永久機制）** — gen_nexo_docs.py 的 NEXO 實體加 `sig`=`assets/NEXO簽名_透明.png`(二姊/Kelly 簽名,白底已去背);`sign_block` 對「NEXO 開立的文件」蓋簽名(34mm,長寬比3.44),高玉開立文件仍蓋高玉發票章。SM-260415 重出 4 份 NEXO 文件(NEXO→美廉社 PI/CI/PL ＋ PO_NEXO-GJ)已含簽名,rclone 原地更新 Drive(SM260415-26FA0005,file id 保留)。往後所有 NEXO 文件自動帶簽名。
