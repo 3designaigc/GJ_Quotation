@@ -1426,3 +1426,8 @@ t10     = 總成本 × 1.05         底線（+5%）
 - Tina 抓到物流貨況看板很多單文件燈號沒亮：根因＝看板(gen_logistics)只讀 `文件追蹤.json`(自6/11後沒人維護、無腳本自動寫)，而近期核對都寫進另一套 `文件核對.json`→兩套各自為政。
 - 修法：gen_logistics 改成**合併讀 文件核對.json**(主動維護那套)→核對通過/已收→看板亮綠✓、不符→⚠️、核對備註覆蓋過時催件字。建 高玉PO↔客戶PO 別名(26FA0008↔SM-260515 同票用任一號都吃得到)。
 - 效果:26FZ0001/26FP250013/26FA0008(經SM-260515別名) 文件燈號即時反映核對結果。以後只要維護 文件核對.json，看板自動同步，不必雙重維護。
+
+## 更新72（2026-06-29）TDS週報固定「追文件」專段 + 9張缺件已寄Mirko
+- Tina:第一封缺件信已寄Mirko;7筆(id41~47)狀態更新為「Requested from Mirko by email on 2026-06-29; awaiting documents」。
+- gen_tds_tracker.py 重構週報:**Part A 固定=Shipping Documents Outstanding**(自動抓所有 類別=='出貨文件',含26FP26004-1/2/26FP25017+新7筆=10件),Part B=其他等TDS,Part C=FYI。空段顯示「none outstanding this week」。txt+html 版同步。
+- 「以後每週週報都有追文件段落」已寫進機制。
