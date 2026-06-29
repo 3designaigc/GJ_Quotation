@@ -1431,3 +1431,10 @@ t10     = 總成本 × 1.05         底線（+5%）
 - Tina:第一封缺件信已寄Mirko;7筆(id41~47)狀態更新為「Requested from Mirko by email on 2026-06-29; awaiting documents」。
 - gen_tds_tracker.py 重構週報:**Part A 固定=Shipping Documents Outstanding**(自動抓所有 類別=='出貨文件',含26FP26004-1/2/26FP25017+新7筆=10件),Part B=其他等TDS,Part C=FYI。空段顯示「none outstanding this week」。txt+html 版同步。
 - 「以後每週週報都有追文件段落」已寫進機制。
+
+## 更新73（2026-06-29）連動稽核：補 BL 斷鏈 + 清孤兒鍵
+- Tina 要求確認所有看板/文件審核連動無斷鏈→跑交叉稽核,發現:
+  1. ⚠️BL 斷鏈:文件核對序原為 PI/PL/COO/CI/HC **不含BL**→「BL收到否」無固定追蹤位置,看板BL燈號永不亮,缺件邏輯把「沒BL欄」誤當「缺BL」。**修:_文件序加入BL(PI→PL→COO→CI→BL→HC)+_文件全名**,gen_doc_check動態讀序自動長出BL燈號,物流看板合併也吃得到。
+  2. ⚠️孤兒鍵:文件核對有 `26FA0005(SM-260415)` 組合鍵(舊核對中/不符)被乾淨的 `SM-260415`(全通過已歸檔)取代→看板讀不到該組合鍵。**已刪除孤兒鍵**。
+- 稽核結論:SM-260202/26FP23020/26FP25011 的 CI/PL/COO/HC 6/16-17已通過,只差BL→給Mirko要BL正確(非重複)。SM-260637(Prisma)未出貨無文件,vessel_reminder已涵蓋。
+- 連動現況:products→業務HTML/sales_d3✅、orders→訂單分析/現金流/損益/物流看板✅、文件核對→物流看板(合併)✅、TDS待辦→週報追文件段✅、船班→看板+publish提醒✅、供應商主檔→Excel✅。
