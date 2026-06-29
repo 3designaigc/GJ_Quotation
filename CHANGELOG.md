@@ -2,6 +2,13 @@
 
 ---
 
+## 2026-06-28（更新 64）— 查船提醒做進 publish_all(規則要能執行)＋SM-260414已到港
+
+**Tina:查船規則「要確實能執行」(之前漏查17天)。** `publish_all.py` 加 `vessel_reminder()`：每次 publish 結尾自動列在途船班＋距上次查船天數，>3天且有在途船班跳⚠️⚠️，逼小T/Tina 順手 WebSearch 查AIS更新。在途判定:船名非TBA/「待」且下一港非「已到港」。
+**SM-260414** 查船:HARBOUR ZIRCON(IMO9365166)已折返Kota Kinabalu跑新航次→該批(5/21離港往基隆)早到港,標「已到港」;`_最後查船`更新2026-06-28。SM-260515 仍TBA(等BL)。
+
+---
+
 ## 2026-06-28（更新 63）— 全面稽核成本單位,修正 C&F/Chizzpa/Abink 整箱價(同Prisma錯)
 
 **Tina 要求:檢查所有產品在業務系統都有「單個＋整箱」正確價,勿重蹈 Prisma 整箱價錯。** 用每克成本法掃 996 支,旗標 91→人工排除誤報(Dogadan茶包每盒/MONTOSCO香料每罐/Domori·Majani巧克力每個/Feast蛋糕每个/S.Ruamthai每隻 都正常),確認 **3 家真有整箱價錯**:
