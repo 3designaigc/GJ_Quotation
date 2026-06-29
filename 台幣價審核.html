@@ -22,7 +22,7 @@ tr.changed{background:#fff8f0} tr:hover{background:#eef6ff}
 .live{color:#1565c0;font-weight:700}
 </style></head><body>
 <h1>🧮 台幣價審核 / 手動給價工作台</h1>
-<div class="meta">產生：2026-06-29 17:34　｜　共 514 項（Feast/Europastry/VIRU），其中 <b style="color:#e65100">0</b> 項公式建議有變動。<br>
+<div class="meta">產生：2026-06-29 17:48　｜　共 514 項（Feast/Europastry/VIRU），其中 <b style="color:#e65100">0</b> 項公式建議有變動。<br>
 🔹 <b>公式建議</b>：打✓核准。　🔹 <b>手動給價</b>：在「修正值」直接輸入，右邊<b>即時顯示利潤率</b>。　🔹 手動成交價(紅)可改但公式不會自動蓋它。<br>
 完成後按「匯出核准結果」→ 交給 Claude 跑 <code>apply_twd.py</code>。</div>
 <div class="bar">
@@ -97,7 +97,7 @@ function exportJSON(){
   if(!out.length){alert('沒有核准或手動填任何項目');return;}
   const blob=new Blob([JSON.stringify(out,null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-  a.download='台幣核准_20260629_1734.json';a.click();
+  a.download='台幣核准_20260629_1748.json';a.click();
   alert('已匯出 '+out.length+' 筆，交給 Claude 執行 apply_twd.py');
 }
 render();
