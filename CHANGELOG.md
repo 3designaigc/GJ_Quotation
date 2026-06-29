@@ -1448,3 +1448,8 @@ t10     = 總成本 × 1.05         底線（+5%）
 - Tina 抓到看板 BL日多為佔位(=訂單日)非真BL。根因:orders.json BL日期匯入時拿訂單日當佔位,未回填真實BL。
 - 修:①gen_logistics 把「BL日==訂單日且文件核對BL未通過」標橘字「估」,真BL日顯示乾淨;②SM-260415/26FA0005 回填真HBL日 2026-06-18(DANUM173裝船日,原佔位6/10)→狀態更正為到港報關。
 - 規則寫入 ERP.md:拿到正本BL第一件事=回填真BL日到orders.json。已確認真BL:26FA0008(6/27)、26FA0005(6/18);其餘估的等Mirko/供應商BL到再回填。
+
+## 更新75（2026-06-30）助理定名 Tate + 署名統一
+- 小T 英文名定為 Tate。管理/報表類文件署名統一「Prepared by Tate, Business Assistant」:gen_tds_tracker(週報3處)、gen_sales_weekly(5處)、gen_pnl(損益footer)、_form_common(建檔表單署名)已更新。
+- ⚠️進出口貿易文件(NEXO CI/PL/PI/PO)維持原樣、檔名 _小T 不改(Tina明示)。
+- 郵件署名:外對信仍以 Tina Huang 署名,下方加一行 Prepared by Tate, Business Assistant。memory feedback_tate_signature 記錄。
