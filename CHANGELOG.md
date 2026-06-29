@@ -1387,3 +1387,17 @@ t10     = 總成本 × 1.05         底線（+5%）
 - **文件到齊核對通過**：CI(FPR19/26,5/19)＋COO(Certificato PG_M26625R4442)＋HC(Umbria 2 prot.M5326)＋COA(No.2613109)＋海運提單(0363)五份**互相吻合且對訂單一致**：735箱=Classico 500ml×315＋1L×180＋Gentle Recipes 1L×240；淨6,347.88kg/毛10,320kg；批號61255000/61111002/61121000，COA效期2029-05-05。核對 品名/重量/效期/收貨人(生活良好)全✓（文件無EAN，以品名/批號核對）。
 - **追船**：MAERSK HONG KONG 620E(IMO9784257)/櫃MRKU8925973/B/L MAERSK 270425263/CIF Keelung。AIS查該輪已轉亞洲線→620E航次推估6月下旬到基隆→**已到港**。
 - data/文件核對.json + data/船班追蹤.json(共8張) 更新，publish_all 全同步。
+
+## 更新66（2026-06-29）26FZ0001 Feast薯條蔬菜 文件核對+追船+應付更正
+- **三文件互核一致**：CI(FPR14/26 corretta更正版,€11,219.90)＋PL(條碼5支全對主檔Feast SP200001)＋HBL DRAFT。15板/1,032箱/11,328件/淨8,088kg·毛9,068.10kg；批號60/49/48/27/5/6/86/91效期2028。核對 條碼/品名/重量/效期/收貨人 全✓。
+- **⚠️應付更正**：CI更正版€11,219.90 vs 系統原估€11,033.28 差€186.62 → orders.json 26FZ0001 應付更正為實際 €11,219.90（BL2026-04-25+75天→付款7/9不變）。
+- **追船**：BERNARD A/IAS014W26（IMO9415959,土耳其地中海feeder）櫃EMCU5603051封EMCKVF9054(1x40RF -18°C,長榮櫃);Aliaga→Taipei,FREIGHT COLLECT,到貨代理Apollo Logistics。feeder現跑愛琴海→實櫃已轉長榮主線,BL+海運約45-55天推估6月中到台北,**待Apollo到貨通知+正本BL確認**。
+- 待補文件：正本BL、COO(土耳其EUR.1)、HC衛生/植檢證。
+- data/文件核對.json + data/船班追蹤.json(共9張) + orders.json 更新，publish_all 全同步。
+
+## 更新67（2026-06-29）查船防漏②：收佣金訂單(TDS/PC/根因)一律追船
+- Tina 強調「所有 TDS收佣金 + PC收佣金 的單都要追船期/航班，寫進規則不要遺漏」。
+- 缺口：收佣金單 TDS 自理船務、不發 NEXO 文件 → 原 vessel_reminder 只掃 nexo_docs 會漏掉收佣金單。
+- publish_all.py vessel_reminder 新增防漏②：掃 orders.json，凡 交易模式含「收佣金」、未收款、訂單日期>=2026-01-01、PO未在船班追蹤 → 列「⚠️收佣金訂單未納入船班追蹤」(已出貨BL→立刻向TDS要船名/航班補進+查AIS；未出貨→出貨後補)。reminder 由三類擴為四類。
+- 現況：自動抓出 Prisma SM-260637(尚未出貨,待追)；Dogadan 26FP26004-1/2 已在追蹤故排除。
+- memory project_golden_erp.md 查船機制段更新。
