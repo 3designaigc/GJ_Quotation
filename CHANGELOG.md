@@ -1453,3 +1453,8 @@ t10     = 總成本 × 1.05         底線（+5%）
 - 小T 英文名定為 Tate。管理/報表類文件署名統一「Prepared by Tate, Business Assistant」:gen_tds_tracker(週報3處)、gen_sales_weekly(5處)、gen_pnl(損益footer)、_form_common(建檔表單署名)已更新。
 - ⚠️進出口貿易文件(NEXO CI/PL/PI/PO)維持原樣、檔名 _小T 不改(Tina明示)。
 - 郵件署名:外對信仍以 Tina Huang 署名,下方加一行 Prepared by Tate, Business Assistant。memory feedback_tate_signature 記錄。
+
+## 更新76（2026-06-30）26FZ0001 COO+HC 正本到、核對歸檔
+- Feast 26FZ0001 收到文件包(3頁掃描):HC正本(p1-2,No.26-35-005332,土農業部)+COO正本(p3,No.E1943209,Izmir商會)。
+- 對源頭一致:15板/9,068.10kg/Feast薯條蔬菜/收貨人GJ/產地Türkiye。存原始附件,文件核對 COO待提供→通過、HC補正本資訊;物流看板COO燈號轉綠。
+- 26FZ0001 現只剩正本BL(現draft BERNARD A)→已在給Mirko缺件信(TDS待辦id47)。
