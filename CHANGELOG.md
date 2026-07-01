@@ -1521,3 +1521,9 @@ t10     = 總成本 × 1.05         底線（+5%）
 - 釐清:先前「70支佔位」是空EAN假匹配(實際只1支舒芙蕾)。真相=Excel有94支Feast、系統93支、對不上42支(蛋糕/布朗尼/派/餅乾/Pasta等烘焙,從未匯入)。
 - 從成本計算主檔Excel匯入42支到products_final(供應商編號SP200001/Feast/買進/冷凍/EXW/EUR/利潤25%/適用通路一般通路),Feast公式算台幣直接寫回(來源公式)。
 - 產品筆數 996→1038。Feast 93→135支。業務報價系統可報這些烘焙品了。
+
+## 更新89（2026-07-01）SM-260531文件更新 + 修看板NEXO單船訊不顯示
+- S.Ruamthai/GoMuc SM-260531(26FA0009)全套到:CI(SRT010/26)/PL/BL草稿/COO草稿,8品425箱/淨461.16毛886.16kg/US$7,182.60 FOB;船SAWASDEE BALTIC V.2611N曼谷→基隆ETD7/4 ETA7/11;B/L KEL260700059。文件核對+船班+orders BL日7/5→7/4+NEXO重出+上傳Drive。
+- ⚠️修:物流看板船訊用高玉PO查、船班追蹤用客戶PO存→NEXO單(26FA0008鮪魚/26FA0009)船位ETA顯示不出來。gen_logistics加別名(高玉PO↔客戶PO)查船訊,現正常顯示位置+ETA。
+- 鮪魚SM-260515 YM WELLHEAD查AIS:台灣北方27N122E往洋山,推估7月中到基隆(AIS ETA不穩,待ONE到貨通知)。
+- ⚠️SM-260531是NEXO轉手單(S.Ruamthai/泰,經NEXO/Apollo),正本BL/COO催找S.Ruamthai/Apollo/Kelly,與TDS/Mirko無關。
