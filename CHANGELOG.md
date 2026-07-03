@@ -1562,3 +1562,8 @@ t10     = 總成本 × 1.05         底線（+5%）
 - **西班牙紅酒**(既有 SP100025 Bodegas Vespertino 田帕尼優 13% 750ml, EAN8413060743527):成本€1.15**不動**;Mirko填PXM表EXW€1.38=**賣生活良好售價**→記通路外幣[生活良好]€1.38(EXW,毛利16.7%);補是否酒類T/度13/容量0.75/箱入12/箱板75。
 - **Bocon s.r.l.**(義大利,新供應商SP200019,冷凍):**高玉買進·比照Europastry冷凍烘焙經銷通路(CH_FROZEN_DIST)**。9品星巴克Offer nr1(FOB Genova,MOQ10棧板/sku,效期8/31):4款麵疙瘩(散裝1kg)/迷你披薩(1kg約26片×38g)/炒蛋佛卡夏(1kg約13片×75g)/蘑菇塔400g/朝鮮薊塔400g/提拉米蘇185g。含郵件補充規格(焗餅75g×13、披薩38g×26)。供應商主檔+報價歷史+9。
 - ⚠️**Bocon報FOB非CIF**:CH_FROZEN_DIST兩模式都要CIF基礎,台幣審核頁建議值暫以FOB代CIF計→**低估Genova→基隆海運費,勿逕核准**,待補CIF/運費重算。Bocon無EAN(報價階段)。
+
+## 更新96（2026-07-03）Bocon 台幣改用 CIF估(FOB+2%)、標估
+- 依Tina:報FOB的冷凍烘焙經銷產品,CIF以FOB×1.02推估。compute_twd frozen_dist:成本條件=FOB時 cif=cost×(1+fob_to_cif_pct 0.02);config CH_FROZEN_DIST加fob_to_cif_pct=0.02。
+- Bocon 9支已寫入通路台幣(模式A台幣到岸,估)+通路外幣(模式B CIF外幣,估),來源標「CIF估FOB+2%」+估:True;台幣審核頁source同步標估。例:麵疙瘩FOB€4.19→CIF估€4.27→台幣到岸估254.63/袋;佛卡夏FOB€7.35→台幣到岸估448.57。
+- ⚠️待實際CIF到:改成本交易條件=CIF+填真CIF→重算即除去估。業務畫面暫未顯示估徽章(資料層已估:True,審核頁已標),需要再加。
