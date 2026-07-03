@@ -1532,3 +1532,8 @@ t10     = 總成本 × 1.05         底線（+5%）
 - C&F SM-260415 收到TELEX正本電放BL(ORD0017384):DANUM 173/櫃WHSU2120110封WHAC072489/270箱。文件核對BL草稿→正本電放定案;nexo補ETA(已到港);Telex BL存檔上傳。
 - ⚠️Tina抓到NEXO PL重量/船名仍TBA→根因:nexo_docs已填(SM-260515重量8.64/船名YM WELLHEAD),但Drive上是更新前上傳的舊版(本機重生不同步Drive)。重傳SM-260515/260415 NEXO 7份覆蓋→現Drive版無TBA(僅SM-260515櫃號待正本ONE BL)。規則寫進memory:改nexo_docs重出後必重傳Drive。
 - S.Ruamthai SM-260531(5份)稍早已更新(船SAWASDEE BALTIC/CI PL通過/BL COO草稿)。
+
+## 更新91（2026-07-03）VE Radler/Cider 套萊爾富啤酒公式桶
+- Ivano報價(I:Prices of Radler and Cider):VE Rad LEMON/Mint 2.5% 0.5Lx24 EXW€0.33、VE Apple/Pear cider 4.5% 0.5Lx6 EXW€0.43(系統本已此價)。
+- 4支套CH_LAIFU啤酒公式桶算萊爾富台幣:Radler NT$42.86/罐、Cider NT$62.27/罐。products_final通路台幣[萊爾富]更新+報價歷史+4。
+- ⚠️西打酒稅:依指示用啤酒率(L×26=NT$13);若歸其他釀造酒應NT$7/L/度=NT$15.75(西打+約NT$4/罐),待Tina確認分類。西打6pack透明膜包裝(Ivano PS)。
