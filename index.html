@@ -162,7 +162,11 @@ function switchSystem(idx) {
 function openApp(accountKey) {
   var account = ACCOUNTS[accountKey];
   if (!account) return;
-  currentSystems = account.systems;
+  // 機密頁(損益表)僅本機看：在 github.io 公開站自動隱藏該分頁，避免 404
+  var isPublic = /github\.io/i.test(location.hostname);
+  currentSystems = account.systems.filter(function(s){
+    return !(isPublic && s.file === '損益表.html');
+  });
   document.getElementById('login').style.display = 'none';
   document.getElementById('app').style.display = 'grid';
   document.getElementById('roleText').textContent = account.name + ' ｜ ' + account.scope;
