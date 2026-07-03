@@ -23,14 +23,19 @@ input:focus,select:focus{outline:2px solid rgba(1,49,33,.2);border-color:#013121
 .hint{margin-top:14px;font-size:11px;color:#777;line-height:1.7}
 .ver{margin-top:18px;font-size:10px;color:#bbb;text-align:center}
 /* App shell */
-.app{display:none;height:100vh;grid-template-rows:52px 1fr}
-.top{display:flex;align-items:center;gap:10px;padding:0 16px;background:#013121;color:#fff;min-height:52px}
+.app{display:none;height:100vh;grid-template-rows:auto auto 1fr}
+.top{display:flex;align-items:center;gap:10px;padding:0 16px;background:#013121;color:#fff;height:50px}
 .top strong{font-size:14px;font-weight:800;white-space:nowrap}
 .role{font-size:11px;color:rgba(255,255,255,.7);white-space:nowrap}
-.sys-tabs{display:flex;gap:4px;margin-left:14px}
-.sys-tab{padding:6px 14px;border-radius:6px;border:1px solid rgba(255,255,255,.3);background:transparent;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s}
-.sys-tab:hover{background:rgba(255,255,255,.15)}
-.sys-tab.active{background:#C9A84C;border-color:#C9A84C;color:#013121}
+/* 分頁列：獨立一條、統一膠囊、不換行、自動排整齊 */
+.tabbar{display:flex;flex-wrap:wrap;gap:7px;padding:9px 16px;background:#0B3A28;
+  border-top:1px solid rgba(201,168,76,.25);box-shadow:inset 0 -1px 0 rgba(0,0,0,.15)}
+.sys-tab{display:inline-flex;align-items:center;gap:5px;padding:7px 15px;border-radius:999px;
+  border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.04);color:#fff;
+  font-size:12.5px;font-weight:600;line-height:1.15;white-space:nowrap;cursor:pointer;
+  font-family:inherit;transition:background .15s,border-color .15s,color .15s}
+.sys-tab:hover{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.5)}
+.sys-tab.active{background:#C9A84C;border-color:#C9A84C;color:#013121;font-weight:700}
 .tab-wrap{position:relative;display:inline-block}
 .badge{position:absolute;top:-6px;right:-6px;background:#E53E3E;color:#fff;
   font-size:10px;font-weight:800;min-width:16px;height:16px;border-radius:8px;
@@ -70,10 +75,10 @@ iframe{width:100%;height:100%;border:0;background:#fff}
   <div class="top">
     <strong>Golden Jade Terre 高玉企業</strong>
     <span class="role" id="roleText"></span>
-    <div class="sys-tabs" id="sysTabs"></div>
     <div class="spacer"></div>
     <button class="logout" onclick="logout()">登出</button>
   </div>
+  <div class="tabbar" id="sysTabs"></div>
   <iframe id="systemFrame" title="高玉系統"></iframe>
 </section>
 
