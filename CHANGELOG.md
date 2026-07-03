@@ -1537,3 +1537,9 @@ t10     = 總成本 × 1.05         底線（+5%）
 - Ivano報價(I:Prices of Radler and Cider):VE Rad LEMON/Mint 2.5% 0.5Lx24 EXW€0.33、VE Apple/Pear cider 4.5% 0.5Lx6 EXW€0.43(系統本已此價)。
 - 4支套CH_LAIFU啤酒公式桶算萊爾富台幣:Radler NT$42.86/罐、Cider NT$62.27/罐。products_final通路台幣[萊爾富]更新+報價歷史+4。
 - ⚠️西打酒稅:依指示用啤酒率(L×26=NT$13);若歸其他釀造酒應NT$7/L/度=NT$15.75(西打+約NT$4/罐),待Tina確認分類。西打6pack透明膜包裝(Ivano PS)。
+
+## 更新92（2026-07-03）杜拜巧克力 CIF 報價更新（一般通路）
+- BEYOĞLU Proforma(2026-07-02, CIF USD, 土耳其產, TDS consignee)14項:更新現有11支成本 EXW→CIF、新增 1 支 DUBACO HAZELNUT 95g(CIF$1.07)；Doubi 蛋糕3口味同價$0.15合併進現有「全口味」品項。
+- 供應商=BEYOĞLU(SP100024,既有,收佣金TDS);品牌 DUBACO/MADLEN/Artisan/Rosso Bianco/Sweet Collection 為旗下品牌(非新供應商,見[[feedback_supplier_vs_brand]])。CIF價已為每片(Piece)價,無需÷箱入。
+- 主要漲幅:Pistachio 95g 1.57→1.70、Dark 1.52→1.65、Mini125g 2.09→2.28、Madlen288g 4.79→5.18、Artisan80g 1.29→1.42、Gofjoy150g 0.90→1.03、Sweet170g 1.94→2.07。成本交易條件改CIF、適用通路空(=一般外幣,USD×係數/(1-利潤%),利潤18~20%)。
+- products_final 1038→1039;報價歷史+12;成本交易條件標CIF。publish_all 三方同步完成。
