@@ -1527,3 +1527,8 @@ t10     = 總成本 × 1.05         底線（+5%）
 - ⚠️修:物流看板船訊用高玉PO查、船班追蹤用客戶PO存→NEXO單(26FA0008鮪魚/26FA0009)船位ETA顯示不出來。gen_logistics加別名(高玉PO↔客戶PO)查船訊,現正常顯示位置+ETA。
 - 鮪魚SM-260515 YM WELLHEAD查AIS:台灣北方27N122E往洋山,推估7月中到基隆(AIS ETA不穩,待ONE到貨通知)。
 - ⚠️SM-260531是NEXO轉手單(S.Ruamthai/泰,經NEXO/Apollo),正本BL/COO催找S.Ruamthai/Apollo/Kelly,與TDS/Mirko無關。
+
+## 更新90（2026-07-01）SM-260415 Telex正本BL + 修Drive NEXO文件舊版TBA
+- C&F SM-260415 收到TELEX正本電放BL(ORD0017384):DANUM 173/櫃WHSU2120110封WHAC072489/270箱。文件核對BL草稿→正本電放定案;nexo補ETA(已到港);Telex BL存檔上傳。
+- ⚠️Tina抓到NEXO PL重量/船名仍TBA→根因:nexo_docs已填(SM-260515重量8.64/船名YM WELLHEAD),但Drive上是更新前上傳的舊版(本機重生不同步Drive)。重傳SM-260515/260415 NEXO 7份覆蓋→現Drive版無TBA(僅SM-260515櫃號待正本ONE BL)。規則寫進memory:改nexo_docs重出後必重傳Drive。
+- S.Ruamthai SM-260531(5份)稍早已更新(船SAWASDEE BALTIC/CI PL通過/BL COO草稿)。
