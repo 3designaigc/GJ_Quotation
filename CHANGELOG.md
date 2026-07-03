@@ -1543,3 +1543,10 @@ t10     = 總成本 × 1.05         底線（+5%）
 - 供應商=BEYOĞLU(SP100024,既有,收佣金TDS);品牌 DUBACO/MADLEN/Artisan/Rosso Bianco/Sweet Collection 為旗下品牌(非新供應商,見[[feedback_supplier_vs_brand]])。CIF價已為每片(Piece)價,無需÷箱入。
 - 主要漲幅:Pistachio 95g 1.57→1.70、Dark 1.52→1.65、Mini125g 2.09→2.28、Madlen288g 4.79→5.18、Artisan80g 1.29→1.42、Gofjoy150g 0.90→1.03、Sweet170g 1.94→2.07。成本交易條件改CIF、適用通路空(=一般外幣,USD×係數/(1-利潤%),利潤18~20%)。
 - products_final 1038→1039;報價歷史+12;成本交易條件標CIF。publish_all 三方同步完成。
+
+## 更新93（2026-07-03）物流看板修正 + SM-260515 BL正本 + 茶葉COO/HC最終版
+- **gen_logistics 空運ETA bug**：原 `eta=BL+海運天數[產地]` 對空運也套海運天數→茶葉26FP26004-1 ETA誤算成2026-09-09。修：船訊提前取、空運改 `空運天數`(config新增=3)、且**優先採船班追蹤手動維護的「預計到港」真值**(能parse日期時)。茶葉ETA正→7/3「到港報關」。
+- SM-260515(26FA0008)：收到EX 27238-26文件包(5頁)→**BL正本到**(ONE ONEYSGZG05059800,3份ORIGINAL,on board6/28,櫃ONEU2413742,主船YM WELLHEAD 050E)；BL草稿→正本通過;COO待提供→草稿(v1待正本);CI毛重疑點消(此版=15,200.38與PL/BL一致)。BL日6/27→6/28。仍待COO正本。
+- 26FP26004-1茶葉：COO正本(No.F1386164伊斯坦堡商會)+HC正本(No.26-06-001957)最終版確認→COO待提供→通過、6份文件全齊；舊HC 001914作廢,Drive錯檔已刪(進垃圾桶)、只留正確版。
+- SM-260531(26FA0009)：PL補得櫃號HALU2307980/056834→更新nexo源頭+重出NEXO7份文件+重傳Drive;船班最後位置去尾避免「→基隆→基隆」。
+- 權限：Noah Tseng 加開「🚢物流貨況追蹤」看板(Tina Kao本已有)。查船:SAWASDEE BALTIC IMO 9886067;茶葉空運7/3抵桃園。
