@@ -1612,3 +1612,9 @@ t10     = 總成本 × 1.05         底線（+5%）
 - **SM-260306 Pinot Grigio白酒750ml**(Verga→TDS→美廉社,收佣金):COO(CO_0000222193,order SM-260306,3000crt×6×0.75L DOC)+BL(HBL605EMA0110-0000560,船MAERSK CAMBRIDGE,櫃MRKU4682129/40,on board30/05)核對通過(酒類免HC)。BL日6/1→**5/30**(收款日→7/29);加船班;TDS待辦id46結清。上傳`SM260306-Verga白酒Pinot Grigio`。
 - **補建3單資料夾**(只傳手上有的):26FP250013-Cirio(PL+客戶訂單確認)、26FP25011-Valnerina松露(客戶訂單確認)、26FD24003-TDS(客戶訂單確認);出貨文件早期Gmail核對未存本機、標歸檔備註待補。
 - **桌面清理**:5個已上傳Drive的PDF移至`刪除桶/桌面已上傳Drive_20260706`(可復原)。
+
+## 更新106（2026-07-06）物流看板 ETA 標「估」規則（Tina）+ SM-260378補船班
+- **Tina規則**:物流看板到港(ETA)欄——**無確定船班時ETA標「估」;有確定船班時用追蹤船班最新得到的ETA(不標估)**。
+- gen_logistics:`has_vessel`=船班追蹤有真實船名(非空/TBA/待);`eta_est = 有eta and 無has_vessel and 狀態≠已到倉`(已到倉ETA已實現不標)。HTML到港欄比照BL加金色「估」badge。line83已優先採船班追蹤手動維護的預計到港真值→有船班即顯示追蹤ETA。
+- 效果:未到倉僅6張無確定船班標估(26FP25011/26FP26004-2/26FA0006/0007/25OL0004/0005);有船名的(SAWASDEE/YM WELLHEAD/ONE FORTUNE/MAERSK CAMBRIDGE等)用追蹤ETA不標估;已到倉歷史單不標(除雜訊)。
+- 順修:SM-260378(文件齊全、on board5/7已到港)補進船班標已到港→不再誤顯示「海運中·估」。
