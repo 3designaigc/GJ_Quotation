@@ -1666,3 +1666,9 @@ t10     = 總成本 × 1.05         底線（+5%）
 - Tina 指示：同品同時有 CIF 及 EXW 要警示（免業務照便宜的 EXW 價報→賠本，如 DUBIGOF 事件）。
 - `publish_all.py` 新增 `incoterm_dup_warning()`（比照 vessel_reminder，每次 publish 結尾自動掃）：**同供應商+同規格 出現 EXW/CIF/FOB 並存**即列出，Tina 逐組確認是否真同品（Tina 選「寧可誤報也不漏」）。
 - 目前命中 3 組皆為「不同產品剛好同規格」誤報(Valnerina/A.R.Tartufi松露醬類90g、Di Biase冷凍莓450g、Europastry可頌25g)→非真同品，可略過；真同品(如已刪的DUBIGOF vs DUO GOFRET)出現才需併價/刪重複。
+
+## 更新115（2026-07-07）杜拜巧克力(BEYOĞLU)全面轉CIF + 刪4支舊EXW
+- Tina 提供 Proforma 02072026 CIF prices（14 SKU/$44,058/857箱/14板）→「重新做這些CIF報價，舊的EXW都刪掉」。
+- 14 支 CIF 確認全部與 proforma 相符（07-03 本就用此張建，成本+箱入一致）：DUBACO 95g開心果1.70/黑1.65/榛果1.07、MINI 125g 2.28、DUO GOFRET 0.48、MADLEN 5.18、Artisan 1.42、Angel Hair 0.28、Doubi Cake 3口味0.15、GOFJOY 1.03、Sweet Collection 覆盆子/牛奶 2.07。
+- **刪 4 支舊 EXW**（proforma 無此規格）：DUBACO MINI 250g(3.8)/DUBACO 200g(3.3)/DUBACO 35g(0.54)/DARK 200g(2.99)。＋先前已刪 DUBIGOF。
+- 結果：BEYOĞLU 只剩 14 支全 CIF，同品兩價風險清零。備份 `刪除桶/products_備份_BEYOGLU_CIF重做前_*`。詳見 [[feedback_same_product_two_incoterm]]。
