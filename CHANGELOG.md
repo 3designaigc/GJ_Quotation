@@ -1661,3 +1661,8 @@ t10     = 總成本 × 1.05         底線（+5%）
 - **處理(Tina指示「不同支保留貴的」)**：刪除便宜的 DUBIGOF(EXW 0.15)、保留 DUO GOFRET(CIF 0.60)。products_final 1056→1055。
 - **Doubi Cake 拆口味**：原僅1支「Rosso Bianco Doubi Cake 杜拜蛋糕 40g（全口味）」(0.15 CIF)，proforma 實為3口味→**拆成 開心果可可/椰子可可/榛果可可** 各1支(40g,0.15 CIF,144箱,利18%→報價0.19)。1055→1057。
 - ⚠️ 教訓：EXW/CIF 兩批報價來源(04-08舊EXW vs 07-02新CIF)混在同供應商巧克力線,近似品名(DUBIGOF vs DUO GOFRET)易造成低價殘留→報價低於真實CIF成本、業務恐賠本賣。備份 `刪除桶/products_備份_杜拜巧克力修正前_*`。三處同步(推11檔)。
+
+## 更新114（2026-07-07）新增「同品兩價（EXW/CIF並存）」publish 警示
+- Tina 指示：同品同時有 CIF 及 EXW 要警示（免業務照便宜的 EXW 價報→賠本，如 DUBIGOF 事件）。
+- `publish_all.py` 新增 `incoterm_dup_warning()`（比照 vessel_reminder，每次 publish 結尾自動掃）：**同供應商+同規格 出現 EXW/CIF/FOB 並存**即列出，Tina 逐組確認是否真同品（Tina 選「寧可誤報也不漏」）。
+- 目前命中 3 組皆為「不同產品剛好同規格」誤報(Valnerina/A.R.Tartufi松露醬類90g、Di Biase冷凍莓450g、Europastry可頌25g)→非真同品，可略過；真同品(如已刪的DUBIGOF vs DUO GOFRET)出現才需併價/刪重複。
