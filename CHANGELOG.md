@@ -1672,3 +1672,6 @@ t10     = 總成本 × 1.05         底線（+5%）
 - 14 支 CIF 確認全部與 proforma 相符（07-03 本就用此張建，成本+箱入一致）：DUBACO 95g開心果1.70/黑1.65/榛果1.07、MINI 125g 2.28、DUO GOFRET 0.48、MADLEN 5.18、Artisan 1.42、Angel Hair 0.28、Doubi Cake 3口味0.15、GOFJOY 1.03、Sweet Collection 覆盆子/牛奶 2.07。
 - **刪 4 支舊 EXW**（proforma 無此規格）：DUBACO MINI 250g(3.8)/DUBACO 200g(3.3)/DUBACO 35g(0.54)/DARK 200g(2.99)。＋先前已刪 DUBIGOF。
 - 結果：BEYOĞLU 只剩 14 支全 CIF，同品兩價風險清零。備份 `刪除桶/products_備份_BEYOGLU_CIF重做前_*`。詳見 [[feedback_same_product_two_incoterm]]。
+
+## 更新116（2026-07-07）杜拜巧克力填每板箱數（箱/板）
+- Tina：proforma「Order (Crtns)」＝每產品一板的箱數（每板箱數）。14 支原箱/板=0→依規格填:95g三款65/125g 84/36g雙威化42/288g 57/80g 70/45g 45/40g Doubi Cake三款48/150g 60/170g兩款80。合計857箱=14板(與proforma一致)。
