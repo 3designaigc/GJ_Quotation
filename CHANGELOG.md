@@ -1655,3 +1655,9 @@ t10     = 總成本 × 1.05         底線（+5%）
 - **Tina抓到**:26FP30016 Prosecco 船名 HMM HANBADA(Booking GOAG1999400)已記在文件核對船名欄,卻**漏建進船班追蹤**→物流看板該單無船、對業務等於空白/TBA。
 - 修:補建船班(HMM HANBADA,EXW,ETD6/10客戶PO,ETA估8/9,ETA估:true[無BL],待Mirko改條碼版+BL/COO id49)→看板顯示待出貨+HMM HANBADA+ETA估8/9。
 - **規則化**:凡已取得的船名/BL/櫃號/EAN/批號等,必回填進**所有**相關系統(orders/船班/文件核對/nexo_docs),不可只填一處而別處留TBA;經手文件後做「回填核對」。真的未取得的(26FP30016 Pitars條碼客戶端TBC、26FP26004-2未開船無櫃號)才可留待補。詳見記憶 [[feedback_backfill_no_tba]]。
+
+## 更新113（2026-07-07）杜拜巧克力(BEYOĞLU)報價修正：刪重複DUBIGOF + Doubi Cake拆3口味
+- **背景**：Tina 檢查杜拜巧克力(BEYOĞLU SP100024,17支,收佣金TDS,土耳其)報價，發現有支「報價低於成本」。查為 **Rosso Bianco DUBIGOF 開心果可可杜拜風威化 36g**（舊 2026-06-16 EXW 報價,成本0.12→報價0.15），與貴的 **DUBAI DUO GOFRET 杜拜雙威化 36g**（2026-07-02 CIF proforma,成本0.48→報價0.60）不同支但都36g/144箱、混列易誤判賠本。
+- **處理(Tina指示「不同支保留貴的」)**：刪除便宜的 DUBIGOF(EXW 0.15)、保留 DUO GOFRET(CIF 0.60)。products_final 1056→1055。
+- **Doubi Cake 拆口味**：原僅1支「Rosso Bianco Doubi Cake 杜拜蛋糕 40g（全口味）」(0.15 CIF)，proforma 實為3口味→**拆成 開心果可可/椰子可可/榛果可可** 各1支(40g,0.15 CIF,144箱,利18%→報價0.19)。1055→1057。
+- ⚠️ 教訓：EXW/CIF 兩批報價來源(04-08舊EXW vs 07-02新CIF)混在同供應商巧克力線,近似品名(DUBIGOF vs DUO GOFRET)易造成低價殘留→報價低於真實CIF成本、業務恐賠本賣。備份 `刪除桶/products_備份_杜拜巧克力修正前_*`。三處同步(推11檔)。
