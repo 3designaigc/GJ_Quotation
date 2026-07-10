@@ -1699,3 +1699,7 @@ t10     = 總成本 × 1.05         底線（+5%）
 - **3項等高玉→等TDS**:①Frozen Spinach 冷凍菠菜(高玉QA 7/9已回覆→等TDS出貨通知)②Costco Oil(高玉7/7已提供好市多表格→請TDS跟進PC填回)③Yonca葵花油(客戶庫存足、定期詢價再下單→請TDS每月提供價格趨勢)。
 - **加2筆等高玉(Part C)**:①東森Q2發票/PC請款(催東森提第二季發票並向PC(Pietro Coricelli)請款,①②同一件合併)②提供杜拜巧克力(BEYOĞLU)訂單。
 - 結果:未結26件(等高玉4/等TDS22);Part A 6/Part B 16/Part C 4。txt+html已上雲 TDS週報/。⚠️TDS待辦本身不留歷史,此軌跡僅記CHANGELOG。
+
+## 更新121（2026-07-10）茶葉BL草稿核對上雲 + 修報價單Feast「單價/箱」消失bug
+- **26FP26004-2 茶葉 HBL草稿(0552 DRAFT/MCL.S.E.26.00000552)**:對源頭核對一致(收貨人生活良好/船WAN HAI 517 V.103/6款Dogadan茶/毛655.94kg/CIF基隆);回填櫃號WHSU8693314封WHA4992729(40HC,3板非堆疊);文件核對加BL草稿、船班追蹤鎖ETA估(草稿BL+70天估算無追蹤ETA);TDS待辦id34更新;PDF上雲歸檔。
+- ⚠️**修報價單printQ「單價/箱」bug**:`isPerUnitTWD(Feast台幣/通路台幣)→ctn()=1`,害 printQ line 1058 的 `ctn>1` 判false→Feast箱價只印label「/個」、箱價數字消失(VIRU非Feast正常)。改成**單價/箱一律用 x.p×箱入數(r[6])**(不靠被歸零的ctn),單價/個後綴同步改用r[6]。Feast青花菜93.23→箱1,118.76、洋蔥圈88.65→箱1,063.80;VIRU 1,423.92不變。純顯示修正,不動數量/小計/訂單邏輯。
