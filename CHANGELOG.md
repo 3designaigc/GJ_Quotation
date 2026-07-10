@@ -1686,3 +1686,16 @@ t10     = 總成本 × 1.05         底線（+5%）
 - 收到電放全套 `EX 27238-26_Documents with telex release`（CI/PL/BL/Surrender Notice/COO正本/Health Cert）。回溯兩源頭(客戶PO SM-260515＋高玉26FA0008＋NEXO規格)核對一致:1,367箱(油700+水667)/CNF$32,502.76/淨11,810.88毛15,200.38kg/效期11/2028/收貨人Simple Mart美廉社。
 - **3項系統更正**:①**櫃號 ONEU2413742→ONEU2413782**(BL/CI/HC三處實為782,前為誤讀;文件核對+船班追蹤+NEXO doc全改,封條THBP46190補齊);②**COO 草稿→正本通過**(THTCCCO260099704泰國商會);③**HC 不需要→通過**(AC0504S4026M010漁業署健康證,廠SIAM TIN FOOD TH No.2018)。
 - **BL加註電放**(Original B/L Surrender Notice,3份正本2026-07-09繳回ONE、憑電放放貨)。NEXO doc重生7份、check_nexo_docs全通過。PDF已上雲歸檔資料夾。⚠️踩坑:櫃號2vs8誤讀,再證[[feedback_scan_doc_verify_before_file]]放大細讀重要性。
+
+## 更新119（2026-07-09）業務週報下一週(07-13)+修「上週進度」跨通路污染 bug
+- 產出 2026-07-13 版:自動帶入團隊本週一(07-06)填的『本週進度回報』→『上週進度』(29/39項),上傳業務硬碟。
+- ⚠️**修 carry() 污染 bug**:原 `read_prev_progress`/`carry` 只用**大項名**當 key,**多通路同名大項**(產品實銷/鋪貨定期更新 全聯/美廉社/家樂福/星巴克都有)互相覆蓋、只留最後一筆(星巴克「起司棒」)套到全部通路→其餘3通路真實回報(全聯穎C/美廉IRENE公司整併/家樂福7-1進銷存)遺失。改成 (通路,大項) 為 key + 唯一名備援 + 通路欄 forward-fill;三處呼叫傳 g['通路']。已驗證各通路各帶自己進度。
+- **業務週報追加3大項**(依「同客戶排同組」):全聯 COOP 品牌進攻計劃／美廉社 GoMuc 經營投資建議／家樂福 冷凍水果鋪貨方案(39→42項);重產上傳業務硬碟。
+
+## 更新120（2026-07-10）TDS週報(07-13)異動:PXM會議延後/刪Coffee/加BaP/3項轉等TDS
+- **PXM Fees**:原訂7/9線上會議未開、延後→改「時間待TDS通知」(移除過時日期)。
+- **刪 Coffee(id19)**:PXM咖啡專案已結案(不採),完結即刪。
+- **加 BaP(Part A,id54)**:Yonca/Kozakli 出美廉社產品要 Benzo(a)pyrene(苯并芘)檢測報告,高玉已提供訂單編號、催TDS儘速回覆。
+- **3項等高玉→等TDS**:①Frozen Spinach 冷凍菠菜(高玉QA 7/9已回覆→等TDS出貨通知)②Costco Oil(高玉7/7已提供好市多表格→請TDS跟進PC填回)③Yonca葵花油(客戶庫存足、定期詢價再下單→請TDS每月提供價格趨勢)。
+- **加2筆等高玉(Part C)**:①東森Q2發票/PC請款(催東森提第二季發票並向PC(Pietro Coricelli)請款,①②同一件合併)②提供杜拜巧克力(BEYOĞLU)訂單。
+- 結果:未結26件(等高玉4/等TDS22);Part A 6/Part B 16/Part C 4。txt+html已上雲 TDS週報/。⚠️TDS待辦本身不留歷史,此軌跡僅記CHANGELOG。
