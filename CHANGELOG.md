@@ -1714,3 +1714,4 @@ t10     = 總成本 × 1.05         底線（+5%）
 - 用戶給 Luong Gia(Ohla) 3份價目表PDF(果乾100g×10/巧克力果乾100g×9/無糖200g×3)。發現**22支其實早已建檔**(成本=EXW USD正確、箱入80/50對)、但**利潤%被設22(錯)**;真缺價的只是2支「越南乾果50g/100g」空佔位。
 - ⚠️**確立慣例**:查Mirko appassimento報價『2.20 NET NET EXW +18% markup → 2.68』=2.20÷0.82,證實**TDS/高玉「+X% markup」＝X%利潤率(f15=成本÷(1−X%))**,非成本×1.18。故 Ohla「報價×18%上去」=利潤18%。
 - 22支利潤%22→18(f15=EXW÷0.82:芒果0.73→0.90/木瓜0.56→0.69);刪2佔位。products_final 1078→1076;全庫無單價8→6(剩VERGA/Amazons4u/Prinze/Sun Grains/Gusto/TDS Prosecco)。備份 *_Ohla前.json。
+- **收尾**(Tina指示「沒報價的刪掉不用等」):刪10支無報價(成本=0)品:VERGA紅酒/Van Pur啤酒×3/Polska Roza果汁/Amazons4u Açaí/Prinze/Sun Grains/Gusto Sorrento/TDS Prosecco Frizzante。products_final 1076→1066;**報價系統無單價=0**。備份 *_刪無報價前.json。⚠️剩Minimelt冰球×2有價但箱入0(待箱入數)。
