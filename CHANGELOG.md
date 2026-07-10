@@ -1709,3 +1709,8 @@ t10     = 總成本 × 1.05         底線（+5%）
 - **COOP兩批釐清**:15支已有價=第一批25FD66008 PO(在Drive);41支缺價=名稱殘留、Excel『第二次選品-20260109』其實是**另一批66支**(EAN零交集)。Tina決定**41支放掉、新建這66支**。
 - **新建66支**(`臺灣生活良好第二次選品-20260109.xlsx`,FCA PRICE=報客戶價):**成本=FCA×0.85(即利潤15%,f15回推=客戶價)**,箱入=UNITS/CARTON、箱/板=CARTONS/PALLET、效期=Shelf life、產品類別由Customs Class對映、中文品名逐支翻譯。**31常溫(SP100046)+35冷凍(冰淇淋/披薩/即食→新開SP200020,已加supplier_master)**。狀態=報價中、Euro、收佣金(TDS)。
 - 結果:products_final 1053→1078;全庫無單價49→8(剩Ohla/VERGA/Gusto等別家新品);冰品/披薩箱價正常。備份 products_final_backup_*_COOP66前.json。⚠️66支技術資料(成分/HS)另有Excel/zip待補;報價歷史未逐支追加(批次來源已記郵件來源欄)。
+
+## 更新123（2026-07-10）Ohla越南果乾22支修利潤%18 + 刪2佔位;確立「+18%markup=18%利潤率」慣例
+- 用戶給 Luong Gia(Ohla) 3份價目表PDF(果乾100g×10/巧克力果乾100g×9/無糖200g×3)。發現**22支其實早已建檔**(成本=EXW USD正確、箱入80/50對)、但**利潤%被設22(錯)**;真缺價的只是2支「越南乾果50g/100g」空佔位。
+- ⚠️**確立慣例**:查Mirko appassimento報價『2.20 NET NET EXW +18% markup → 2.68』=2.20÷0.82,證實**TDS/高玉「+X% markup」＝X%利潤率(f15=成本÷(1−X%))**,非成本×1.18。故 Ohla「報價×18%上去」=利潤18%。
+- 22支利潤%22→18(f15=EXW÷0.82:芒果0.73→0.90/木瓜0.56→0.69);刪2佔位。products_final 1078→1076;全庫無單價8→6(剩VERGA/Amazons4u/Prinze/Sun Grains/Gusto/TDS Prosecco)。備份 *_Ohla前.json。
