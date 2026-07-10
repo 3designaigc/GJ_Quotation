@@ -1681,3 +1681,8 @@ t10     = 總成本 × 1.05         底線（+5%）
 - Mas Choices 沙丁魚4款(EAN…521/538/491/460):廠商藉 CIF→FOB 改條件漲價,Tina 指示**利潤 20→19%**+設**MOQ「500箱」**。products_final 已改;報價重算 f15=成本÷0.81(水煮0.61/番茄醬0.60/植物油0.64/辣味0.65)。
 - **報價系統新增 MOQ 欄**:`sync_html_data.py` 業務列尾追加 **r[27]=MOQ**(讀 products_final 的「MOQ」欄);`高玉業務報價系統.html` 產品標籤改讀 r[27] 顯示金色「MOQ xxx」badge,有值才顯示。
 - ⚠️**順帶修既有 bug**:原 MOQ badge 誤讀 **r[18]=郵件來源**→全庫每支產品都把郵件來源當「MOQ」顯示;現改讀真 MOQ 欄,只有實際設 MOQ 的產品(目前僅4款沙丁魚)才顯示。
+
+## 更新118（2026-07-09）SM-260515(26FA0008 Mas鮪魚)電放全套核對+3項更正
+- 收到電放全套 `EX 27238-26_Documents with telex release`（CI/PL/BL/Surrender Notice/COO正本/Health Cert）。回溯兩源頭(客戶PO SM-260515＋高玉26FA0008＋NEXO規格)核對一致:1,367箱(油700+水667)/CNF$32,502.76/淨11,810.88毛15,200.38kg/效期11/2028/收貨人Simple Mart美廉社。
+- **3項系統更正**:①**櫃號 ONEU2413742→ONEU2413782**(BL/CI/HC三處實為782,前為誤讀;文件核對+船班追蹤+NEXO doc全改,封條THBP46190補齊);②**COO 草稿→正本通過**(THTCCCO260099704泰國商會);③**HC 不需要→通過**(AC0504S4026M010漁業署健康證,廠SIAM TIN FOOD TH No.2018)。
+- **BL加註電放**(Original B/L Surrender Notice,3份正本2026-07-09繳回ONE、憑電放放貨)。NEXO doc重生7份、check_nexo_docs全通過。PDF已上雲歸檔資料夾。⚠️踩坑:櫃號2vs8誤讀,再證[[feedback_scan_doc_verify_before_file]]放大細讀重要性。
