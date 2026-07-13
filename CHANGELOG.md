@@ -1715,3 +1715,9 @@ t10     = 總成本 × 1.05         底線（+5%）
 - ⚠️**確立慣例**:查Mirko appassimento報價『2.20 NET NET EXW +18% markup → 2.68』=2.20÷0.82,證實**TDS/高玉「+X% markup」＝X%利潤率(f15=成本÷(1−X%))**,非成本×1.18。故 Ohla「報價×18%上去」=利潤18%。
 - 22支利潤%22→18(f15=EXW÷0.82:芒果0.73→0.90/木瓜0.56→0.69);刪2佔位。products_final 1078→1076;全庫無單價8→6(剩VERGA/Amazons4u/Prinze/Sun Grains/Gusto/TDS Prosecco)。備份 *_Ohla前.json。
 - **收尾**(Tina指示「沒報價的刪掉不用等」):刪10支無報價(成本=0)品:VERGA紅酒/Van Pur啤酒×3/Polska Roza果汁/Amazons4u Açaí/Prinze/Sun Grains/Gusto Sorrento/TDS Prosecco Frizzante。products_final 1076→1066;**報價系統無單價=0**。備份 *_刪無報價前.json。⚠️剩Minimelt冰球×2有價但箱入0(待箱入數)。
+
+## 更新124（2026-07-10）新增星巴克台幣公式桶(SP200019·Bocon冷凍)＋compute加「每板檢驗費」
+- Tina指示開星巴克專屬台幣桶(原Bocon暫借「冷凍烘焙經銷」CH_FROZEN_DIST、CIF估FOB+2%標估、不正確)。
+- **compute_twd 新增 `inspection_per_pallet` 欄**(檢驗費每板X÷箱板÷箱入=每單位;原`inspection`是每單位加平,填每板值會爆)。
+- **新桶 SP200019**(供應商級,比照Feast/Europastry;FOB義大利+海運4000€÷20板×37→關稅20%→VAT清關10%→+冷凍倉儲24萬(比照Europastry)+內陸3萬+檢驗費5000/板;免貼標;不經TDS;利潤20%)。
+- Bocon 9支改`適用通路=星巴克`、清掉借用的冷凍烘焙經銷通路台幣;compute→審核頁→apply_twd寫回預設台幣最低報價。建議價:Gnocchi起司胡椒296.7/鼠尾草306.5/索倫托284.5/原味245.4、迷你披薩433.3、佛卡夏537.1、蘑菇塔216、朝鮮薊203.8、提拉米蘇110.8。核准檔 05_台幣審核/台幣核准_Bocon星巴克_20260710.json。三處同步。
