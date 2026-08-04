@@ -2,6 +2,37 @@
 
 ---
 
+## 2026-08-05（更新 127）— 2027 看展規劃改為 buyer program 導向；新增自動偵測與每週提醒
+
+**Tina 定調：看展「原則上有申請到 buyer program 才去」。** 首選四場：FOODEX 東京（3/9–12）、Cibus 帕爾馬（5/4–6）、THAIFEX 曼谷（5/25–29）、Anuga 科隆（10/9–13）。
+
+**查證結果（四場的 2027 版申請全部尚未開放）：**
+
+| 展 | Buyer Program | 主辦負擔 | 我方義務 |
+|---|---|---|---|
+| THAIFEX | ✅ Hosted Buyer | 機票＋接送＋住宿全包（事後核銷） | **最少 16 場預約會議**＋每場會後線上評分 |
+| Cibus | ✅ Buyers Program（＋ITA） | 住宿、交通、口譯、工廠參訪 | 依主辦媒合行程 |
+| FOODEX | ✅ Official Buyer | 住宿補助、免費入場、VIP lounge | 事前預約商談 |
+| Anuga 科隆 | ❌ **查無**（買主端只賣票） | 無 | — |
+
+**🔴 Anuga 依規則不合格。** 科隆本展不辦 hosted buyer（14.5 萬買主自來）；有 hosted buyer 的是 Anuga 區域展與 THAIFEX。走 Koelnmesse 台灣代表處（Gloria Tu）探詢，2027-04-01 為最後決策點，否則需 Tina 拍板破例。
+
+**⚠️ 訂票邏輯因此反轉：** 以前是「早訂卡位」，現在**等錄取才訂機票** —— THAIFEX 核准後主辦才給補助上限、須在上限內自訂，提前訂會超過上限無法核銷；Cibus 入選則住宿交通由主辦安排。住宿只用「免費取消」訂單對沖。唯一例外：Anuga 科隆房價漲 3–5 倍且展前一年開賣。
+
+**新增：**
+- `data/看展追蹤.json` — 四場的 program 條件、窗口、期限、偵測關鍵字、狀態
+- `03_腳本/check_show_buyer_programs.py` — 抓官網偵測是否開放申請，寫回狀態；人工狀態（已送件/已錄取/未錄取/放棄）不覆蓋
+- launchd `com.goldenjade.showbuyer` — 週三 09:00、週六 07:50（趕在週六提醒 08:00 之前）
+- `gen_saturday_pending.py` 加第 5 段「看展 buyer program（申請上才去）」＋下方「🎪 看展追蹤」現況區；偵測到開放會直接叫去發信，並列出窗口信箱
+
+**⚠️ 偵測踩坑（已修）：** 初版用 `apply now`／`application form` 當 Cibus 的開放訊號 → **誤報**，那兩個字是全站選單項目；正文宣告句是 `application will be opened soon`（不是 `will open soon`，字不同）。改為**以「未開放宣告句消失」為開放訊號**，比抓正向關鍵字可靠。
+
+**規劃書：** `2027看展行程規劃.md`（含四場體檢、THAIFEX 資格逐條自評、申請時程、條件式訂票訂房表）。已排除 Gulfood（只有媒合服務非補助型）與 PLMA（與 THAIFEX 撞期）。
+
+**待辦：2026-09-01 前寄出四封意向信**（Cibus `incoming@fiereparma.it`／THAIFEX `wendy.lim@koelnmesse.com.sg`／Anuga 台灣代表處 `g.tu@koelnmesse-taiwan.com.tw`／FOODEX 官網 Contact）。寄出後到 `data/看展追蹤.json` 填「意向信寄出」日期，否則週六提醒會一直催。
+
+---
+
 ## 2026-08-04（更新 126*）— 26FA0011 ETD/ETA 全庫拉齊；採購單誤印 [ETD][ETA] 佔位符待重出
 
 > \*編號依記憶索引所載最後編號 125（2026-07-13）順推。本檔在 更新 64 之後中斷，65~125 未寫入，實際下一號若不是 126 請逕改。
