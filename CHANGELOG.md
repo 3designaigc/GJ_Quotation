@@ -2107,3 +2107,14 @@ t10     = 總成本 × 1.05         底線（+5%）
 - **上雲**：SM-260435 六頁 PDF 依文件別拆成 5 檔上傳（ShippingAdvice／CI正本／PL正本／BL電放／COO正本）；SM-260444 上傳 `SM-260444_BL電放_WGKELBKI2600344.pdf`（保留原 `BL正本` 檔，兩者為同一 BL 的不同狀態，非重複版本）。**SM-260435 四份 DRAFT（CI/COO/HBL/PL）已自雲端移除**（[[feedback_keep_folders_clean]]）。
 - ⚠️ **檔名與內容不符，勿照檔名歸檔**（[[feedback_scan_doc_verify_before_file]]）：`TELEX HBL - WGE26060169.pdf` 內容其實是 **SM-260444**（B/L WGKELBKI2600344）；`FINAL-ORD0017422 (SM-260435).pdf` 內文 Reference 是 **ORD0017421**（ORD0017422 屬 SM-260444）。
 - 備份：`data/文件核對_backup_20260805_435正本前.json`、`02_訂單資料/orders_backup_20260805_BL日期修正前.json`。
+
+## 更新158（2026-08-05）🚨 NEXO 七份載舊櫃號/舊裝船日 — 重生後才可發 Kelly
+- **Tina 問「這兩單文件齊全了嗎、可以發給 Kelly？」→ 查出不能發。** 供應商文件雖已到齊，但**我方開給 NEXO／NEXO 開給美廉社的七份商業文件仍是 6 月版**，載著已作廢的資料：
+  - **SM-260435**：櫃號 `EGSU2205011`（應為 EITU3296712）、ETD `19-Jul-2026`（應為 01-Aug）、提單註記「正本3份」（已轉電放）、ETA 仍寫「Late Jul ~ Early Aug (EST.)」。
+  - **SM-260444**：提單註記「正本3份」（已轉電放）、ETA `30-Jul-2026`（已不成立）。
+  - 若直接發給 Kelly，NEXO 會照這些數字開給美廉社，報關時櫃號對不上、BL 後 45 天付款起算日也會錯 13 天。
+- **處置**：更新 `data/nexo_docs/SM-260435.json`、`SM-260444.json` → 重跑 `gen_nexo_docs.py` 產出七份 → `check_nexo_docs.py` 兩單皆「✅ 邏輯與計算全部通過」（SM-260435 毛利 US$808.50/14.5%；SM-260444 US$2,127.30/14.3%）→ 重新上雲覆蓋。
+- **ETA 依當日 AIS 重估**：SM-260435 `06-Aug-2026 (EST.；卸貨港高雄 05-Aug 轉基隆)`；SM-260444 `10-Aug-2026 (EST.；主線 WAN HAI 322 07-Aug 抵蛇口後北上)`。
+- **卸貨港欄位處理**：兩單 nexo_docs 的「卸貨港」維持 `PORT KEELUNG`，與 CI/PL/COO 及客戶 PO 一致；BL 上 SM-260435 為高雄（轉基隆，正常）、SM-260444 誤植 TAIPEI（待 Worldgate 改），兩者差異記在 `_說明` 內。
+- **雲端清理**：舊命名 `*_NEXO-SM_*` 三份／單已自雲端移除（產生器現行命名為 `*_NEXO-CUST_*`），本機舊檔移入桌面「進階ERP_刪除桶/NEXO舊命名_20260805」（[[feedback_delete_to_bucket]]）。兩單雲端各 15/16 檔，無重複版本。
+- **結論：兩單目前都還不能發 Kelly** — SM-260435 待 C&F 換發 PL（櫃號 EGSU2205011→EITU3296712）；SM-260444 待 Worldgate 更正 BL 卸貨港 TAIPEI→KEELUNG。NEXO 七份已就緒，缺件補齊即可寄出。
