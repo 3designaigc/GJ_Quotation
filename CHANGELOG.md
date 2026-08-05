@@ -2093,3 +2093,17 @@ t10     = 總成本 × 1.05         底線（+5%）
   **❌唯一不一致：付款條件** —— PI「Prepayment 30% Deposit, **70% Upon BL Draft**」vs 採購單「30% deposit, **70% against B/L**」（憑提單草稿 vs 憑提單，付款時點不同）。
 - **催信改寫**：原七點長信 → 只講付款條件一項，附帶請對方補上 PO 號 26FA0011。
 - 文件核對／訂單 JSON／船班追蹤 三處的冗長清單一併刪除改寫；各品項加 `客戶備註_來源` 欄註明該文字出自表格欄外，非訂單條款，避免日後再被當成客戶要求。
+
+## 更新157（2026-08-05）📄 SM-260435 FINAL 全套 + SM-260444 電放 BL — 核對·上雲
+- **SM-260435（26FA0006，Go Bites 270箱）FINAL 全套到**（CI IN0017190／PL SH0018045／COO 正本 KK/2026/000382／HBL 電放 WGKELBKI2600329／Shipping Advice）。以我方採購單 26FA0006 檢查：270箱（海鹽162+冬蔭108）·@USD17.62·USD 4,757.40·FOB Sepangar·淨648.00/毛972.00kg/24.40CBM — **相符**。
+  - ✅ **on board 已換發為 01-Aug-2026**（草稿誤植 19-JUL 早 13 天，Tina 7/28 指正後已更正；關係客戶 BL 後 45 天付款起算）。
+  - ✅ 已轉**電放**（Telex Release，正本 0 份）；COO 正本 MICCI 2026-08-04 簽發。
+  - ⚠️ **櫃號異動 EGSU2205011 → EITU3296712**（封條 EMCXNN4464 不變），BL/COO 皆用新櫃。
+  - ❌ **唯一不一致：PL SH0018045 仍載舊櫃 EGSU2205011** → 已請 C&F 換發。
+  - 🔍 BL 載 **POD＝KAOHSIUNG／Final Destination＋Place of Delivery＝KEELUNG**，與今日 AIS（UNI PERFECT 8/5 14:00 抵高雄）完全吻合 → 確認為**高雄卸船轉基隆**，更新 153 提出的「CPM 輪港不含基隆」疑問就此解除。
+- **SM-260444（26FA0007）收到電放 BL**（WGKELBKI2600344，正本 0 份，取代原正本 3 份）。746箱／2,685.600KGS／67.4100M3／櫃 WHSU8160110 封 WHAC084536／DANUM 173 V.73160E on board 23-JULY-2026 — 與 CI/PL/COO 一致。
+  - ❌ **卸貨港仍寫 TAIPEI 未更正**（Final Destination／Place of Delivery 及 CI/PL/COO 全為 KEELUNG）。Tina 7/31 已請 Apollo Anna 轉 Worldgate 更正，電放版仍未改 → 續催。
+- **順手修正資料錯誤**：`orders.json` 26FA0007 兩列 BL日期 記 `2026-07-13`，實際 on board 為 **2026-07-23**（BL 正本與電放版一致）→ 已更正（影響 BL 起算之付款與物流看板 ETA）。
+- **上雲**：SM-260435 六頁 PDF 依文件別拆成 5 檔上傳（ShippingAdvice／CI正本／PL正本／BL電放／COO正本）；SM-260444 上傳 `SM-260444_BL電放_WGKELBKI2600344.pdf`（保留原 `BL正本` 檔，兩者為同一 BL 的不同狀態，非重複版本）。**SM-260435 四份 DRAFT（CI/COO/HBL/PL）已自雲端移除**（[[feedback_keep_folders_clean]]）。
+- ⚠️ **檔名與內容不符，勿照檔名歸檔**（[[feedback_scan_doc_verify_before_file]]）：`TELEX HBL - WGE26060169.pdf` 內容其實是 **SM-260444**（B/L WGKELBKI2600344）；`FINAL-ORD0017422 (SM-260435).pdf` 內文 Reference 是 **ORD0017421**（ORD0017422 屬 SM-260444）。
+- 備份：`data/文件核對_backup_20260805_435正本前.json`、`02_訂單資料/orders_backup_20260805_BL日期修正前.json`。
