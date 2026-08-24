@@ -378,11 +378,18 @@ function card(label, val, sub) {
 function renderSup() {
   const today = new Date().toISOString().slice(0,10);
   // 與 TAB 1 同一個母體：排除採購列與未出貨列（無 BL 或 BL 在未來）
-  const rows = ORD.filter(o => (o['record_type']||'銷售')!=='採購'
+  let rows = ORD.filter(o => (o['record_type']||'銷售')!=='採購'
     && String(o['BL日期']||'').length>=7 && String(o['BL日期']).slice(0,10)<=today);
+  // ⚠️ 2026-08-24 Tina 指出表上出現「(未填供應商)」：那是家樂福代收代付貨款——
+  //    代收代付不是向誰進的貨，本來就沒有供應商，混進「各供應商做多少生意」會被誤讀成漏填。
+  //    與產品比對的「非產品列」同一個道理：排除，但在表頭寫明排除了什麼、多少錢。
+  const isNonSup = o => !String(o['供應商']||'').trim();
+  const exc = rows.filter(isNonSup);
+  rows = rows.filter(o => !isNonSup(o));
+
   const g = {};
   rows.forEach(o => {
-    const k = o['供應商'] || '(未填供應商)';
+    const k = o['供應商'];
     const t = g[k] || (g[k] = {po:new Set(), rev:0, prf:0});
     t.po.add(o['高玉PO編號'] || o['客戶PO編號'] || '');   // ⚠️ 一個訂單號碼算一筆
     t.rev += o['台幣小計']||0;
@@ -398,7 +405,9 @@ function renderSup() {
   const nPO = new Set(rows.map(o => o['高玉PO編號']||o['客戶PO編號']||'')).size;
   document.getElementById('supNote').textContent =
     `資料來源：orders.json（${nPO} 張訂單／${rows.length} 個品項列，已排除採購列與未出貨列）`
-    + `｜毛利率% ＝ 該供應商總毛利 ÷ 總營業額（加權），非各筆毛利率的簡單平均`;
+    + `｜毛利率% ＝ 該供應商總毛利 ÷ 總營業額（加權），非各筆毛利率的簡單平均`
+    + (exc.length ? `｜已排除無供應商的代收代付列 ${exc.length} 筆／NT$${Math.round(
+        exc.reduce((s,o)=>s+(o['台幣小計']||0),0)).toLocaleString('zh-TW')}（非採購來的貨，無供應商可歸屬）` : '');
 }
 
 renderProd();
