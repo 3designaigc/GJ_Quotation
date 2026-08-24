@@ -116,6 +116,9 @@ td.lo{color:#b91c1c}
     <select id="oCat" onchange="renderOrd()"><option value="">全部類別</option></select>
     <select id="oSup" onchange="renderOrd()"><option value="">全部供應商</option></select>
     <select id="oCust" onchange="renderOrd()"><option value="">全部客戶</option></select>
+    <label style="font-size:11px;color:#475569;display:flex;align-items:center;gap:4px;white-space:nowrap"
+           title="草稿列＝無數量且台幣小計為 0（東森未定案草稿、代墊費用列）。它們對營業額/毛利貢獻 0，預設隱藏避免誤讀成漏算。">
+      <input type="checkbox" id="oDraft" onchange="renderOrd()"> 顯示草稿/零金額列</label>
     <span class="badge-count" id="oCount">—</span>
   </div>
   <div class="tbl-wrap">
@@ -304,7 +307,15 @@ function renderOrd() {
   const sup = document.getElementById('oSup').value;
   const cu  = document.getElementById('oCust').value;
 
+  // ⚠️ 2026-08-24 Tina：草稿/零金額列（無數量且台幣小計=0）預設隱藏——
+  //    它們在表上一整排「—」，看起來像漏算，其實對任何統計都貢獻 0。
+  //    ⚠️ 不刪資料：其中 3 列是代墊費用，帶發票號與應收（IT260201~03 共 €3,270 待向 TDS 索回）。
+  const showDraft = document.getElementById('oDraft').checked;
+  const isDraft = o => !(o['數量_箱']) && !(o['台幣小計']);
+  const nDraft = ORD.filter(isDraft).length;
+
   let rows = ORD.filter(o =>
+    (showDraft || !isDraft(o)) &&
     (!ym  || o['下訂月份']===ym) &&
     (!cat || o['類別']===cat) &&
     (!sup || o['供應商']===sup) &&
@@ -321,16 +332,20 @@ function renderOrd() {
     });
   }
 
-  document.getElementById('oCount').textContent = rows.length + ' 筆';
+  document.getElementById('oCount').textContent =
+    rows.length + ' 個品項列' + (showDraft || !nDraft ? '' : `（另隱藏 ${nDraft} 筆草稿/零金額列）`);
 
   const totTWD   = rows.reduce((s,o)=>s+o['台幣小計'],0);
   const totProfit= rows.reduce((s,o)=>s+o['毛利_台幣'],0);
-  const avgMg    = rows.length ? rows.reduce((s,o)=>s+(parseFloat(o['毛利率%'])||0),0)/rows.length : 0;
+  // ⚠️ 訂單數＝訂單號碼去重，不是品項列數（Tina 2026-08-23：「一個訂單號碼算一筆」）
+  const nPO = new Set(rows.map(o => o['高玉PO'] || '')).size;
+  // ⚠️ 毛利率用加權（總毛利÷總營業額）；各筆簡單平均會讓 1 箱的單與 1000 箱的單同權重
+  const wMg = totTWD ? totProfit/totTWD*100 : 0;
   document.getElementById('ordCards').innerHTML =
-    card('訂單數', rows.length + ' 筆', '') +
+    card('訂單數', nPO + ' 張', rows.length + ' 個品項列') +
     card('台幣總營業額', 'NT$'+Math.round(totTWD).toLocaleString('zh-TW'), '篩選範圍') +
     card('台幣總毛利',   'NT$'+Math.round(totProfit).toLocaleString('zh-TW'), '') +
-    card('平均毛利率%', avgMg.toFixed(1)+'%', '各筆平均');
+    card('毛利率%', wMg.toFixed(1)+'%', '加權：總毛利÷總營業額');
 
   document.getElementById('ordBody').innerHTML = rows.map(o => {
     const mc = mgCls(o['毛利率%']);
