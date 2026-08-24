@@ -142,41 +142,17 @@ td.lo{color:#b91c1c}
 
 <!-- ══ TAB 2: 供應商彙整 ══ -->
 <div class="section" id="s2">
-  <p style="font-size:11px;color:#94a3b8;margin-bottom:10px">資料來源：orders.json（94 筆訂單）｜ 平均毛利率% 為各筆毛利率%的平均值</p>
+  <p id="supNote" style="font-size:11px;color:#94a3b8;margin-bottom:10px"></p>
   <div class="tbl-wrap">
     <table>
       <thead><tr>
         <th>供應商</th>
-        <th>訂單數</th>
-        <th>總台幣營業額</th>
-        <th>總台幣毛利</th>
-        <th>平均毛利率%</th>
+        <th class="num">訂單數</th>
+        <th class="num">總台幣營業額</th>
+        <th class="num">總台幣毛利</th>
+        <th class="num">毛利率%</th>
       </tr></thead>
-      <tbody><tr><td>Pietro Coricelli</td><td class="num">19</td><td class="num">NT$50,304,308</td><td class="num">NT$5,232,613</td><td class="num ok">10.6%</td></tr>
-<tr><td>Kozakli</td><td class="num">5</td><td class="num">NT$12,665,120</td><td class="num">NT$1,052,534</td><td class="num ok">8.3%</td></tr>
-<tr><td>Agro</td><td class="num">5</td><td class="num">NT$5,913,785</td><td class="num">NT$912,395</td><td class="num hi">15.4%</td></tr>
-<tr><td>Verga</td><td class="num">7</td><td class="num">NT$4,873,086</td><td class="num">NT$337,848</td><td class="num lo">7.6%</td></tr>
-<tr><td>Yonca</td><td class="num">5</td><td class="num">NT$4,435,340</td><td class="num">NT$351,496</td><td class="num ok">8.7%</td></tr>
-<tr><td>Europastry</td><td class="num">37</td><td class="num">NT$3,658,392</td><td class="num">NT$555,756</td><td class="num hi">15.4%</td></tr>
-<tr><td>G7</td><td class="num">1</td><td class="num">NT$2,659,997</td><td class="num">NT$126,667</td><td class="num lo">4.8%</td></tr>
-<tr><td>天津工廠</td><td class="num">2</td><td class="num">NT$2,258,354</td><td class="num">NT$228,042</td><td class="num ok">10.2%</td></tr>
-<tr><td>Menodiciotto</td><td class="num">1</td><td class="num">NT$2,073,160</td><td class="num">NT$98,475</td><td class="num lo">4.8%</td></tr>
-<tr><td>Feast</td><td class="num">17</td><td class="num">NT$1,794,288</td><td class="num">NT$890,306</td><td class="num hi">50.3%</td></tr>
-<tr><td>HariHari</td><td class="num">8</td><td class="num">NT$1,693,171</td><td class="num">NT$252,876</td><td class="num ok">14.5%</td></tr>
-<tr><td>順發</td><td class="num">5</td><td class="num">NT$1,324,908</td><td class="num">NT$322,913</td><td class="num hi">23.2%</td></tr>
-<tr><td>Mas Choices</td><td class="num">2</td><td class="num">NT$1,304,064</td><td class="num">NT$254,291</td><td class="num hi">19.5%</td></tr>
-<tr><td>Volfas Engelman</td><td class="num">1</td><td class="num">NT$1,125,274</td><td class="num">NT$56,264</td><td class="num lo">5.0%</td></tr>
-<tr><td>Chizzpa</td><td class="num">2</td><td class="num">NT$931,188</td><td class="num">NT$65,172</td><td class="num lo">6.9%</td></tr>
-<tr><td>COOP</td><td class="num">2</td><td class="num">NT$884,630</td><td class="num">NT$75,023</td><td class="num ok">8.5%</td></tr>
-<tr><td>Valnerina Tartufi</td><td class="num">1</td><td class="num">NT$777,779</td><td class="num">NT$77,778</td><td class="num ok">10.0%</td></tr>
-<tr><td>GoMuc</td><td class="num">4</td><td class="num">NT$727,791</td><td class="num">NT$179,068</td><td class="num hi">24.6%</td></tr>
-<tr><td>GURIMI/ABC</td><td class="num">2</td><td class="num">NT$722,280</td><td class="num">NT$148,883</td><td class="num hi">17.6%</td></tr>
-<tr><td>Dogadan</td><td class="num">12</td><td class="num">NT$516,923</td><td class="num">NT$248,391</td><td class="num hi">48.1%</td></tr>
-<tr><td>Koriko</td><td class="num">2</td><td class="num">NT$484,116</td><td class="num">NT$79,740</td><td class="num hi">16.5%</td></tr>
-<tr><td>La Mole</td><td class="num">1</td><td class="num">NT$437,891</td><td class="num">NT$43,789</td><td class="num ok">10.0%</td></tr>
-<tr><td>TDS</td><td class="num">5</td><td class="num">NT$325,045</td><td class="num">NT$35,373</td><td class="num ok">10.9%</td></tr>
-<tr><td>MB(義大利餅乾)</td><td class="num">1</td><td class="num">NT$158,231</td><td class="num">NT$11,416</td><td class="num lo">7.2%</td></tr>
-<tr><td>RAW</td><td class="num">1</td><td class="num">—</td><td class="num">—</td><td class="num lo">—</td></tr></tbody>
+      <tbody id="supBody"></tbody>
     </table>
   </div>
 </div>
@@ -380,8 +356,39 @@ function card(label, val, sub) {
   return `<div class="card"><div class="label">${label}</div><div class="val">${val}</div><div class="sub">${sub}</div></div>`;
 }
 
+// ── TAB 2: 供應商彙整（即時由 ORD 計算）─────────────────
+// ⚠️ 2026-08-24 修：原本整張表是**寫死的靜態 HTML**，凍結在「94 筆訂單」，
+//    orders.json 早已 324 列卻永遠不會更新；表頭又漏了 class="num"，
+//    表頭靠左、數字靠右，Tina 反映「容易看錯」。改為即時計算並對齊。
+function renderSup() {
+  const today = new Date().toISOString().slice(0,10);
+  // 與 TAB 1 同一個母體：排除採購列與未出貨列（無 BL 或 BL 在未來）
+  const rows = ORD.filter(o => (o['record_type']||'銷售')!=='採購'
+    && String(o['BL日期']||'').length>=7 && String(o['BL日期']).slice(0,10)<=today);
+  const g = {};
+  rows.forEach(o => {
+    const k = o['供應商'] || '(未填供應商)';
+    const t = g[k] || (g[k] = {po:new Set(), rev:0, prf:0});
+    t.po.add(o['高玉PO編號'] || o['客戶PO編號'] || '');   // ⚠️ 一個訂單號碼算一筆
+    t.rev += o['台幣小計']||0;
+    t.prf += o['毛利_台幣']||0;
+  });
+  const list = Object.entries(g).sort((a,b) => b[1].rev - a[1].rev);
+  document.getElementById('supBody').innerHTML = list.map(([k,t]) => {
+    const mg = t.rev ? t.prf/t.rev*100 : 0;
+    return `<tr><td>${k}</td><td class="num">${t.po.size}</td>`
+         + `<td class="num">${fmtTWD(t.rev)}</td><td class="num">${fmtTWD(t.prf)}</td>`
+         + `<td class="num ${mgCls(mg)}">${fmtPct(mg)}</td></tr>`;
+  }).join('');
+  const nPO = new Set(rows.map(o => o['高玉PO編號']||o['客戶PO編號']||'')).size;
+  document.getElementById('supNote').textContent =
+    `資料來源：orders.json（${nPO} 張訂單／${rows.length} 個品項列，已排除採購列與未出貨列）`
+    + `｜毛利率% ＝ 該供應商總毛利 ÷ 總營業額（加權），非各筆毛利率的簡單平均`;
+}
+
 renderProd();
 renderOrd();
+renderSup();
 </script>
 </body>
 </html>
