@@ -70,11 +70,11 @@ table.pot tr.tot-row td{border:1px solid #99a}
 [contenteditable]:focus{outline:2px solid #4a90d9;background:#FFF9C4}
 .etd-line{margin-top:5px;font-weight:700}
 /* 公司發票章：預設隱藏，確認正式訂單後才顯示 */
-.po-doc{position:relative;padding-bottom:80px}   /* 下方預留放發票章的空間,避免壓到 ETD/ETA */
-.gj-seal{display:none;position:absolute;left:14%;bottom:6px;width:112px;opacity:.92;
+.po-doc{position:relative}
+.gj-seal{display:none;position:absolute;left:32%;bottom:18px;width:130px;opacity:.92;
   transform:rotate(-7deg);pointer-events:none;z-index:5}
 body.confirmed .gj-seal{display:block}
-.gj-seal-date{display:none;position:absolute;left:14%;bottom:2px;width:112px;text-align:center;
+.gj-seal-date{display:none;position:absolute;left:32%;bottom:0;width:130px;text-align:center;
   font-family:'Courier New',monospace;font-size:9.5pt;font-weight:700;color:#000;
   letter-spacing:1px;transform:rotate(-7deg);opacity:.95;pointer-events:none;z-index:5}
 body.confirmed .gj-seal-date{display:block}
@@ -96,7 +96,7 @@ body.confirmed .draft-mark{display:none}
   [contenteditable]{background:transparent!important}
   @page{size:A4 landscape;margin:6mm 8mm}
   /* 一頁化:全面壓縮間距與字級(2026-06-12) */
-  .po-doc{padding:4px 8px 80px;font-size:8pt;max-width:none;margin-bottom:0}
+  .po-doc{padding:4px 8px;font-size:8pt;max-width:none;margin-bottom:0}
   .po-letterhead{padding:0 0 5px;margin-bottom:5px;border-bottom-width:2px}
   .po-logo{width:32px;height:32px}
   .po-co-name{font-size:10pt}
