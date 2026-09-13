@@ -712,7 +712,7 @@ function n2(n){return typeof n==='number'?n.toLocaleString('en',{minimumFraction
 function buildOnePO(order,grp,etd,eta,note,idx,total){
   const sup=SUPS[grp.supCode]||{name:grp.supplier||'[供應商]',attn:'',email:'',a1:'',a2:''};
   // Consignee：買進/自進口時進口人是高玉，與「客戶」不同 → 訂單 JSON 可指定 consignee 覆寫。
-  //            未指定才用 customer。（Tina 2026-08-04：藍莓 26FZ0003 進口人=高玉，不填家樂福）
+  //            未指定才用 customer。（Tina 2026-08-04：藍莓 26FZ0003 進口人=高玉，不填萬家福）
   const cust=CUSTS[order.consignee||order.customer]||{en:order.consignee||order.customer||'',a1:'',a2:'Taiwan'};
 
   // PO number: if single supplier, use gjPO; if multiple, append letter
@@ -915,7 +915,7 @@ function buildOnePO(order,grp,etd,eta,note,idx,total){
 function buildTdsPO(order,grp,etd,eta,note,idx,total,tds){
   const tdsSup=SUPS['SP100052']||{name:'TDS',attn:'Mirko Puri',email:'mirko.puri@tdsinternational.it',a1:'Loc. Monte Cuculo, 113C',a2:'01023 Boisena (VT), Italy'};
   // Consignee：買進/自進口時進口人是高玉，與「客戶」不同 → 訂單 JSON 可指定 consignee 覆寫。
-  //            未指定才用 customer。（Tina 2026-08-04：藍莓 26FZ0003 進口人=高玉，不填家樂福）
+  //            未指定才用 customer。（Tina 2026-08-04：藍莓 26FZ0003 進口人=高玉，不填萬家福）
   const cust=CUSTS[order.consignee||order.customer]||{en:order.consignee||order.customer||'',a1:'',a2:'Taiwan'};
   const gjPO=order.gjPO||order.orderId||'GJ-PO';
   const poNum=total>1?`${gjPO}-${String.fromCharCode(65+idx)}`:gjPO;
