@@ -71,6 +71,10 @@ table.pot tr.tot-row td{border:1px solid #99a}
 .etd-line{margin-top:5px;font-weight:700}
 /* 公司發票章：預設隱藏，確認正式訂單後才顯示 */
 .po-doc{position:relative}
+/* ⚠️2026-09-30：發票章原本靠 .po-doc 的 bottom 定位，訂單最下方一加特別條款(poFooter)
+   就被推到條款上面去（Tina 截圖指出「蓋章位置跑掉了」）。改為包一層 .sig-wrap 當定位基準，
+   章永遠蓋在簽名欄那條線上，後面再接什麼都不會跑。未用 poFooter 的單位置與原本完全相同。 */
+.sig-wrap{position:relative}
 .gj-seal{display:none;position:absolute;left:32%;bottom:18px;width:130px;opacity:.92;
   transform:rotate(-7deg);pointer-events:none;z-index:5}
 body.confirmed .gj-seal{display:block}
@@ -911,6 +915,7 @@ function buildOnePO(order,grp,etd,eta,note,idx,total){
   <p class="etd-line">SHIPMENT &nbsp;&nbsp; ETD <span contenteditable="true">${fmtDate(etd)||'[ETD]'}</span> &nbsp;&nbsp;&nbsp; ETA <span contenteditable="true">${fmtDate(eta)||'[ETA]'}</span></p>
 </div>
 
+<div class="sig-wrap">
 <div class="sig-grid">
   <div class="sig-block">
     <b>BUYER</b>
@@ -929,9 +934,10 @@ function buildOnePO(order,grp,etd,eta,note,idx,total){
     </div>
   </div>
 </div>
+<img class="gj-seal" src="${SEAL}" alt="高玉企業發票章"><div class="gj-seal-date">${today()}</div>
+</div>
 ${poFooter}
 
-<img class="gj-seal" src="${SEAL}" alt="高玉企業發票章"><div class="gj-seal-date">${today()}</div>
 <div class="draft-mark">草稿 DRAFT</div>
 </div>`;
 }
