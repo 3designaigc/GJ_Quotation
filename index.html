@@ -87,6 +87,7 @@ const ACCOUNTS = {
   tina_huang: {
     name: 'Tina Huang', pin: 'tina1688', scope: '管理者',
     systems: [
+      {label: '🚨 異常預警看板', file: '異常預警看板.html'},
       {label: '📊 業務報價系統', file: '高玉業務報價系統.html'},
       {label: '📦 產品技術主檔', file: '產品技術主檔.html'},
       {label: '📋 訂單分析', file: '訂單分析系統.html'},
@@ -165,10 +166,18 @@ function switchSystem(idx) {
 function openApp(accountKey) {
   var account = ACCOUNTS[accountKey];
   if (!account) return;
-  // 機密頁(損益表)僅本機看：在 github.io 公開站自動隱藏該分頁，避免 404
-  var isPublic = /github\.io/i.test(location.hostname);
+  // 機密頁僅本機看：公開站自動隱藏這些分頁，避免 404。
+  // ⚠️ 2026-10-19 修：原本只比對 github.io，但站台實際在 **Netlify**（*.netlify.app），
+  //    所以在 Netlify 上「損益表」分頁一直照顯示、點了就 404（檔案本來就在 publish_all 禁推清單）。
+  //    改為「只有本機(file:// 或 localhost)才算非公開」，並改成清單，新增機密頁只要加這裡。
+  var LOCAL_ONLY = ['損益表.html', '實際成本損益表.html', '損益預估表.html',
+                    '異常預警看板.html', 'TDS待辦追蹤.html', 'daily_import_summary.html'];
+  var isLocal = location.protocol === 'file:' ||
+                /^(localhost|127\.0\.0\.1|\[::1\])$/i.test(location.hostname);
   currentSystems = account.systems.filter(function(s){
-    return !(isPublic && s.file === '損益表.html');
+    if (isLocal) return true;
+    var f = String(s.file).split('?')[0];
+    return LOCAL_ONLY.indexOf(f) === -1;
   });
   document.getElementById('login').style.display = 'none';
   document.getElementById('app').style.display = 'grid';
