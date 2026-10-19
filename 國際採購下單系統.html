@@ -919,7 +919,9 @@ function buildOnePO(order,grp,etd,eta,note,idx,total){
   <p>1. Shipping documents: Commercial Invoice, Packing List, Certificate of Origin, Health Certificate (if not necessary, will be confirmed by mail).</p>
   <p>2. Based on local regulation, for shipments import to Taiwan, all wooden packing materials MUST be fumigated as follow ISPM-No. 15 method and marked with "IPPC" logo clearly on the packing materials surface.</p>
   <p>3. Organic products must have the certificate symbol on the pack or bottle. Supplier MUST provide "ECOCERT CERTIFICATE OF PRODUCTS FROM ORGANIC PRODUCTION" for import Customs clearance. Without ECOCERT CERTIFICATE, please DO NOT ship organic products.</p>
-  <p class="etd-line">SHIPMENT &nbsp;&nbsp; ETD <span contenteditable="true">${fmtDate(etd)||'[ETD]'}</span> &nbsp;&nbsp;&nbsp; ETA <span contenteditable="true">${fmtDate(eta)||'[ETA]'}</span></p>
+  <!-- ⚠️2026-10-19 修：ETD/ETA 空白時原印「[ETD]/[ETA]」，正式用印寄供應商的單上看起來像沒做完；
+       改印貿易慣用的 T.B.A.（草稿狀態欄位仍是可編輯的黃底，該填還是看得出來）。 -->
+  <p class="etd-line">SHIPMENT &nbsp;&nbsp; ETD <span contenteditable="true">${fmtDate(etd)||'T.B.A.'}</span> &nbsp;&nbsp;&nbsp; ETA <span contenteditable="true">${fmtDate(eta)||'T.B.A.'}</span></p>
 </div>
 
 <div class="sig-wrap">
