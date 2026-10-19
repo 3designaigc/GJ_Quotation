@@ -1,0 +1,549 @@
+<!doctype html><html lang="zh-Hant"><meta charset="utf-8">
+<title>訂單預估時程表</title><style>
+*{box-sizing:border-box}body{font-family:"PingFang TC","Microsoft JhengHei",sans-serif;
+margin:0;padding:24px;background:#FAFAF7;color:#222}
+h1{color:#1B5E20;font-size:22px;margin:0 0 4px}
+.sub{color:#666;font-size:12px;margin-bottom:4px}
+.warn{color:#B8860B;font-size:12px;margin-bottom:18px;font-weight:600}
+.cust{background:#fff;border:1px solid #E0E0E0;border-radius:8px;padding:16px 18px;margin-bottom:22px}
+.cust h2{font-size:16px;color:#1B5E20;margin:0 0 2px}
+.cust .meta{font-size:11px;color:#777;margin-bottom:12px}
+.chart{display:flex;align-items:flex-end;gap:3px;height:150px;border-bottom:2px solid #BDBDBD;
+padding-bottom:0;margin-bottom:2px;overflow-x:auto}
+.col{flex:1 0 26px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%}
+.seg{width:100%;min-height:13px;font-size:9px;color:#fff;text-align:center;line-height:13px}
+.seg.pred{background:transparent!important;border:2px dashed;color:#555}
+.seg.booked{opacity:.55;border:1px solid rgba(0,0,0,.35)}
+.future{background:#F5F5F0}
+.lbl{display:flex;gap:3px}
+.lbl div{flex:1 0 26px;font-size:9px;color:#666;text-align:center;
+writing-mode:vertical-rl;height:42px}
+.lbl div.now{color:#C62828;font-weight:700}
+.legend{margin-top:10px;font-size:11px}
+.legend span{display:inline-block;margin:2px 10px 2px 0}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:2px;vertical-align:-1px;margin-right:4px}
+table{border-collapse:collapse;width:100%;margin-top:12px;font-size:11px}
+th{background:#1B5E20;color:#fff;padding:5px 7px;text-align:left;font-weight:600}
+td{border-bottom:1px solid #EEE;padding:5px 7px}
+.st-正常{color:#2E7D32}.st-逾期{color:#EF6C00;font-weight:700}
+.st-靜默{color:#C62828;font-weight:700}.st-單次,.st-同月多張{color:#999}
+.st-已接單{color:#1565C0;font-weight:700}
+.alert{background:#FFF3E0;border-left:4px solid #C62828;padding:12px 16px;border-radius:4px;margin-bottom:22px}
+.alert h2{color:#C62828;font-size:15px;margin:0 0 8px}
+.foot{font-size:11px;color:#888;margin-top:20px;line-height:1.7}
+</style><body>
+<h1>訂單預估時程表</h1>
+<div class="sub">製表 2026-10-19｜小T　單位＝一張高玉PO，依 <b>BL 日期</b>歸月　色塊＝產品線（供應商）　　<b>實心＝已出貨</b>／<b>半透明＝已確認未出貨（依 BL 月排定）</b>／<b>虛線＝依週期推算的預估</b></div>
+<div class="warn">⚠️ 實際資料自 2025-04 起（約 18 個月，非兩年）｜寄倉（萬家福·悠旅生活）無逐張客戶訂單，未納入｜只下過一次的產品線無法推週期，不預估</div>
+<div class="alert"><h2>🔴 該催的單</h2><table><tr><th>客戶</th><th>產品線</th><th>上次下單</th><th>已隔</th><th>正常週期</th><th>狀態</th></tr>
+<tr><td>美廉社</td><td>Abc</td><td>2025-12</td><td>10 個月</td><td>3 個月</td><td class="st-靜默">靜默</td></tr>
+<tr><td>生活良好</td><td>Pietro Coricelli</td><td>2026-04</td><td>6 個月</td><td>2 個月</td><td class="st-靜默">靜默</td></tr>
+<tr><td>美廉社</td><td>Verga</td><td>2026-05</td><td>5 個月</td><td>3 個月</td><td class="st-逾期">逾期</td></tr>
+</table></div>
+<div class="cust"><h2>美廉社</h2><div class="meta">33 張訂單｜12 條產品線</div>
+<div class="chart">
+<div class="col">
+</div>
+<div class="col">
+</div>
+<div class="col">
+</div>
+<div class="col">
+<div class="seg" style="background:#4527A0;height:26px" title="Kozakli 2025-07 1張（已出貨）">1</div>
+<div class="seg" style="background:#33691E;height:26px" title="Yonca 2025-07 1張（已出貨）">1</div>
+</div>
+<div class="col">
+<div class="seg" style="background:#C62828;height:26px" title="順發 2025-08 1張（已出貨）">1</div>
+</div>
+<div class="col">
+<div class="seg" style="background:#5D4037;height:26px" title="Abc 2025-09 1張（已出貨）">1</div>
+<div class="seg" style="background:#AD1457;height:26px" title="NBF 2025-09 1張（已出貨）">1</div>
+<div class="seg" style="background:#00838F;height:26px" title="S. Ruamthai 2025-09 1張（已出貨）">1</div>
+<div class="seg" style="background:#78909C;height:26px" title="Verga 2025-09 1張（已出貨）">1</div>
+</div>
+<div class="col">
+<div class="seg" style="background:#4527A0;height:26px" title="Kozakli 2025-10 1張（已出貨）">1</div>
+</div>
+<div class="col">
+<div class="seg" style="background:#0277BD;height:52px" title="Chizzpa 2025-11 2張（已出貨）">2</div>
+</div>
+<div class="col">
+<div class="seg" style="background:#5D4037;height:26px" title="Abc 2025-12 1張（已出貨）">1</div>
+<div class="seg" style="background:#1565C0;height:52px" title="C&F 2025-12 2張（已出貨）">2</div>
+<div class="seg" style="background:#78909C;height:26px" title="Verga 2025-12 1張（已出貨）">1</div>
+</div>
+<div class="col">
+<div class="seg" style="background:#78909C;height:26px" title="Verga 2026-01 1張（已出貨）">1</div>
+<div class="seg" style="background:#C62828;height:52px" title="順發 2026-01 2張（已出貨）">2</div>
+</div>
+<div class="col">
+</div>
+<div class="col">
+<div class="seg" style="background:#1565C0;height:52px" title="C&F 2026-03 2張（已出貨）">2</div>
+<div class="seg" style="background:#AD1457;height:52px" title="NBF 2026-03 2張（已出貨）">2</div>
+</div>
+<div class="col">
+<div class="seg" style="background:#78909C;height:26px" title="Menodiciotto 2026-04 1張（已出貨）">1</div>
+</div>
+<div class="col">
+<div class="seg" style="background:#1565C0;height:26px" title="C&F 2026-05 1張（已出貨）">1</div>
+<div class="seg" style="background:#4527A0;height:26px" title="Kozakli 2026-05 1張（已出貨）">1</div>
+<div class="seg" style="background:#78909C;height:26px" title="Verga 2026-05 1張（已出貨）">1</div>
+</div>
+<div class="col">
+<div class="seg" style="background:#1565C0;height:26px" title="C&F 2026-06 1張（已出貨）">1</div>
+<div class="seg" style="background:#283593;height:26px" title="Mas Choices 2026-06 1張（已出貨）">1</div>
+</div>
+<div class="col">
+<div class="seg" style="background:#1565C0;height:26px" title="C&F 2026-07 1張（已出貨）">1</div>
+<div class="seg" style="background:#00838F;height:26px" title="S. Ruamthai 2026-07 1張（已出貨）">1</div>
+</div>
+<div class="col">
+<div class="seg" style="background:#1565C0;height:26px" title="C&F 2026-08 1張（已出貨）">1</div>
+<div class="seg" style="background:#B71C1C;height:26px" title="Prisma Foods Egypt 2026-08 1張（已出貨）">1</div>
+</div>
+<div class="col">
+<div class="seg" style="background:#1565C0;height:26px" title="C&F 2026-09 1張（已出貨）">1</div>
+<div class="seg" style="background:#C62828;height:26px" title="順發 2026-09 1張（已出貨）">1</div>
+</div>
+<div class="col">
+</div>
+<div class="col future">
+<div class="seg pred" style="border-color:#1565C0;height:26px" title="C&F 2026-11 預估1張">1</div>
+<div class="seg pred" style="border-color:#78909C;height:26px" title="Verga 2026-11 預估1張">1</div>
+</div>
+<div class="col future">
+<div class="seg pred" style="border-color:#5D4037;height:26px" title="Abc 2026-12 預估1張">1</div>
+<div class="seg pred" style="border-color:#1565C0;height:26px" title="C&F 2026-12 預估1張">1</div>
+</div>
+<div class="col future">
+<div class="seg pred" style="border-color:#1565C0;height:26px" title="C&F 2027-01 預估1張">1</div>
+</div>
+<div class="col future">
+<div class="seg pred" style="border-color:#1565C0;height:26px" title="C&F 2027-02 預估1張">1</div>
+<div class="seg pred" style="border-color:#78909C;height:26px" title="Verga 2027-02 預估1張">1</div>
+</div>
+<div class="col future">
+<div class="seg pred" style="border-color:#5D4037;height:26px" title="Abc 2027-03 預估1張">1</div>
+<div class="seg pred" style="border-color:#1565C0;height:26px" title="C&F 2027-03 預估1張">1</div>
+<div class="seg pred" style="border-color:#4527A0;height:26px" title="Kozakli 2027-03 預估1張">1</div>
+<div class="seg pred" style="border-color:#AD1457;height:26px" title="NBF 2027-03 預估1張">1</div>
+<div class="seg pred" style="border-color:#C62828;height:26px" title="順發 2027-03 預估1張">1</div>
+</div>
+<div class="col future">
+<div class="seg pred" style="border-color:#1565C0;height:26px" title="C&F 2027-04 預估1張">1</div>
+</div>
+</div>
+<div class="lbl">
+<div>25-04</div>
+<div>25-05</div>
+<div>25-06</div>
+<div>25-07</div>
+<div>25-08</div>
+<div>25-09</div>
+<div>25-10</div>
+<div>25-11</div>
+<div>25-12</div>
+<div>26-01</div>
+<div>26-02</div>
+<div>26-03</div>
+<div>26-04</div>
+<div>26-05</div>
+<div>26-06</div>
+<div>26-07</div>
+<div>26-08</div>
+<div>26-09</div>
+<div class="now">26-10</div>
+<div>26-11</div>
+<div>26-12</div>
+<div>27-01</div>
+<div>27-02</div>
+<div>27-03</div>
+<div>27-04</div>
+</div>
+<div class="legend">
+<span><i style="background:#5D4037"></i>Abc</span>
+<span><i style="background:#1565C0"></i>C&F</span>
+<span><i style="background:#0277BD"></i>Chizzpa</span>
+<span><i style="background:#4527A0"></i>Kozakli</span>
+<span><i style="background:#283593"></i>Mas Choices</span>
+<span><i style="background:#78909C"></i>Menodiciotto</span>
+<span><i style="background:#AD1457"></i>NBF</span>
+<span><i style="background:#B71C1C"></i>Prisma Foods Egypt</span>
+<span><i style="background:#00838F"></i>S. Ruamthai</span>
+<span><i style="background:#78909C"></i>Verga</span>
+<span><i style="background:#33691E"></i>Yonca</span>
+<span><i style="background:#C62828"></i>順發</span>
+</div>
+<table><tr><th>產品線</th><th>單數</th><th>下單週期</th><th>上次下單</th><th>距今</th><th>狀態</th><th>未來6個月預估</th></tr>
+<tr><td>C&F</td><td>9</td><td>1 個月一次</td><td>2026-09</td><td>1 個月</td><td class="st-正常">正常</td><td>2026-11、2026-12、2027-01、2027-02、2027-03、2027-04</td></tr>
+<tr><td>Verga</td><td>4</td><td>3 個月一次</td><td>2026-05</td><td>5 個月</td><td class="st-逾期">逾期</td><td>2026-11、2027-02</td></tr>
+<tr><td>順發</td><td>4</td><td>6 個月一次</td><td>2026-09</td><td>1 個月</td><td class="st-正常">正常</td><td>2027-03</td></tr>
+<tr><td>Kozakli</td><td>3</td><td>5 個月一次</td><td>2026-05</td><td>5 個月</td><td class="st-正常">正常</td><td>2027-03</td></tr>
+<tr><td>NBF</td><td>3</td><td>6 個月一次</td><td>2026-03</td><td>7 個月</td><td class="st-正常">正常</td><td>2027-03</td></tr>
+<tr><td>S. Ruamthai</td><td>2</td><td>10 個月一次</td><td>2026-07</td><td>3 個月</td><td class="st-正常">正常</td><td>—</td></tr>
+<tr><td>Abc</td><td>2</td><td>3 個月一次</td><td>2025-12</td><td>10 個月</td><td class="st-靜默">靜默</td><td>2026-12、2027-03</td></tr>
+<tr><td>Chizzpa</td><td>2</td><td>—</td><td>2025-11</td><td>11 個月</td><td class="st-同月多張">同月多張</td><td>—</td></tr>
+<tr><td>Yonca</td><td>1</td><td>—</td><td>2025-07</td><td>15 個月</td><td class="st-單次">單次</td><td>—</td></tr>
+<tr><td>Menodiciotto</td><td>1</td><td>—</td><td>2026-04</td><td>6 個月</td><td class="st-單次">單次</td><td>—</td></tr>
+<tr><td>Mas Choices</td><td>1</td><td>—</td><td>2026-06</td><td>4 個月</td><td class="st-單次">單次</td><td>—</td></tr>
+<tr><td>Prisma Foods Egypt</td><td>1</td><td>—</td><td>2026-08</td><td>2 個月</td><td class="st-單次">單次</td><td>—</td></tr>
+</table></div>
+<div class="cust"><h2>美廉自有品牌</h2><div class="meta">6 張訂單｜3 條產品線</div>
+<div class="chart">
+<div class="col">
+</div>
+<div class="col">
+</div>
+<div class="col">
+</div>
+<div class="col">
+</div>
+<div class="col">
+</div>
+<div class="col">
+</div>
+<div class="col">
+</div>
+<div class="col">
+<div class="seg" style="background:#4527A0;height:130px" title="Kozakli 2025-11 1張（已出貨）">1</div>
+</div>
+<div class="col">
+</div>
+<div class="col">
+<div class="seg" style="background:#33691E;height:130px" title="Yonca 2026-01 1張（已出貨）">1</div>
+</div>
+<div class="col">
+</div>
+<div class="col">
+</div>
+<div class="col">
+</div>
+<div class="col">
+</div>
+<div class="col">
+<div class="seg" style="background:#4527A0;height:130px" title="Kozakli 2026-06 1張（已出貨）">1</div>
+</div>
+<div class="col">
+</div>
+<div class="col">
+</div>
+<div class="col">
+<div class="seg" style="background:#33691E;height:130px" title="Yonca 2026-09 1張（已出貨）">1</div>
+</div>
+<div class="col">
+<div class="seg" style="background:#283593;height:130px" title="Mas Choices 2026-10 1張（已出貨）">1</div>
+</div>
+<div class="col future">
+<div class="seg booked" style="background:#4527A0;height:130px" title="Kozakli 2026-11 1張（已確認未出貨）">1</div>
+</div>
+<div class="col future">
+</div>
+<div class="col future">
+</div>
+<div class="col future">
+</div>
+<div class="col future">
+</div>
+<div class="col future">
+</div>
+</div>
+<div class="lbl">
+<div>25-04</div>
+<div>25-05</div>
+<div>25-06</div>
+<div>25-07</div>
+<div>25-08</div>
+<div>25-09</div>
+<div>25-10</div>
+<div>25-11</div>
+<div>25-12</div>
+<div>26-01</div>
+<div>26-02</div>
+<div>26-03</div>
+<div>26-04</div>
+<div>26-05</div>
+<div>26-06</div>
+<div>26-07</div>
+<div>26-08</div>
+<div>26-09</div>
+<div class="now">26-10</div>
+<div>26-11</div>
+<div>26-12</div>
+<div>27-01</div>
+<div>27-02</div>
+<div>27-03</div>
+<div>27-04</div>
+</div>
+<div class="legend">
+<span><i style="background:#4527A0"></i>Kozakli</span>
+<span><i style="background:#283593"></i>Mas Choices</span>
+<span><i style="background:#33691E"></i>Yonca</span>
+</div>
+<table><tr><th>產品線</th><th>單數</th><th>下單週期</th><th>上次下單</th><th>距今</th><th>狀態</th><th>未來6個月預估</th></tr>
+<tr><td>Kozakli</td><td>3</td><td>6 個月一次</td><td>2026-06</td><td>4 個月</td><td class="st-已接單">已接單</td><td>—</td></tr>
+<tr><td>Yonca</td><td>2</td><td>8 個月一次</td><td>2026-09</td><td>1 個月</td><td class="st-正常">正常</td><td>—</td></tr>
+<tr><td>Mas Choices</td><td>1</td><td>—</td><td>2026-10</td><td>0 個月</td><td class="st-單次">單次</td><td>—</td></tr>
+</table></div>
+<div class="cust"><h2>東森</h2><div class="meta">25 張訂單｜5 條產品線</div>
+<div class="chart">
+<div class="col">
+<div class="seg" style="background:#2E7D32;height:32px" title="Pietro Coricelli 2025-04 1張（已出貨）">1</div>
+</div>
+<div class="col">
+</div>
+<div class="col">
+</div>
+<div class="col">
+<div class="seg" style="background:#EF6C00;height:32px" title="Agro 2025-07 1張（已出貨）">1</div>
+<div class="seg" style="background:#2E7D32;height:32px" title="Pietro Coricelli 2025-07 1張（已出貨）">1</div>
+</div>
+<div class="col">
+<div class="seg" style="background:#EF6C00;height:32px" title="Agro 2025-08 1張（已出貨）">1</div>
+<div class="seg" style="background:#2E7D32;height:65px" title="Pietro Coricelli 2025-08 2張（已出貨）">2</div>
+<div class="seg" style="background:#6A1B9A;height:32px" title="上海根因 2025-08 1張（已出貨）">1</div>
+</div>
+<div class="col">
+<div class="seg" style="background:#6A1B9A;height:32px" title="上海根因 2025-09 1張（已出貨）">1</div>
+</div>
+<div class="col">
+<div class="seg" style="background:#2E7D32;height:130px" title="Pietro Coricelli 2025-10 4張（已出貨）">4</div>
+</div>
+<div class="col">
+<div class="seg" style="background:#2E7D32;height:32px" title="Pietro Coricelli 2025-11 1張（已出貨）">1</div>
+</div>
+<div class="col">
+<div class="seg" style="background:#EF6C00;height:32px" title="Agro 2025-12 1張（已出貨）">1</div>
+<div class="seg" style="background:#2E7D32;height:32px" title="Pietro Coricelli 2025-12 1張（已出貨）">1</div>
+</div>
+<div class="col">
+<div class="seg" style="background:#2E7D32;height:98px" title="Pietro Coricelli 2026-01 3張（已出貨）">3</div>
+</div>
+<div class="col">
+</div>
+<div class="col">
+</div>
+<div class="col">
+</div>
+<div class="col">
+</div>
+<div class="col">
+</div>
+<div class="col">
+</div>
+<div class="col">
+</div>
+<div class="col">
+<div class="seg" style="background:#2E7D32;height:32px" title="Pietro Coricelli 2026-09 1張（已出貨）">1</div>
+</div>
+<div class="col">
+<div class="seg" style="background:#EF6C00;height:32px" title="Agro 2026-10 1張（已出貨）">1</div>
+<div class="seg" style="background:#2E7D32;height:32px" title="Pietro Coricelli 2026-10 1張（已出貨）">1</div>
+<div class="seg" style="background:#6A1B9A;height:32px" title="上海根因 2026-10 1張（已出貨）">1</div>
+</div>
+<div class="col future">
+<div class="seg booked" style="background:#EF6C00;height:32px" title="Agro 2026-11 1張（已確認未出貨）">1</div>
+<div class="seg pred" style="border-color:#2E7D32;height:32px" title="Pietro Coricelli 2026-11 預估1張">1</div>
+<div class="seg booked" style="background:#00838F;height:32px" title="S. Ruamthai 2026-11 1張（已確認未出貨）">1</div>
+</div>
+<div class="col future">
+<div class="seg pred" style="border-color:#2E7D32;height:32px" title="Pietro Coricelli 2026-12 預估1張">1</div>
+<div class="seg booked" style="background:#00695C;height:32px" title="VIRU S.A. 2026-12 1張（已確認未出貨）">1</div>
+</div>
+<div class="col future">
+<div class="seg pred" style="border-color:#EF6C00;height:32px" title="Agro 2027-01 預估1張">1</div>
+<div class="seg pred" style="border-color:#2E7D32;height:32px" title="Pietro Coricelli 2027-01 預估1張">1</div>
+</div>
+<div class="col future">
+<div class="seg pred" style="border-color:#2E7D32;height:32px" title="Pietro Coricelli 2027-02 預估1張">1</div>
+</div>
+<div class="col future">
+<div class="seg pred" style="border-color:#EF6C00;height:32px" title="Agro 2027-03 預估1張">1</div>
+<div class="seg pred" style="border-color:#2E7D32;height:32px" title="Pietro Coricelli 2027-03 預估1張">1</div>
+</div>
+<div class="col future">
+<div class="seg pred" style="border-color:#2E7D32;height:32px" title="Pietro Coricelli 2027-04 預估1張">1</div>
+</div>
+</div>
+<div class="lbl">
+<div>25-04</div>
+<div>25-05</div>
+<div>25-06</div>
+<div>25-07</div>
+<div>25-08</div>
+<div>25-09</div>
+<div>25-10</div>
+<div>25-11</div>
+<div>25-12</div>
+<div>26-01</div>
+<div>26-02</div>
+<div>26-03</div>
+<div>26-04</div>
+<div>26-05</div>
+<div>26-06</div>
+<div>26-07</div>
+<div>26-08</div>
+<div>26-09</div>
+<div class="now">26-10</div>
+<div>26-11</div>
+<div>26-12</div>
+<div>27-01</div>
+<div>27-02</div>
+<div>27-03</div>
+<div>27-04</div>
+</div>
+<div class="legend">
+<span><i style="background:#EF6C00"></i>Agro</span>
+<span><i style="background:#2E7D32"></i>Pietro Coricelli</span>
+<span><i style="background:#00838F"></i>S. Ruamthai</span>
+<span><i style="background:#00695C"></i>VIRU S.A.</span>
+<span><i style="background:#6A1B9A"></i>上海根因</span>
+</div>
+<table><tr><th>產品線</th><th>單數</th><th>下單週期</th><th>上次下單</th><th>距今</th><th>狀態</th><th>未來6個月預估</th></tr>
+<tr><td>Pietro Coricelli</td><td>15</td><td>1 個月一次</td><td>2026-10</td><td>0 個月</td><td class="st-正常">正常</td><td>2026-11、2026-12、2027-01、2027-02、2027-03、2027-04</td></tr>
+<tr><td>Agro</td><td>5</td><td>2 個月一次</td><td>2026-10</td><td>0 個月</td><td class="st-已接單">已接單</td><td>2027-01、2027-03</td></tr>
+<tr><td>上海根因</td><td>3</td><td>7 個月一次</td><td>2026-10</td><td>0 個月</td><td class="st-正常">正常</td><td>—</td></tr>
+<tr><td>VIRU S.A.</td><td>1</td><td>—</td><td>2026-12</td><td>0 個月</td><td class="st-已接單">已接單</td><td>—</td></tr>
+<tr><td>S. Ruamthai</td><td>1</td><td>—</td><td>2026-11</td><td>0 個月</td><td class="st-已接單">已接單</td><td>—</td></tr>
+</table></div>
+<div class="cust"><h2>生活良好</h2><div class="meta">22 張訂單｜14 條產品線</div>
+<div class="chart">
+<div class="col">
+</div>
+<div class="col">
+</div>
+<div class="col">
+</div>
+<div class="col">
+</div>
+<div class="col">
+<div class="seg" style="background:#C62828;height:32px" title="順發 2025-08 1張（已出貨）">1</div>
+</div>
+<div class="col">
+</div>
+<div class="col">
+<div class="seg" style="background:#78909C;height:32px" title="COOP 2025-10 1張（已出貨）">1</div>
+<div class="seg" style="background:#78909C;height:32px" title="Verga 2025-10 1張（已出貨）">1</div>
+</div>
+<div class="col">
+</div>
+<div class="col">
+<div class="seg" style="background:#78909C;height:32px" title="MB(義大利餅乾) 2025-12 1張（已出貨）">1</div>
+<div class="seg" style="background:#2E7D32;height:32px" title="Pietro Coricelli 2025-12 1張（已出貨）">1</div>
+<div class="seg" style="background:#33691E;height:32px" title="Yonca 2025-12 1張（已出貨）">1</div>
+</div>
+<div class="col">
+<div class="seg" style="background:#4E342E;height:32px" title="TDS 2026-01 1張（已出貨）">1</div>
+</div>
+<div class="col">
+<div class="seg" style="background:#C62828;height:32px" title="順發 2026-02 1張（已出貨）">1</div>
+</div>
+<div class="col">
+<div class="seg" style="background:#2E7D32;height:32px" title="Pietro Coricelli 2026-03 1張（已出貨）">1</div>
+<div class="seg" style="background:#78909C;height:32px" title="Volfas Engelman 2026-03 1張（已出貨）">1</div>
+</div>
+<div class="col">
+<div class="seg" style="background:#2E7D32;height:32px" title="Pietro Coricelli 2026-04 1張（已出貨）">1</div>
+</div>
+<div class="col">
+<div class="seg" style="background:#78909C;height:32px" title="La Mole 2026-05 1張（已出貨）">1</div>
+<div class="seg" style="background:#78909C;height:32px" title="Valnerina Tartufi 2026-05 1張（已出貨）">1</div>
+</div>
+<div class="col">
+</div>
+<div class="col">
+<div class="seg" style="background:#D84315;height:65px" title="Dogadan 2026-07 2張（已出貨）">2</div>
+<div class="seg" style="background:#4E342E;height:32px" title="TDS 2026-07 1張（已出貨）">1</div>
+<div class="seg" style="background:#33691E;height:32px" title="Yonca 2026-07 1張（已出貨）">1</div>
+</div>
+<div class="col">
+</div>
+<div class="col">
+<div class="seg" style="background:#4E342E;height:32px" title="TDS 2026-09 1張（已出貨）">1</div>
+<div class="seg" style="background:#880E4F;height:32px" title="VERGA 2026-09 1張（已出貨）">1</div>
+<div class="seg" style="background:#C62828;height:32px" title="順發 2026-09 1張（已出貨）">1</div>
+</div>
+<div class="col">
+<div class="seg" style="background:#4527A0;height:32px" title="Kozakli 2026-10 1張（已出貨）">1</div>
+<div class="seg" style="background:#78909C;height:32px" title="Olidi 2026-10 1張（已出貨）">1</div>
+</div>
+<div class="col future">
+</div>
+<div class="col future">
+<div class="seg pred" style="border-color:#2E7D32;height:32px" title="Pietro Coricelli 2026-12 預估1張">1</div>
+</div>
+<div class="col future">
+<div class="seg pred" style="border-color:#4E342E;height:32px" title="TDS 2027-01 預估1張">1</div>
+</div>
+<div class="col future">
+<div class="seg pred" style="border-color:#2E7D32;height:32px" title="Pietro Coricelli 2027-02 預估1張">1</div>
+<div class="seg pred" style="border-color:#33691E;height:32px" title="Yonca 2027-02 預估1張">1</div>
+</div>
+<div class="col future">
+<div class="seg pred" style="border-color:#C62828;height:32px" title="順發 2027-03 預估1張">1</div>
+</div>
+<div class="col future">
+<div class="seg pred" style="border-color:#2E7D32;height:32px" title="Pietro Coricelli 2027-04 預估1張">1</div>
+</div>
+</div>
+<div class="lbl">
+<div>25-04</div>
+<div>25-05</div>
+<div>25-06</div>
+<div>25-07</div>
+<div>25-08</div>
+<div>25-09</div>
+<div>25-10</div>
+<div>25-11</div>
+<div>25-12</div>
+<div>26-01</div>
+<div>26-02</div>
+<div>26-03</div>
+<div>26-04</div>
+<div>26-05</div>
+<div>26-06</div>
+<div>26-07</div>
+<div>26-08</div>
+<div>26-09</div>
+<div class="now">26-10</div>
+<div>26-11</div>
+<div>26-12</div>
+<div>27-01</div>
+<div>27-02</div>
+<div>27-03</div>
+<div>27-04</div>
+</div>
+<div class="legend">
+<span><i style="background:#78909C"></i>COOP</span>
+<span><i style="background:#D84315"></i>Dogadan</span>
+<span><i style="background:#4527A0"></i>Kozakli</span>
+<span><i style="background:#78909C"></i>La Mole</span>
+<span><i style="background:#78909C"></i>MB(義大利餅乾)</span>
+<span><i style="background:#78909C"></i>Olidi</span>
+<span><i style="background:#2E7D32"></i>Pietro Coricelli</span>
+<span><i style="background:#4E342E"></i>TDS</span>
+<span><i style="background:#880E4F"></i>VERGA</span>
+<span><i style="background:#78909C"></i>Valnerina Tartufi</span>
+<span><i style="background:#78909C"></i>Verga</span>
+<span><i style="background:#78909C"></i>Volfas Engelman</span>
+<span><i style="background:#33691E"></i>Yonca</span>
+<span><i style="background:#C62828"></i>順發</span>
+</div>
+<table><tr><th>產品線</th><th>單數</th><th>下單週期</th><th>上次下單</th><th>距今</th><th>狀態</th><th>未來6個月預估</th></tr>
+<tr><td>順發</td><td>3</td><td>6 個月一次</td><td>2026-09</td><td>1 個月</td><td class="st-正常">正常</td><td>2027-03</td></tr>
+<tr><td>Pietro Coricelli</td><td>3</td><td>2 個月一次</td><td>2026-04</td><td>6 個月</td><td class="st-靜默">靜默</td><td>2026-12、2027-02、2027-04</td></tr>
+<tr><td>TDS</td><td>3</td><td>4 個月一次</td><td>2026-09</td><td>1 個月</td><td class="st-正常">正常</td><td>2027-01</td></tr>
+<tr><td>Yonca</td><td>2</td><td>7 個月一次</td><td>2026-07</td><td>3 個月</td><td class="st-正常">正常</td><td>2027-02</td></tr>
+<tr><td>Dogadan</td><td>2</td><td>—</td><td>2026-07</td><td>3 個月</td><td class="st-同月多張">同月多張</td><td>—</td></tr>
+<tr><td>Verga</td><td>1</td><td>—</td><td>2025-10</td><td>12 個月</td><td class="st-單次">單次</td><td>—</td></tr>
+<tr><td>COOP</td><td>1</td><td>—</td><td>2025-10</td><td>12 個月</td><td class="st-單次">單次</td><td>—</td></tr>
+<tr><td>MB(義大利餅乾)</td><td>1</td><td>—</td><td>2025-12</td><td>10 個月</td><td class="st-單次">單次</td><td>—</td></tr>
+<tr><td>Volfas Engelman</td><td>1</td><td>—</td><td>2026-03</td><td>7 個月</td><td class="st-單次">單次</td><td>—</td></tr>
+<tr><td>La Mole</td><td>1</td><td>—</td><td>2026-05</td><td>5 個月</td><td class="st-單次">單次</td><td>—</td></tr>
+<tr><td>Valnerina Tartufi</td><td>1</td><td>—</td><td>2026-05</td><td>5 個月</td><td class="st-單次">單次</td><td>—</td></tr>
+<tr><td>Kozakli</td><td>1</td><td>—</td><td>2026-10</td><td>0 個月</td><td class="st-單次">單次</td><td>—</td></tr>
+<tr><td>VERGA</td><td>1</td><td>—</td><td>2026-09</td><td>1 個月</td><td class="st-單次">單次</td><td>—</td></tr>
+<tr><td>Olidi</td><td>1</td><td>—</td><td>2026-10</td><td>0 個月</td><td class="st-單次">單次</td><td>—</td></tr>
+</table></div>
+<div class="foot">共 86 張 PO 納入分析。週期取歷次下單月距的<b>中位數</b>；逾期＝距今 ≥ 週期×1.5，靜默＝≥ 週期×3.0。<br>虛線塊為推算值，僅供提醒業務去追單，不代表客戶已有需求。</div>
+</body></html>
