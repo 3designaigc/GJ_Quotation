@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>高玉企業 — 系統入口</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#F4F6FA;color:#1a1a2e;height:100vh;overflow:hidden}
+.login{min-height:100vh;display:grid;place-items:center;padding:24px;background:linear-gradient(135deg,#013121,#2A5240)}
+.panel{width:min(420px,100%);background:#fff;border-radius:8px;padding:26px 28px;box-shadow:0 18px 50px rgba(0,0,0,.28)}
+.brand{display:flex;align-items:center;gap:14px;margin-bottom:22px}
+.mark{width:54px;height:54px;border-radius:8px;background:#013121;color:#C9A84C;display:grid;place-items:center;font-weight:800;font-size:22px}
+h1{font-size:22px;color:#013121;line-height:1.2}
+.sub{font-size:12px;color:#666;margin-top:4px}
+label{display:block;font-size:12px;font-weight:700;color:#013121;margin:14px 0 5px}
+select,input{width:100%;height:42px;border:1.5px solid #cbd5e1;border-radius:6px;padding:0 11px;font-size:15px;background:#fff}
+input:focus,select:focus{outline:2px solid rgba(1,49,33,.2);border-color:#013121}
+.btn{width:100%;height:44px;margin-top:18px;border:0;border-radius:6px;background:#013121;color:#fff;font-size:15px;font-weight:800;cursor:pointer}
+.btn:hover{background:#2A5240}
+.err{display:none;margin-top:12px;padding:9px 11px;border-radius:6px;background:#FFF1F1;color:#B42318;font-size:12px}
+.hint{margin-top:14px;font-size:11px;color:#777;line-height:1.7}
+.ver{margin-top:18px;font-size:10px;color:#bbb;text-align:center}
+/* App shell */
+.app{display:none;height:100vh;grid-template-rows:auto auto 1fr}
+.top{display:flex;align-items:center;gap:10px;padding:0 16px;background:#013121;color:#fff;height:50px}
+.top strong{font-size:14px;font-weight:800;white-space:nowrap}
+.role{font-size:11px;color:rgba(255,255,255,.7);white-space:nowrap}
+/* 分頁列：獨立一條、統一膠囊、不換行、自動排整齊 */
+.tabbar{display:flex;flex-wrap:wrap;gap:7px;padding:9px 16px;background:#0B3A28;
+  border-top:1px solid rgba(201,168,76,.25);box-shadow:inset 0 -1px 0 rgba(0,0,0,.15)}
+.sys-tab{display:inline-flex;align-items:center;gap:5px;padding:7px 15px;border-radius:999px;
+  border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.04);color:#fff;
+  font-size:12.5px;font-weight:600;line-height:1.15;white-space:nowrap;cursor:pointer;
+  font-family:inherit;transition:background .15s,border-color .15s,color .15s}
+.sys-tab:hover{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.5)}
+.sys-tab.active{background:#C9A84C;border-color:#C9A84C;color:#013121;font-weight:700}
+.tab-wrap{position:relative;display:inline-block}
+.badge{position:absolute;top:-6px;right:-6px;background:#E53E3E;color:#fff;
+  font-size:10px;font-weight:800;min-width:16px;height:16px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;padding:0 4px;
+  line-height:1;pointer-events:none;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.spacer{flex:1}
+.logout{border:1px solid rgba(255,255,255,.35);background:transparent;color:#fff;border-radius:5px;padding:5px 10px;font-size:12px;cursor:pointer;font-family:inherit}
+iframe{width:100%;height:100%;border:0;background:#fff}
+</style>
+</head>
+<body>
+
+<main class="login" id="login">
+  <section class="panel">
+    <div class="brand">
+      <div class="mark">GJ</div>
+      <div>
+        <h1>高玉企業</h1>
+        <div class="sub">系統入口</div>
+      </div>
+    </div>
+    <label for="account">使用者</label>
+    <select id="account">
+      <option value="tina_huang">Tina Huang</option>
+      <option value="tina_kao">Tina Kao</option>
+      <option value="noah_tseng">Noah Tseng</option>
+    </select>
+    <label for="pin">PIN</label>
+    <input id="pin" type="password" inputmode="text" autocomplete="current-password" placeholder="輸入 PIN">
+    <button class="btn" id="loginBtn" onclick="login()">登入</button>
+    <div class="err" id="err">使用者或 PIN 不正確。</div>
+    <div class="ver">版本日期 2026-06-02</div>
+  </section>
+</main>
+
+<section class="app" id="app">
+  <div class="top">
+    <strong>Golden Jade Terre 高玉企業</strong>
+    <span class="role" id="roleText"></span>
+    <div class="spacer"></div>
+    <button class="logout" onclick="logout()">登出</button>
+  </div>
+  <div class="tabbar" id="sysTabs"></div>
+  <iframe id="systemFrame" title="高玉系統"></iframe>
+</section>
+
+<script>
+const ACCOUNTS = {
+  tina_huang: {
+    name: 'Tina Huang', salt: 'fe2f669a38805c7d44fab9b028475478', iter: 600000, hash: 'df2825c2c5e988cc0dc02d803d8ee8d482bc5f24d5e5fb87e13d14a6a33f238b', scope: '管理者',
+    systems: [
+      {label: '🚨 異常預警看板', file: '異常預警看板.html'},
+      {label: '📊 業務報價系統', file: '高玉業務報價系統.html'},
+      {label: '📦 產品技術主檔', file: '產品技術主檔.html'},
+      {label: '📋 訂單分析', file: '訂單分析系統.html'},
+      {label: '💰 成本利潤報表', file: '產品成本利潤報表.html'},
+      {label: '📊 財務損益表', file: '損益表.html'},
+      {label: '💵 現金流預估', file: '現金流預估表.html'},
+      {label: '🚢 物流貨況追蹤', file: '物流貨況追蹤.html'},
+      {label: '📑 訂單文件核對', file: '訂單文件核對系統.html'},
+      {label: '🔬 廠商品管文件', file: '品管文件資料庫.html'},
+      {label: '📋 TDS待辦追蹤', file: 'TDS待辦追蹤.html'},
+      {label: '📥 訂單審核', file: 'order_review.html'},
+      {label: '🌐 國際採購下單', file: '國際採購下單系統.html'},
+      {label: '🧮 台幣價審核', file: '台幣價審核.html'},
+      {label: '📐 台幣公式設定', file: '台幣公式設定檢視.html'}
+    ]
+  },
+  tina_kao: {
+    name: 'Tina Kao', salt: '927656c45430c404f2a0e9173913107a', iter: 600000, hash: '0a0297d3e5189302969368da2b36283c03c5cb5276d598cb4c7582340cf68a91', scope: '業務主管',
+    systems: [
+      {label: '📊 業務報價系統', file: '高玉業務報價系統.html?role=tina'},
+      {label: '📦 產品技術主檔', file: '產品技術主檔.html?role=tina'},
+      {label: '📋 訂單分析', file: '訂單分析系統.html'},
+      {label: '🚢 物流貨況追蹤', file: '物流貨況追蹤.html'},
+      {label: '📑 訂單文件核對', file: '訂單文件核對系統.html'},
+      {label: '🔬 廠商品管文件', file: '品管文件資料庫.html'}
+    ]
+  },
+  noah_tseng: {
+    name: 'Noah Tseng', salt: '644a34a96db25bc1ade1ee67e4838656', iter: 600000, hash: '2da56616faa7a71f443ec8096e9ff32fd1041ec8268bdd5d9df1a467189f9788', scope: '業務',
+    systems: [
+      {label: '📊 業務報價系統', file: '高玉業務報價系統.html?role=noah'},
+      {label: '📦 產品技術主檔', file: '產品技術主檔.html?role=noah'},
+      {label: '📋 訂單分析', file: '訂單分析系統.html'},
+      {label: '🚢 物流貨況追蹤', file: '物流貨況追蹤.html'},
+      {label: '🔬 廠商品管文件', file: '品管文件資料庫.html'}
+    ]
+  }
+};
+
+let currentSystems = [];
+let pendingCount = 0;
+let pollTimer = null;
+
+function renderTabs(systems, activeIdx) {
+  document.getElementById('sysTabs').innerHTML = systems.map(function(s, i) {
+    var isReview = s.file === 'order_review.html';
+    var badge = (isReview && pendingCount > 0)
+      ? '<span class="badge">' + pendingCount + '</span>' : '';
+    return '<div class="tab-wrap"><button class="sys-tab' + (i === activeIdx ? ' active' : '') +
+           '" onclick="switchSystem(' + i + ')">' + s.label + '</button>' + badge + '</div>';
+  }).join('');
+}
+
+function checkPending() {
+  // badge = 待審核（有旗標）+ 本機 localStorage 中未處理的訂單
+  var reviewN  = (window.PENDING_ORDERS && window.PENDING_ORDERS.review)  || 0;
+  var queueN   = 0;
+  try {
+    var q = JSON.parse(localStorage.getItem('gj_order_import_queue') || '[]');
+    queueN = Array.isArray(q) ? q.length : 0;
+  } catch(e) {}
+  var n = reviewN + queueN;
+  if (n !== pendingCount) {
+    pendingCount = n;
+    var saved = sessionStorage.getItem('goldenJadeTab') || '0';
+    renderTabs(currentSystems, parseInt(saved));
+  }
+}
+
+function switchSystem(idx) {
+  document.getElementById('systemFrame').src = currentSystems[idx].file;
+  renderTabs(currentSystems, idx);
+  sessionStorage.setItem('goldenJadeTab', idx);
+}
+
+function openApp(accountKey) {
+  var account = ACCOUNTS[accountKey];
+  if (!account) return;
+  // 機密頁僅本機看：公開站自動隱藏這些分頁，避免 404。
+  // ⚠️ 2026-10-19 修：原本只比對 github.io，但站台實際在 **Netlify**（*.netlify.app），
+  //    所以在 Netlify 上「損益表」分頁一直照顯示、點了就 404（檔案本來就在 publish_all 禁推清單）。
+  //    改為「只有本機(file:// 或 localhost)才算非公開」，並改成清單，新增機密頁只要加這裡。
+  var LOCAL_ONLY = ['TDS待辦追蹤.html', 'order_review.html', '台幣價審核.html', '台幣公式設定檢視.html', '國際採購下單系統.html', '損益表.html', '現金流預估表.html', '產品成本利潤報表.html', '異常預警看板.html'];
+  var isLocal = location.protocol === 'file:' ||
+                /^(localhost|127\.0\.0\.1|\[::1\])$/i.test(location.hostname);
+  currentSystems = account.systems.filter(function(s){
+    if (isLocal) return true;
+    var f = String(s.file).split('?')[0];
+    return LOCAL_ONLY.indexOf(f) === -1;
+  });
+  document.getElementById('login').style.display = 'none';
+  document.getElementById('app').style.display = 'grid';
+  document.getElementById('roleText').textContent = account.name + ' ｜ ' + account.scope;
+  var savedTab = parseInt(sessionStorage.getItem('goldenJadeTab') || '0');
+  var startIdx = savedTab < currentSystems.length ? savedTab : 0;
+  checkPending();
+  renderTabs(currentSystems, startIdx);
+  document.getElementById('systemFrame').src = currentSystems[startIdx].file;
+  sessionStorage.setItem('goldenJadeUser', accountKey);
+}
+
+// ───────────────────────────────────────────────────────────────
+// PIN 驗證：檔案裡只存 salt / iter / hash，不存 PIN 本身
+//   🔴2026-11-11：原本是 `account.pin !== pin` 明文比對 —— 要比對就得把 PIN 放在前端，
+//     而 github repo `3designaigc/GJ_Quotation` 是 public，未登入的 curl 就能讀到
+//     全部三組（含管理者）。Noah 用 Claude 看系統時就是這樣一次全看到的。
+//   改成 PBKDF2-HMAC-SHA256（WebCrypto，600,000 次迭代），只能驗證、無法反推。
+//   ⚠️當天的轉換是**拿既有 PIN 直接算雜湊**，所以大家的 PIN 沒變、沒有人被鎖在外面；
+//     但舊 PIN 已外洩，仍須另外更換（已去信請 Noah／Tina Kao 想新的）。
+//   PIN 以 03_腳本/set_pin.py 在本機設定（getpass 隱藏輸入），設定者以外無人看得到。
+//   ⚠️這仍是前端驗證，擋的是「讀檔就拿到密碼」，不是「不給進」——
+//     PIN 只控制 index 的分頁，擋不住直接打網址開檔。
+//     真正的門要靠 Netlify 站台層級密碼或把 repo 轉私有。
+function hex(buf) {
+  return Array.prototype.map.call(new Uint8Array(buf),
+    function (b) { return b.toString(16).padStart(2, '0'); }).join('');
+}
+
+function unhex(s) {
+  var a = new Uint8Array(s.length / 2);
+  for (var i = 0; i < a.length; i++) a[i] = parseInt(s.substr(i * 2, 2), 16);
+  return a;
+}
+
+function pinHash(pin, saltHex, iter) {
+  return crypto.subtle.importKey('raw', new TextEncoder().encode(pin),
+      'PBKDF2', false, ['deriveBits'])
+    .then(function (k) {
+      return crypto.subtle.deriveBits(
+        {name: 'PBKDF2', salt: unhex(saltHex), iterations: iter, hash: 'SHA-256'},
+        k, 256);
+    }).then(hex);
+}
+
+function login() {
+  var key = document.getElementById('account').value;
+  var pin = document.getElementById('pin').value;
+  var account = ACCOUNTS[key];
+  var err = document.getElementById('err');
+  if (!account || !account.hash) { err.style.display = 'block'; return; }
+  var btn = document.getElementById('loginBtn');
+  if (btn) btn.disabled = true;
+  pinHash(pin, account.salt, account.iter).then(function (h) {
+    if (btn) btn.disabled = false;
+    if (h !== account.hash) { err.style.display = 'block'; return; }
+    err.style.display = 'none';
+    openApp(key);
+  }).catch(function () {
+    if (btn) btn.disabled = false;
+    err.style.display = 'block';
+  });
+}
+
+function logout() {
+  if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+  pendingCount = 0;
+  sessionStorage.removeItem('goldenJadeUser');
+  sessionStorage.removeItem('goldenJadeTab');
+  document.getElementById('systemFrame').src = 'about:blank';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login').style.display = 'grid';
+  document.getElementById('pin').value = '';
+  currentSystems = [];
+}
+
+document.getElementById('pin').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') login();
+});
+
+var saved = sessionStorage.getItem('goldenJadeUser');
+if (saved && ACCOUNTS[saved]) openApp(saved);
+</script>
+</body>
+</html>
