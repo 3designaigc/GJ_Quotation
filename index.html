@@ -186,7 +186,7 @@ function openApp(accountKey) {
 // 登入：Cloudflare Access（2026-11-15 起）
 //   Tina 2026-11-15：「之前進階ERP的安全系統有問題（登錄），現在用 cloudflare 登錄。
 //   但是每個 email 登入看到資訊是不一樣的（參考之前登入原則）。」
-//   → 正式站 https://erp.vizken.com 前面是 Cloudflare Access（Zero Trust），
+//   → 正式站 https://sales.vizken.com（2026-11-15 由 erp.vizken.com 改名）前面是 Cloudflare Access（Zero Trust），
 //     使用者先在 Access 用自己的 email 收驗證碼登入；本頁不再有 PIN。
 //   → 進站後本頁向 Access 的 /cdn-cgi/access/get-identity 取回登入者 email，
 //     對應 ACCOUNTS[*].emails 決定是哪個帳號、看哪些分頁（原本的三組權限不變）。
@@ -197,7 +197,7 @@ function openApp(accountKey) {
 //     （本機檔案本來就只在 Tina 自己的裝置上）。
 //   ⚠️ 這只決定「index 顯示哪些分頁」；各支 HTML 的網址在 erp.vizken.com 上同樣受 Access 保護，
 //      但舊公開站（Netlify／GitHub Pages／public repo）上仍可直連，要另外關掉。
-var ACCESS_HOST = 'erp.vizken.com';
+var ACCESS_HOST = 'sales.vizken.com';
 
 function isLocalRun() {
   return location.protocol === 'file:' ||
