@@ -164,8 +164,12 @@ function openApp(accountKey) {
   //    所以在 Netlify 上「損益表」分頁一直照顯示、點了就 404（檔案本來就在 publish_all 禁推清單）。
   //    改為「只有本機(file:// 或 localhost)才算非公開」，並改成清單，新增機密頁只要加這裡。
   var LOCAL_ONLY = ['TDS待辦追蹤.html', 'order_review.html', '台幣價審核.html', '台幣公式設定檢視.html', '國際採購下單系統.html', '損益表.html', '現金流預估表.html', '產品成本利潤報表.html', '異常預警看板.html'];
+  // 2026-11-15：完整資料站 jade.vizken.com（Wrangler 本機直傳、Access 只放行管理者）
+  //   與本機同等級 —— 全部分頁都顯示；sales.vizken.com 仍照 LOCAL_ONLY 隱藏機密分頁。
+  var FULL_HOSTS = ['jade.vizken.com'];
   var isLocal = location.protocol === 'file:' ||
-                /^(localhost|127\.0\.0\.1|\[::1\])$/i.test(location.hostname);
+                /^(localhost|127\.0\.0\.1|\[::1\])$/i.test(location.hostname) ||
+                FULL_HOSTS.indexOf(location.hostname) !== -1;
   currentSystems = account.systems.filter(function(s){
     if (isLocal) return true;
     var f = String(s.file).split('?')[0];
